@@ -1,0 +1,17 @@
+scan codes:
+z = '-'
+x = '.'
+c = '/'
+v = '0'
+b = '1'
+n = '2'
+m = '3'
+, = '4'
+. = '5'
+/ = '6'
+lshift = '7'
+up = 'I'
+down = 'Q'
+left = 'L'
+right = 'N'
+
