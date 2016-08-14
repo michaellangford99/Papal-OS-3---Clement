@@ -70,7 +70,7 @@ int clement_vfs_mkfile(char* name, ata_atapi_device device) {
   ata_read(device.device_num, &fat_block, BLOCKS_PER_FAT, BOOT_BLOCKS);
   printf("mkfile '%s'\n", name);
   
-  //find if the file that we are going to create already exists
+  //find if the file that we are going to create already exists- if so, exit
   if (find_fat_entry(name, device) != -1){
     printf("....file %s already exists\n", name);
     printf("mkfile abort\n\n");
