@@ -338,9 +338,9 @@ int delete_data_block(int absolute_block_number, ata_atapi_device device) {
     return K_ERROR_M;
   }
   
-  uint8_t zero_block[device.blocksize];               
-  memset((char*)&zero_block[0], 0, device.blocksize);
-  
+  uint8_t zero_block[device.blocksize];                //declare zero block
+  memset((char*)&zero_block[0], 0, device.blocksize);  //set entire block to zeroes
+  ata_write(device.device_num, &zero_block, 1, absolute_block_number); //write block back to disk
   
   return K_SUCCESS;
 }
