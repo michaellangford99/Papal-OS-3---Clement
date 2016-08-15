@@ -234,11 +234,11 @@ int clement_vfs_write(char* name, ata_atapi_device device, char write_mode, char
   //writing from the beginning
   for (int i = 0; i < file_blocks; i++) //loop through blocks in file, getting their numbers - like traversing a linked list
   {
-    uint16_t data_block[device.blocksize];                                //read in the data block
-    ata_read(device.device_num, &data_block, 1, file_block_numbers[i]);   //..
-    //if (data_block[0] != USED_BLOCK) break;                             //error
-    if (data_block[1] == LAST_BLOCK) break;                               //if its the LAST_BLOCK we break before trying addressing the nect block num
-    file_block_numbers[i+1] = data_block[1];                              //save block number mentioned in NEXT_BLOCK field in data block  
+    uint16_t data_block[device.blocksize];                                  //read in the data block
+    ata_read(device.device_num, &data_block, 1, file_block_numbers[i]);     //..
+    //if (data_block[0] != USED_BLOCK) break;                               //error
+    if (data_block[1] == LAST_BLOCK) break;                                 //if its the LAST_BLOCK we break before trying addressing the nect block num
+    file_block_numbers[i+1] = data_block[1];                                //save block number mentioned in NEXT_BLOCK field in data block  
   }
   
   if (write_mode == FILE_OVERWRITE)         //if overwriting the file, we must first mark the first data bock as the last block
@@ -261,16 +261,17 @@ int clement_vfs_write(char* name, ata_atapi_device device, char write_mode, char
     if (blocks_in_new_file == 0) blocks_in_new_file = 1;                    //if data is smaller than what will fit in one block, 
                                                                             //the 'blocks needed' rounds down to zero. to fix this, there is a catch
 
+    printf("....file will occupy %d blocks\n", blocks_in_new_file);
+                                                                            
     //loop through each block to be written
-    for(int i = 0; i < blocks_in_new_file; i++) //write one block at a time
+    for(int i = 0; i < blocks_in_new_file; i++)                //write one block at a time
     {
-      printf("....file will occupy %d blocks\n", blocks_in_new_file);
       char dat[device.blocksize];                              //declare the block
       int block_number = find_free_block(device);              //find the next free block
       printf("....the next free block is %d\n", block_number);
-      if (i == 0) 
+      if (i == 0)                                              //if we are on the first block, we want to write to the first block of the old file
       {
-        block_number = file_block_numbers[0];        //if we are writing the first block, use the block number reffered to in FAT
+        block_number = file_block_numbers[0];                  //if we are writing the first block, use the block number referred to in FAT
         printf("....the first block in file is %d\n", block_number);
       }
       ata_read(device.device_num, &dat, 1, block_number);      //read in the block
@@ -278,22 +279,22 @@ int clement_vfs_write(char* name, ata_atapi_device device, char write_mode, char
       ata_write(device.device_num, &dat, 1, block_number);     //write block to disk
       dat[2] = find_free_block(device);                        //mark next block
       dat[3] = find_free_block(device) >> 8;                   //1 byte at a time  
-      for (int i = 4; i < device.blocksize; i++)               //loop through the block
+      for (int i = 4; i < device.blocksize; i++)               //loop through the block, starting at 4 (first 32 bits of data block are reserved)
       {
         dat[i] = *buffer;                                      //copy the data from buffer
         if (*buffer == '\0')                                   //stop after finding the EOS char
         {
-          dat[2] = LAST_BLOCK;
-          dat[3] = 0;
+          dat[2] = LAST_BLOCK;                                 //block has already been marked as used, what is left is to mark
+          dat[3] = LAST_BLOCK >> 8;                            //the second 16-bit value as the last block ( 0000 )
           printf("....finished writing buffer %d\n", i);
           printf("....now updating FAT entry\n");
-          fat_block[fat_entry_number_relative_to_block].blocks = blocks_in_new_file;
-          ata_write(device.device_num, &fat_block, 1, BOOT_BLOCKS + fat_block_number);
+          fat_block[fat_entry_number_relative_to_block].blocks = blocks_in_new_file;  //modify FAT entry to state the nmber of blocks in the file
+          ata_write(device.device_num, &fat_block, 1, BOOT_BLOCKS + fat_block_number);//actually write the FAT block back to the disk
           break;
         }
         buffer++;                                              //increase pointer to next char
       }
-      ata_write(device.device_num, &dat, 1, block_number); //write block to disk
+      ata_write(device.device_num, &dat, 1, block_number);     //write data block to disk
     }
   }
   printf("write done\n\n");
