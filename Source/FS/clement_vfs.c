@@ -250,17 +250,17 @@ int clement_vfs_write(char* name, ata_atapi_device device, char write_mode, char
     first_data_block[1] = LAST_BLOCK;                                         //change next block number to LAST_BLOCK
     ata_write(device.device_num, &first_data_block, 1, file_block_numbers[0]);//write back the data block
     printf("....marked first block in file \n....as the last block\n");
-    for (int i = 1; i < file_blocks; i++)                                  //start with the second block
+    
+    for (int i = 1; i < file_blocks; i++)                                   //start with the second block
     {
       printf("deleting block %d in list, #%d\n", i, file_block_numbers[i]);
-      uint16_t data_block[device.blocksize];                                //read in the data block
-      ata_read(device.device_num, &data_block, 1, file_block_numbers[i]);   //..
-      data_block[0] = FREE_BLOCK;                                           //mark the blocks as free
-      data_block[1] = 0;
-      ata_write(device.device_num, &data_block, 1, file_block_numbers[i]);  //write them back to the disk
+      delete_data_block(file_block_numbers[i], device);                     //delete the block, using subfunction
     }
-    int blocks_in_new_file = strlen(buffer)/device.blocksize + 1;
-    //if (blocks_in_new_file == 0) blocks_in_new_file = 1;
+    
+    int blocks_in_new_file = strlen(buffer)/(device.blocksize-4);           //find number of blocks needed to fit data
+    if (blocks_in_new_file == 0) blocks_in_new_file = 1;                    //if data is smaller than what will fi in one block, 
+                                                                            //the 'blocks needed' rounds down to zero. to fix this, there is a catch
+
     //loop through each block to be written
     for(int i = 0; i < blocks_in_new_file; i++) //write one block at a time
     {
