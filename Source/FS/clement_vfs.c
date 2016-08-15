@@ -60,6 +60,7 @@ int clement_vfs_format(ata_atapi_device device) {
   printf("format device %d done\n\n", device.device_num);
   return K_SUCCESS;
 }
+
 //fully commented and reviewed as non-buggy Vs 1
 int clement_vfs_mkfile(char* name, ata_atapi_device device) {
   
@@ -295,6 +296,7 @@ int clement_vfs_write(char* name, ata_atapi_device device, char write_mode, char
   return K_SUCCESS;
 }
 
+//fully commented and reviewed as non-buggy Vs 1
 int delete_fat_entry(char* name, ata_atapi_device device) {
   printf("delete_fat_entry '%s' on device %d\n", name, device.device_num);
   /*
@@ -331,15 +333,16 @@ int delete_fat_entry(char* name, ata_atapi_device device) {
   return K_SUCCESS;
 }
 
+//fully commented and reviewed as non-buggy Vs 1
 int delete_data_block(int absolute_block_number, ata_atapi_device device) {
-  if (absolute_block_number >= device.nblocks)         //check that the desired block to be deleted is actually on the disk
+  if (absolute_block_number >= device.nblocks)                         //check that the desired block to be deleted is actually on the disk
   {
     printf("ERROR -> delete_data_block -> data block %d does not exist\n", absolute_block_number);
     return K_ERROR_M;
   }
   
-  uint8_t zero_block[device.blocksize];                //declare zero block
-  memset((char*)&zero_block[0], 0, device.blocksize);  //set entire block to zeroes
+  uint8_t zero_block[device.blocksize];                                //declare zero block
+  memset((char*)&zero_block[0], 0, device.blocksize);                  //set entire block to zeroes
   ata_write(device.device_num, &zero_block, 1, absolute_block_number); //write block back to disk
   
   return K_SUCCESS;
