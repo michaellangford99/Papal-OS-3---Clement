@@ -1,9 +1,0 @@
-OBJECTS=boot.o kernel.o vga.o keyboard.o io.o console.o
-
-export PREFIX="$HOME/opt/cross"
-export TARGET=i686-elf
-export PATH="$PREFIX/bin:$PATH"
-export PATH="$HOME/opt/cross/bin:$PATH"
-
-i686-elf-as Source/boot.s -o Bin/boot.o
-i686-elf-g++ -c Source/kernel.c++ -o Bin/kernel.o -ffreestanding -O2 -Wall -Wextra -fno-exceptions -fno-rttiz
