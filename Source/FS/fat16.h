@@ -23,7 +23,6 @@
 
 #define FAT_16_RESERVED_SECTORS                1
 
-
 typedef struct {
   uint8_t    jmp[3];
   char       oem_name[8];

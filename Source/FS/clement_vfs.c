@@ -13,7 +13,7 @@
 //TODO : clement_vfs_find_file_size(char* name, ata_atapi_device device)
 //TODO : clement_vfs_defrag(ata_atapi_device device)
 //TODO : create_fat_entry(clement_vfs_fat_entry entry, ata_atapi_device device)
-
+//TODO : read_fat_entry
 
 //fully commented and reviewed as non-buggy Vs 1
 int clement_vfs_format(ata_atapi_device device) {
@@ -333,6 +333,8 @@ int clement_vfs_write(char* name, ata_atapi_device device, char write_mode, char
   printf("write done\n\n");
   return K_SUCCESS;
 }
+
+int create_fat_entry()
 
 //fully commented and reviewed as non-buggy Vs 1
 int delete_fat_entry(char* name, ata_atapi_device device) {
