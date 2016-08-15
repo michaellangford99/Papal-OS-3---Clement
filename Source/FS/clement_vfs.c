@@ -334,7 +334,7 @@ int clement_vfs_write(char* name, ata_atapi_device device, char write_mode, char
   return K_SUCCESS;
 }
 
-int create_fat_entry()
+int create_fat_entry() { return 0; }
 
 //fully commented and reviewed as non-buggy Vs 1
 int delete_fat_entry(char* name, ata_atapi_device device) {
