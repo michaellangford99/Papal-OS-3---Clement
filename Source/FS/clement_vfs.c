@@ -185,7 +185,7 @@ int clement_vfs_delfile(char* name, ata_atapi_device device) {
   ata_write(device.device_num, &fat_block, 1, BOOT_BLOCKS + fat_block_number);*/
   return K_SUCCESS;
 }
-
+//fully commented and reviewed as non -buggy Vs 1 - for OVERWRITE mode only, Append is still is progress
 int clement_vfs_write(char* name, ata_atapi_device device, char write_mode, char* buffer) {
   printf("write file %s\n", name);
   
