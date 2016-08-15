@@ -37,10 +37,10 @@ i686-elf-gcc -c Source/FS/fat16.c       -o Bin/fat16.o           -std=gnu99 -ffr
 
 i686-elf-gcc -T Source/linker.ld -o Bin/clement.bin -ffreestanding -O2 -nostdlib Bin/boot.o Bin/io.o Bin/mem.o Bin/multiboot.o Bin/kernel.o Bin/console.o Bin/keyboard.o Bin/ata.o Bin/vga.o Bin/interrupt.o Bin/pic.o Bin/string.o Bin/math.o Bin/gdt.o Bin/gdts.o Bin/idt.o Bin/idts.o Bin/clock.o Bin/fs.o Bin/clement_vfs.o Bin/fat16.o Bin/bintools.o -lgcc
 
-cp Bin/clement.bin Grub_Settings/boot/clement.bin
-cp Grub_Settings/grub.cfg Grub_Settings/boot/grub/grub.cfg
+cp Bin/clement.bin Grub/boot/clement.bin
+cp Grub/grub.cfg Grub/boot/grub/grub.cfg
 
-grub-mkrescue -o Build/clement.iso Grub_Settings
+grub-mkrescue -o Build/clement.iso Grub
 
 echo "--Build Clement OS--" >> buildlog.log
 date >> buildlog.log
