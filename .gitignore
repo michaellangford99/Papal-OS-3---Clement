@@ -37,3 +37,8 @@
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# my stuff
+push.sh
+commit.sh
+githelp.readme
