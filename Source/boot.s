@@ -62,6 +62,7 @@ _start:
 	# To set up a stack, we simply set the esp register to point to the top of
 	# our stack (as it grows downwards).
 	movl $stack_top, %esp
+	movl $stack_bottom, %ebp
 	
 	pushl %eax
 	pushl %ebx # Pointer to multiboot header
