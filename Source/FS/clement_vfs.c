@@ -297,6 +297,21 @@ int clement_vfs_write(char* name, ata_atapi_device device, char write_mode, char
       ata_write(device.device_num, &dat, 1, block_number);     //write data block to disk
     }
   }
+  if (write_mode == FILE_APPEND)
+  {
+    /*
+    For a file written using 'Append', we must first find the length of the new file in blocks. 
+    To do this, we must read in the last block of the current file, and see how much of it is utilized.
+    We can then find the total amount of characters currently in tbe file. We then add this to the total 
+    number of characters in the buffer to be appended to the file. We then use this to recalculate the total amount of blocks needed.
+    
+    Next, we read in the last block of the file, and the fat entry for the file. We change the  'number of blocks'
+    value in the fat entry to our newly calculated value. We then find free dat blocks to be used for the new blocks to be added.
+    We change the value of the 'next block' value in the last block of the old file to the number of the first block to be added.
+    We mark all the new blocks as used, and link them together (mark their 'next-block' values). Then we write (512-4) -> 508 bytes ( 1 block) of
+    data at a time to disk, until we reach the EOS character. We mark the last block as the last block, and write the FAT entry back to the disk.
+    */
+  }
   printf("write done\n\n");
   return K_SUCCESS;
 }
