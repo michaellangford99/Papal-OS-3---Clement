@@ -240,7 +240,6 @@ int clement_vfs_write(char* name, ata_atapi_device device, char write_mode, char
     if (data_block[1] == LAST_BLOCK) break;                               //if its the LAST_BLOCK we break before trying addressing the nect block num
     file_block_numbers[i+1] = data_block[1];                              //save block number mentioned in NEXT_BLOCK field in data block  
   }
-  //+++++Sunday 8/14 +++++//
   
   if (write_mode == FILE_OVERWRITE)         //if overwriting the file, we must first mark the first data bock as the last block
   {                                         //and then erase the other data blocks
@@ -257,7 +256,8 @@ int clement_vfs_write(char* name, ata_atapi_device device, char write_mode, char
       delete_data_block(file_block_numbers[i], device);                     //delete the block, using subfunction
     }
     
-    int blocks_in_new_file = strlen(buffer)/(device.blocksize-4);           //find number of blocks needed to fit data
+    int blocks_in_new_file = strlen(buffer)/(device.blocksize-4);           //find number of blocks needed to fit data. The first 32 bits of 
+                                                                            //each block are reserved for metadata
     if (blocks_in_new_file == 0) blocks_in_new_file = 1;                    //if data is smaller than what will fi in one block, 
                                                                             //the 'blocks needed' rounds down to zero. to fix this, there is a catch
 
