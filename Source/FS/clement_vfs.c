@@ -214,6 +214,7 @@ int clement_vfs_write(char* name, ata_atapi_device device, char write_mode, char
     fat_entry_number_relative_to_block = fat_entry_number % (device.blocksize/FAT_ENTRY_SIZE);
   }
   printf("....entry is in block %d, entry %d\n", fat_block_number + BOOT_BLOCKS, fat_entry_number_relative_to_block);
+  
   //read in the fat block containing our file's fat entry
   clement_vfs_fat_entry fat_block[device.blocksize/FAT_ENTRY_SIZE];
   ata_read(device.device_num, &fat_block, 1, BOOT_BLOCKS + fat_block_number);
@@ -221,8 +222,10 @@ int clement_vfs_write(char* name, ata_atapi_device device, char write_mode, char
   //find amount of blocks used by file
   int file_blocks = fat_block[fat_entry_number_relative_to_block].blocks;
   printf("....there are %d blocks in %s\n", file_blocks, name);
+  
   //declare container for block numbers of the file's blocks
   int file_block_numbers[file_blocks];
+  
   //set first block number as the block number of the first data block in the file
   file_block_numbers[0] = fat_block[fat_entry_number_relative_to_block].first_block;
   
@@ -237,6 +240,7 @@ int clement_vfs_write(char* name, ata_atapi_device device, char write_mode, char
     if (data_block[1] == LAST_BLOCK) break;                               //if its the LAST_BLOCK we break before trying addressing the nect block num
     file_block_numbers[i+1] = data_block[1];                              //save block number mentioned in NEXT_BLOCK field in data block  
   }
+  //+++++Sunday 8/14 +++++//
   
   if (write_mode == FILE_OVERWRITE)         //if overwriting the file, we must first mark the first data bock as the last block
   {                                         //and then erase the other data blocks

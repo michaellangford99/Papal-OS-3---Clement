@@ -41,6 +41,7 @@ int clement_vfs_delfile(char* name, ata_atapi_device device);
 int clement_vfs_write(char* name, ata_atapi_device device, char write_mode, char* buffer);
 
 int delete_fat_entry(char* name, ata_atapi_device device);
+int delete_datablock(int absolute_block_number, ata_atapi_device device);
 int find_fat_entry(char* name, ata_atapi_device device);
 int find_free_block(ata_atapi_device device);
 
