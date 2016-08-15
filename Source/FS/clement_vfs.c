@@ -138,53 +138,70 @@ int clement_vfs_mkfile(char* name, ata_atapi_device device) {
   return K_ERROR_M;
 }
 
+//fully commented and reviewed as non-buggy Vs 1
 int clement_vfs_delfile(char* name, ata_atapi_device device) {
-/*  //the first step is to read in the FAT blocks and try to find the file entry...
-  int fat_entry = find_fat_entry(device, name);
-  //read in the fat entry to find address of first block
-  int fat_block_number=0;
-  int fat_entry_number_relative_to_block = fat_entry;
-  if (fat_entry != 0)
+  printf("delete file %s\n", name);
+  
+  //find which entry is used by the file
+  int fat_entry_number = find_fat_entry(name, device);
+  
+  //check whether a file was found
+  if (fat_entry_number == -1)
   {
-    fat_block_number = fat_entry / (device.blocksize/FAT_ENTRY_SIZE);
-    fat_entry_number_relative_to_block = fat_entry % (device.blocksize/FAT_ENTRY_SIZE);
+    printf("....file %s not found\n", name);
+    printf("delete abort\n");
+    return K_ERROR_M;
   }
-  //read in the fat block
+  
+  //Now we must find which fat BLOCK the file is in
+  int fat_block_number=0;  // relative to the first fat block, not to the boot block
+  //fat_entry_number_relative_to_block is the entry number relative to the block that the entry is in - say, entry 5, in block 64. the full number would be entry 2053
+  int fat_entry_number_relative_to_block = 0;
+  
+  if (fat_entry_number != 0)//check whether it is entry zero, to stop division by zero error
+  {
+    fat_block_number = fat_entry_number / (device.blocksize/FAT_ENTRY_SIZE);
+    fat_entry_number_relative_to_block = fat_entry_number % (device.blocksize/FAT_ENTRY_SIZE);
+  }
+  printf("....entry is in block %d, entry %d\n", fat_block_number + BOOT_BLOCKS, fat_entry_number_relative_to_block);
+  
+  //read in the fat block containing our file's fat entry
   clement_vfs_fat_entry fat_block[device.blocksize/FAT_ENTRY_SIZE];
   ata_read(device.device_num, &fat_block, 1, BOOT_BLOCKS + fat_block_number);
   
+  //find amount of blocks used by file
   int file_blocks = fat_block[fat_entry_number_relative_to_block].blocks;
-  int block_numbers[file_blocks];
-  block_numbers[0] = fat_block[fat_entry_number_relative_to_block].first_block;
-  //next, find the first data block specified. after reading the next block number, 
-  //delete the block. repeat until the LAST_BLOCK constant is found...
-  for (int i = 0; i < file_blocks; i++)
+  printf("....there are %d blocks in %s\n", file_blocks, name);
+  
+  //declare container for block numbers of the file's blocks
+  int file_block_numbers[file_blocks];
+  
+  //set first block number as the block number of the first data block in the file
+  file_block_numbers[0] = fat_block[fat_entry_number_relative_to_block].first_block;
+  
+  //find first block. if it has more blocks in the list, keep navigating htrough untill the LAST_BLOCK
+  // is found. then, if APPEND, write from there. if not, mark all but the first block as free and continue 
+  //writing from the beginning
+  for (int i = 0; i < file_blocks; i++) //loop through blocks in file, getting their numbers - like traversing a linked list
   {
-    uint16_t data_block[device.blocksize];                                //read in the data block
-    ata_read(device.device_num, &data_block, 1, block_numbers[i]);        //..
-    //if (data_block[0] != USED_BLOCK) break;                             //error
-    if (data_block[1] == LAST_BLOCK) break;                               //if its the LAST_BLOCK we break before trying addressing the nect bnum
-    block_numbers[i+1] = data_block[1];                                   //save block number mentioned in NEXT_BLOCK field in data block  
+    uint16_t data_block[device.blocksize];                                  //read in the data block
+    ata_read(device.device_num, &data_block, 1, file_block_numbers[i]);     //..
+    //if (data_block[0] != USED_BLOCK) break;                               //error
+    if (data_block[1] == LAST_BLOCK) break;                                 //if its the LAST_BLOCK we break before trying addressing the nect block num
+    file_block_numbers[i+1] = data_block[1];                                //save block number mentioned in NEXT_BLOCK field in data block  
   }
-  for (int i = 0; i < file_blocks; i++)
+  //now that we have found all the block, numbers, we can delete them all!
+  for (int i = 0; i < file_blocks; i++) //loop through blocks in file, and delete them
   {
-    uint16_t data_block[device.blocksize];                                
-    ata_read(device.device_num, &data_block, 1, block_numbers[i]);        
-    data_block[0] = FREE_BLOCK;                             
-    data_block[1] = 0;   
-    ata_write(device.device_num, &data_block, 1, block_numbers[i]);        //..
+    delete_data_block(file_block_numbers[i], device);
   }
-  //then, delete the FAT entry...
-  fat_block[fat_entry_number_relative_to_block].in_use = 0;
-  for (int i = 0; i < MAX_CHARS_VFS_NAME; i++)
-  {
-    fat_block[fat_entry_number_relative_to_block].name[i] = 0;
-  }
-  fat_block[fat_entry_number_relative_to_block].blocks = 0;
-  fat_block[fat_entry_number_relative_to_block].first_block = 0;
-  ata_write(device.device_num, &fat_block, 1, BOOT_BLOCKS + fat_block_number);*/
+  //no delete the fat entry
+  delete_fat_entry(name, device);
+  
+  printf("delete done\n\n");
   return K_SUCCESS;
 }
+
 //fully commented and reviewed as non -buggy Vs 1 - for OVERWRITE mode only, Append is still is progress
 int clement_vfs_write(char* name, ata_atapi_device device, char write_mode, char* buffer) {
   printf("write file %s\n", name);

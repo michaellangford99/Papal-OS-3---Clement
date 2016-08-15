@@ -35,15 +35,14 @@ void kernel_main(struct multiboot_header* mboot_header, uint32_t multiboot_magic
 	
 	
 	fs_format(1, FS_CLEMENT_VFS);
-	clement_vfs_mkfile("foo.vfs", get_device(1));
-	clement_vfs_mkfile("bar", get_device(1));	
-	clement_vfs_mkfile("test.txt", get_device(1));
-	clement_vfs_write("test.txt", get_device(1), FILE_OVERWRITE, "hi, this is a very stupid test\nI hope you like it! Bye!");	
-	clement_vfs_mkfile("foo.txt", get_device(1));
-	clement_vfs_write("foo.txt", get_device(1), FILE_OVERWRITE, "hi again!\n\n\n\n\n\n\nlots of eols!\n");
+	clement_vfs_mkfile("file1", get_device(1));
+	clement_vfs_write("file1", get_device(1), FILE_OVERWRITE, "hi, this is a very stupid test\nI hope you like it! Bye!");	
+	clement_vfs_mkfile("file2", get_device(1));
+	clement_vfs_write("file2", get_device(1), FILE_OVERWRITE, "hi again!\n\n\n\n\n\n\nlots of eols!\n");
+	clement_vfs_mkfile("file3", get_device(1));
+	clement_vfs_write("file3", get_device(1), FILE_OVERWRITE, "hi again!\n\n\n\n\n\nmore of eols!\n");
 	
-	delete_fat_entry("foo", get_device(1));
-	delete_fat_entry("foo.txt", get_device(1));
+	clement_vfs_delfile("file2", get_device(1));
 	
 	printf("Clement 2.0 @ VirtualBox Ubuntu >> ");
 	
