@@ -258,7 +258,7 @@ int clement_vfs_write(char* name, ata_atapi_device device, char write_mode, char
     
     int blocks_in_new_file = strlen(buffer)/(device.blocksize-4);           //find number of blocks needed to fit data. The first 32 bits of 
                                                                             //each block are reserved for metadata
-    if (blocks_in_new_file == 0) blocks_in_new_file = 1;                    //if data is smaller than what will fi in one block, 
+    if (blocks_in_new_file == 0) blocks_in_new_file = 1;                    //if data is smaller than what will fit in one block, 
                                                                             //the 'blocks needed' rounds down to zero. to fix this, there is a catch
 
     //loop through each block to be written
