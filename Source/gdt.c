@@ -64,7 +64,7 @@ void encode_GDT_entry(uint8_t *target, struct GDT_sector_descriptor source)
 		printf("\nERROR: GDT sector descriptor limit value is invalid!\n");
 	}
 	if (source.limit > 65536) {
-		//adjust granumarity if required
+		//adjust granularity if required
 		source.limit = source.limit >> 12;
 		target[6] = 0xC0;
 	} else {

@@ -1,6 +1,7 @@
 #ifndef GDT_H
 #define GDT_H
 
+//constants for GDT
 #define SEGMENT_DESCRIPTORS    3
 #define SECTOR_CODE_DPL_0      0x9A
 #define SECTOR_DATA_DPL_0      0x92
