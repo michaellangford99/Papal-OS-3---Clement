@@ -42,4 +42,8 @@ cp Grub_Settings/grub.cfg Grub_Settings/boot/grub/grub.cfg
 
 grub-mkrescue -o Build/clement.iso Grub_Settings
 
+echo "--Build Clement OS--" >> buildlog.log
+date >> buildlog.log
+echo "" >> buildlog.log
+
 echo "Finished!"
