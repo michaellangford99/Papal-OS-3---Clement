@@ -12,6 +12,7 @@
 //TODO : clement_vfs_read(char* name, ata_atapi_device device, char* buffer, int length)
 //TODO : clement_vfs_find_file_size(char* name, ata_atapi_device device)
 //TODO : clement_vfs_defrag(ata_atapi_device device)
+//TODO : create_fat_entry(clement_vfs_fat_entry entry, ata_atapi_device device)
 
 
 //fully commented and reviewed as non-buggy Vs 1
