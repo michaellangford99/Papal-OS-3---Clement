@@ -40,9 +40,9 @@ int memory_init(struct multiboot_header* mboot_header)
   mem_map_size  = (uint32_t)mboot_header->mmap_length;
   mem_map_end = (uint32_t)mboot_header->mmap_addr + (uint32_t)mboot_header->mmap_length;
   
-  //printf("kernel location %d / %dKB\n", kernel_location, kernel_location/1024);
-  //printf(".......size     %d / %dKB\n", kernel_size, kernel_size/1024);
-  //printf(".......end      %d / %dKB\n", kernel_end, kernel_end/1024);  
+  //printf("kernel location %d / %dKB\n", kernel_location, kernel_location/MEM_MNGR_SLOT_SIZE);
+  //printf(".......size     %d / %dKB\n", kernel_size, kernel_size/MEM_MNGR_SLOT_SIZE);
+  //printf(".......end      %d / %dKB\n", kernel_end, kernel_end/MEM_MNGR_SLOT_SIZE);  
   
   mboot_memmap_t mmap_entries[memory_slots];
   memcpy((char*)&mmap_entries, (char*)mboot_header->mmap_addr, mboot_header->mmap_length);
@@ -56,14 +56,14 @@ int memory_init(struct multiboot_header* mboot_header)
       {
         mmap_entries[i].base_addr += (uint64_t)kernel_size;
         mmap_entries[i].length -= (uint64_t)kernel_size;
-          //printf("::::shrunk slot %d %d / %dKB\n", i, (uint32_t)kernel_size, (uint32_t)kernel_size / 1024);
+          //printf("::::shrunk slot %d %d / %dKB\n", i, (uint32_t)kernel_size, (uint32_t)kernel_size / MEM_MNGR_SLOT_SIZE);
       }
       if (mem_map_start >= (uint32_t)mmap_entries[i].base_addr && 
           mem_map_end <= ((uint32_t)mmap_entries[i].length+(uint32_t)mmap_entries[i].base_addr))
       {
         mmap_entries[i].base_addr += (uint64_t)mem_map_size;
         mmap_entries[i].length -= (uint64_t)mem_map_size;
-        //printf("::::shrunk slot %d %d / %dKB\n", i, (uint32_t)mem_map_size, (uint32_t)mem_map_size / 1024);
+        //printf("::::shrunk slot %d %d / %dKB\n", i, (uint32_t)mem_map_size, (uint32_t)mem_map_size / MEM_MNGR_SLOT_SIZE);
       }
       mmap_entries[i].length -= mmap_entries[i].length % (uint64_t)MEM_MNGR_SLOT_SIZE;
       
@@ -106,9 +106,9 @@ int memory_init(struct multiboot_header* mboot_header)
   {
     printf("mmap entry     %d\n", k);
     printf("....entry size %d\n", (uint32_t)mmap_entries[k].size);
-    printf("....addr       %d / %dKB\n", (uint32_t)mmap_entries[k].base_addr, (uint32_t)mmap_entries[k].base_addr/1024);
-    printf("....length     %d / %dKB\n", (uint32_t)mmap_entries[k].length, (uint32_t)mmap_entries[k].length/1024);
-    printf("....end addr   %d / %dKB\n", (uint32_t)mmap_entries[k].base_addr + (uint32_t)mmap_entries[k].length, ((uint32_t)mmap_entries[k].base_addr + (uint32_t)mmap_entries[k].length)/1024);
+    printf("....addr       %d / %dKB\n", (uint32_t)mmap_entries[k].base_addr, (uint32_t)mmap_entries[k].base_addr/MEM_MNGR_SLOT_SIZE);
+    printf("....length     %d / %dKB\n", (uint32_t)mmap_entries[k].length, (uint32_t)mmap_entries[k].length/MEM_MNGR_SLOT_SIZE);
+    printf("....end addr   %d / %dKB\n", (uint32_t)mmap_entries[k].base_addr + (uint32_t)mmap_entries[k].length, ((uint32_t)mmap_entries[k].base_addr + (uint32_t)mmap_entries[k].length)/MEM_MNGR_SLOT_SIZE);
     printf("....type       %d\n\n", (uint32_t)mmap_entries[k].type);
   }*/
   
