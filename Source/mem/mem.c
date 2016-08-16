@@ -117,12 +117,12 @@ int memory_init(struct multiboot_header* mboot_header)
           
           
           //align slot on 4K boundary
-          uint32_t decrease = MEM_MNGR_SLOT_SIZE - ((uint32_t)mmap_entries[i].base_addr % MEM_MNGR_SLOT_SIZE);
+          uint32_t decrease = MEM_MNGR_SLOT_SIZE - ((uint32_t)mmap_entries[j].base_addr % MEM_MNGR_SLOT_SIZE);
           decrease = decrease % MEM_MNGR_SLOT_SIZE;
-          mmap_entries[i].base_addr += (uint64_t)decrease;
-          mmap_entries[i].length -= (uint64_t)decrease;
+          mmap_entries[j].base_addr += (uint64_t)decrease;
+          mmap_entries[j].length -= (uint64_t)decrease;
           
-          mmap_entries[i].length -= mmap_entries[i].length % (uint64_t)MEM_MNGR_SLOT_SIZE; // make each entry try to fit in block size
+          mmap_entries[j].length -= mmap_entries[j].length % (uint64_t)MEM_MNGR_SLOT_SIZE; // make each entry try to fit in block size
           
           
           
