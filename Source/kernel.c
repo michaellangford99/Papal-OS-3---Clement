@@ -34,15 +34,15 @@ void kernel_main(struct multiboot_header* mboot_header, uint32_t multiboot_magic
 	multiboot_dump(multiboot_get_address());           //.
 	
 	
-	fs_format(1, FS_CLEMENT_VFS);
+	//fs_format(1, FS_CLEMENT_VFS);
 	clement_vfs_mkfile("file1", get_device(1));
-	clement_vfs_write("file1", get_device(1), FILE_OVERWRITE, "hi, this is a very stupid test\nI hope you like it! Bye!");	
+	//clement_vfs_write("file1", get_device(1), FILE_OVERWRITE, "hi, this is a very stupid test\nI hope you like it! Bye!");	
 	clement_vfs_mkfile("file2", get_device(1));
-	clement_vfs_write("file2", get_device(1), FILE_OVERWRITE, "hi again!\n\n\n\n\n\n\nlots of eols!\n");
+	//clement_vfs_write("file2", get_device(1), FILE_OVERWRITE, "hi again!\n\n\n\n\n\n\nlots of eols!\n");
 	clement_vfs_mkfile("file3", get_device(1));
-	clement_vfs_write("file3", get_device(1), FILE_OVERWRITE, "hi again!\n\n\n\n\n\nmore of eols!\n");
+	//clement_vfs_write("file3", get_device(1), FILE_OVERWRITE, "hi again!\n\n\n\n\n\nmore of eols!\n");
 	
-	clement_vfs_delfile("file2", get_device(1));
+	//clement_vfs_delfile("file2", get_device(1));
 	
 	printf("Clement 2.0 @ VirtualBox Ubuntu >> ");
 	
