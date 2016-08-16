@@ -20,7 +20,11 @@ uint32_t* kmalloc(uint32_t length);
 int kfree(uint32_t* base, uint32_t length);
 
 
-int get_bitmap_size();
-int get_bitmap_addr();
+uint64_t get_bitmap_size();
+uint32_t get_bitmap_addr();
+
+uint32_t get_kernel_location();
+uint32_t get_kernel_size();
+uint32_t get_kernel_end();
 
 #endif
