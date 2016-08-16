@@ -11,9 +11,10 @@ cd
 cd 'Operating System/Clement'
 clear
 
-i686-elf-as Source/boot.s -o Bin/boot.o
-nasm -felf Source/gdt.asm -o Bin/gdts.o
-nasm -felf Source/idt.asm -o Bin/idts.o
+i686-elf-as Source/boot.s           -o Bin/boot.o
+nasm -felf Source/gdt.asm           -o Bin/gdts.o
+nasm -felf Source/idt.asm           -o Bin/idts.o
+nasm -felf Source/mem/paging.asm    -o Bin/paging.o
 
 i686-elf-gcc -c Source/kernel.c         -o Bin/kernel.o          -std=gnu99 -ffreestanding -O2 -Wall -Wextra
 i686-elf-gcc -c Source/multiboot.c      -o Bin/multiboot.o       -std=gnu99 -ffreestanding -O2 -Wall -Wextra

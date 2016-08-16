@@ -340,3 +340,19 @@ uint32_t get_bitmap_addr() { return bitmap_addr; }
 uint32_t get_kernel_location() { return kernel_location; }
 uint32_t get_kernel_size() { return kernel_size; }
 uint32_t get_kernel_end() { return kernel_end; }
+
+memory_info_t get_memory_info() {
+  memory_info_t m;
+  m.kernel_location=kernel_location;
+  m.kernel_size=kernel_size;
+  m.kernel_end=kernel_end;
+  m.mem_map_start=mem_map_start;
+  m.mem_map_size=mem_map_size;
+  m.mem_map_end=mem_map_end;
+  m.total_memory_size=total_memory_size;
+  m.alloc_size=alloc_size; 
+  m.bitmap_size=bitmap_size;
+  m.bitmap_addr=bitmap_addr;
+  
+  return m;
+}
