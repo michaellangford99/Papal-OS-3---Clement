@@ -5,7 +5,7 @@
 #define MEM_MNGR_2KB_SLOT         2
 #define MEM_MNGR_FREE_SLOT        0
 #define MEM_MNGR_USED_SLOT        1
-#define MEM_MNGR_SLOT_SIZE     1024
+#define MEM_MNGR_SLOT_SIZE     4096
 #define MEM_MNGR_LAST_BLOCK       0
 
 typedef struct {
