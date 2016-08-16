@@ -43,7 +43,8 @@ void kernel_main(struct multiboot_header* mboot_header, uint32_t multiboot_magic
 	printf("kernel_end      : 0x%x,   %d bytes,    %d KB\n", kernel_end, kernel_end, kernel_end/1024);
 	
 	printf("bitmap location : 0x%x,   %d bytes     %d KB\n", bitmap_addr, bitmap_addr, bitmap_addr/1024);
-	
+	uint32_t ptr = (uint32_t)kmalloc((uint32_t)4096);
+	printf("kmalloc(4096) returns address: %d, %d KB\n", ptr, ptr/1024);
 	//fs_format(1, FS_CLEMENT_VFS);
 	//clement_vfs_mkfile("file1", get_device(1));
 	//clement_vfs_write("file1", get_device(1), FILE_OVERWRITE, "hi, this is a very stupid test\nI hope you like it! Bye!");	
