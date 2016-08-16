@@ -98,7 +98,7 @@ int memory_init(struct multiboot_header* mboot_header)
   
   //printf("bitmap size: %d\n", (uint32_t)(bitmap_size));
   //printf("allocatable memory: %d\n", (uint32_t)(alloc_size));
-  
+   
   //find if bitmap will fit in a free slot
   
   for (uint32_t j = 0; j < memory_slots; j++)
