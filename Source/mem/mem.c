@@ -298,3 +298,6 @@ int kfree(uint32_t* base, uint32_t length)
   memset((char*)base, 0, mem_blocks);
   return K_SUCCESS;
 }
+
+int get_bitmap_size() { return bitmap_size; }
+int get_bitmap_addr() { return bitmap_addr; }

@@ -10,12 +10,11 @@ This kernel is based off of the "Bare Bones" demo on osdev.org
 void kernel_main(struct multiboot_header* mboot_header, uint32_t multiboot_magic) {
 	
 	int continue_boot = multiboot_init(mboot_header, multiboot_magic);
-	if (continue_boot == K_FATAL) { /*loop forever, don't boot*/ while(true) { } }
+	if (continue_boot == K_FATAL) { /*loop forever, don't boot*/ printf("multiboot panic!!!!"); while(true) { } }
 	
 	memory_init(multiboot_get_address());              //. gotta be first
 	
 	graphics_init(multiboot_get_vbe_address());        //basic initial boot-time drivers
-	
 	console_init();                                    //.
 	
 	//start basic drivers
@@ -32,7 +31,6 @@ void kernel_main(struct multiboot_header* mboot_header, uint32_t multiboot_magic
 	
 	//data dump
 	multiboot_dump(multiboot_get_address());           //.
-	
 	
 	//fs_format(1, FS_CLEMENT_VFS);
 	clement_vfs_mkfile("file1", get_device(1));

@@ -19,4 +19,8 @@ int memory_init(struct multiboot_header* mboot_header);
 uint32_t* kmalloc(uint32_t length);
 int kfree(uint32_t* base, uint32_t length);
 
+
+int get_bitmap_size();
+int get_bitmap_addr();
+
 #endif
