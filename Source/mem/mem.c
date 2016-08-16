@@ -53,6 +53,8 @@ int memory_init(struct multiboot_header* mboot_header)
     {
       if ((uint32_t)mmap_entries[i].base_addr >= kernel_location)
       {
+        
+        //exclude kernel
         if (kernel_location >= (uint32_t)mmap_entries[i].base_addr && 
             kernel_end <= ((uint32_t)mmap_entries[i].length+(uint32_t)mmap_entries[i].base_addr))
         {
@@ -60,6 +62,8 @@ int memory_init(struct multiboot_header* mboot_header)
           mmap_entries[i].length -= (uint64_t)kernel_size;
             //printf("::::shrunk slot %d %d / %dKB\n", i, (uint32_t)kernel_size, (uint32_t)kernel_size / MEM_MNGR_SLOT_SIZE);
         }
+        
+        //exclude memory map
         if (mem_map_start >= (uint32_t)mmap_entries[i].base_addr && 
             mem_map_end <= ((uint32_t)mmap_entries[i].length+(uint32_t)mmap_entries[i].base_addr))
         {
@@ -67,9 +71,20 @@ int memory_init(struct multiboot_header* mboot_header)
           mmap_entries[i].length -= (uint64_t)mem_map_size;
           //printf("::::shrunk slot %d %d / %dKB\n", i, (uint32_t)mem_map_size, (uint32_t)mem_map_size / MEM_MNGR_SLOT_SIZE);
         }
+        
+        //align slot on 4K boundary
+        uint32_t decrease = MEM_MNGR_SLOT_SIZE - ((uint32_t)mmap_entries[i].base_addr % MEM_MNGR_SLOT_SIZE);
+        decrease = decrease % MEM_MNGR_SLOT_SIZE;
+        mmap_entries[i].base_addr += (uint64_t)decrease;
+        mmap_entries[i].length -= (uint64_t)decrease;
+        
         mmap_entries[i].length -= mmap_entries[i].length % (uint64_t)MEM_MNGR_SLOT_SIZE; // make each entry try to fit in block size
         
+        
         total_memory_size +=  (uint32_t)mmap_entries[i].length;
+      }
+      else{
+        mmap_entries[i].type = MULTIBOOT_MMAP_RESERVED;
       }
     }
   }
@@ -99,6 +114,17 @@ int memory_init(struct multiboot_header* mboot_header)
           
           mmap_entries[j].base_addr += (uint64_t)bitmap_size;
           mmap_entries[j].length -= (uint64_t)bitmap_size;
+          
+          
+          //align slot on 4K boundary
+          uint32_t decrease = MEM_MNGR_SLOT_SIZE - ((uint32_t)mmap_entries[i].base_addr % MEM_MNGR_SLOT_SIZE);
+          decrease = decrease % MEM_MNGR_SLOT_SIZE;
+          mmap_entries[i].base_addr += (uint64_t)decrease;
+          mmap_entries[i].length -= (uint64_t)decrease;
+          
+          mmap_entries[i].length -= mmap_entries[i].length % (uint64_t)MEM_MNGR_SLOT_SIZE; // make each entry try to fit in block size
+          
+          
           
           //printf("bitmap will fit in and has been stored in memory slot %d\n", j);
           break;

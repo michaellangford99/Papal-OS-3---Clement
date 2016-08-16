@@ -36,7 +36,7 @@ void kernel_main(struct multiboot_header* mboot_header, uint32_t multiboot_magic
   uint32_t kernel_size = get_kernel_size();
   uint32_t kernel_end = get_kernel_end();
 	
-	uint32_t bitmap_addr = (uint32_t)get_bitmap_addr();
+	uint32_t bitmap_addr = get_bitmap_addr();
 	
 	printf("kernel_location : 0x%x,   %d bytes,    %d KB\n", kernel_location, kernel_location, kernel_location/1024);
 	printf("kernel_size     : 0x%x,   %d bytes,    %d KB\n", kernel_size, kernel_size, kernel_size/1024);
