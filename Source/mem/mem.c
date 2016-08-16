@@ -40,9 +40,9 @@ int memory_init(struct multiboot_header* mboot_header)
   mem_map_size  = (uint32_t)mboot_header->mmap_length;
   mem_map_end = (uint32_t)mboot_header->mmap_addr + (uint32_t)mboot_header->mmap_length;
   
-  //printf("kernel location %d / %dKB\n", kernel_location, kernel_location/MEM_MNGR_SLOT_SIZE);
-  //printf(".......size     %d / %dKB\n", kernel_size, kernel_size/MEM_MNGR_SLOT_SIZE);
-  //printf(".......end      %d / %dKB\n", kernel_end, kernel_end/MEM_MNGR_SLOT_SIZE);  
+  //printf("kernel location %d / %dKB\n", kernel_location, kernel_location/1024);
+  //printf(".......size     %d / %dKB\n", kernel_size, kernel_size/1024);
+  //printf(".......end      %d / %dKB\n", kernel_end, kernel_end/1024);  
   
   mboot_memmap_t mmap_entries[memory_slots];
   memcpy((char*)&mmap_entries, (char*)mboot_header->mmap_addr, mboot_header->mmap_length);
@@ -51,23 +51,26 @@ int memory_init(struct multiboot_header* mboot_header)
   {
     if ((uint32_t)mmap_entries[i].type == MULTIBOOT_MMAP_FREE_MEMORY)
     {
-      if (kernel_location >= (uint32_t)mmap_entries[i].base_addr && 
-          kernel_end <= ((uint32_t)mmap_entries[i].length+(uint32_t)mmap_entries[i].base_addr))
+      if ((uint32_t)mmap_entries[i].base_addr >= kernel_location)
       {
-        mmap_entries[i].base_addr += (uint64_t)kernel_size;
-        mmap_entries[i].length -= (uint64_t)kernel_size;
-          //printf("::::shrunk slot %d %d / %dKB\n", i, (uint32_t)kernel_size, (uint32_t)kernel_size / MEM_MNGR_SLOT_SIZE);
+        if (kernel_location >= (uint32_t)mmap_entries[i].base_addr && 
+            kernel_end <= ((uint32_t)mmap_entries[i].length+(uint32_t)mmap_entries[i].base_addr))
+        {
+          mmap_entries[i].base_addr += (uint64_t)kernel_size;
+          mmap_entries[i].length -= (uint64_t)kernel_size;
+            //printf("::::shrunk slot %d %d / %dKB\n", i, (uint32_t)kernel_size, (uint32_t)kernel_size / MEM_MNGR_SLOT_SIZE);
+        }
+        if (mem_map_start >= (uint32_t)mmap_entries[i].base_addr && 
+            mem_map_end <= ((uint32_t)mmap_entries[i].length+(uint32_t)mmap_entries[i].base_addr))
+        {
+          mmap_entries[i].base_addr += (uint64_t)mem_map_size;
+          mmap_entries[i].length -= (uint64_t)mem_map_size;
+          //printf("::::shrunk slot %d %d / %dKB\n", i, (uint32_t)mem_map_size, (uint32_t)mem_map_size / MEM_MNGR_SLOT_SIZE);
+        }
+        mmap_entries[i].length -= mmap_entries[i].length % (uint64_t)MEM_MNGR_SLOT_SIZE; // make each entry try to fit in block size
+        
+        total_memory_size +=  (uint32_t)mmap_entries[i].length;
       }
-      if (mem_map_start >= (uint32_t)mmap_entries[i].base_addr && 
-          mem_map_end <= ((uint32_t)mmap_entries[i].length+(uint32_t)mmap_entries[i].base_addr))
-      {
-        mmap_entries[i].base_addr += (uint64_t)mem_map_size;
-        mmap_entries[i].length -= (uint64_t)mem_map_size;
-        //printf("::::shrunk slot %d %d / %dKB\n", i, (uint32_t)mem_map_size, (uint32_t)mem_map_size / MEM_MNGR_SLOT_SIZE);
-      }
-      mmap_entries[i].length -= mmap_entries[i].length % (uint64_t)MEM_MNGR_SLOT_SIZE;
-      
-      total_memory_size +=  (uint32_t)mmap_entries[i].length;
     }
   }
   
@@ -87,16 +90,19 @@ int memory_init(struct multiboot_header* mboot_header)
   {
     if ((uint32_t)mmap_entries[j].type == MULTIBOOT_MMAP_FREE_MEMORY)
     {
-      if ((uint32_t)mmap_entries[j].length >= bitmap_size)
+      if ((uint32_t)mmap_entries[j].base_addr >= kernel_location)
       {
-        //if it does, save it there, and shrink the slot. allocate the bitmap for the memmanager
-        bitmap_addr = (uint32_t)mmap_entries[j].base_addr;
-        
-        mmap_entries[j].base_addr += (uint64_t)bitmap_size;
-        mmap_entries[j].length -= (uint64_t)bitmap_size;
-        
-        //printf("bitmap will fit in and has been stored in memory slot %d\n", j);
-        break;
+        if ((uint32_t)mmap_entries[j].length >= bitmap_size)
+        {
+          //if it does, save it there, and shrink the slot. allocate the bitmap for the memmanager
+          bitmap_addr = (uint32_t)mmap_entries[j].base_addr;
+          
+          mmap_entries[j].base_addr += (uint64_t)bitmap_size;
+          mmap_entries[j].length -= (uint64_t)bitmap_size;
+          
+          //printf("bitmap will fit in and has been stored in memory slot %d\n", j);
+          break;
+        }
       }
     }
   }
@@ -172,12 +178,15 @@ uint32_t* kmalloc(uint32_t length)
       {
         if ((uint32_t)mmap_entries[slot].type == MULTIBOOT_MMAP_FREE_MEMORY)
         {
-          blocks_passed += (uint32_t)mmap_entries[slot].length/MEM_MNGR_SLOT_SIZE;
-          if (blocks_passed > i)
+          if ((uint32_t)mmap_entries[slot].base_addr >= kernel_location)
           {
-            uint32_t addr_to_return = (i - (blocks_passed - (uint32_t)mmap_entries[slot].length/MEM_MNGR_SLOT_SIZE))*MEM_MNGR_SLOT_SIZE + (uint32_t)mmap_entries[slot].base_addr;
-            //printf("returning address %d\n", addr_to_return);
-            return (uint32_t*)addr_to_return;
+            blocks_passed += (uint32_t)mmap_entries[slot].length/MEM_MNGR_SLOT_SIZE;
+            if (blocks_passed > i)
+            {
+              uint32_t addr_to_return = (i - (blocks_passed - (uint32_t)mmap_entries[slot].length/MEM_MNGR_SLOT_SIZE))*MEM_MNGR_SLOT_SIZE + (uint32_t)mmap_entries[slot].base_addr;
+              //printf("returning address %d\n", addr_to_return);
+              return (uint32_t*)addr_to_return;
+            }
           }
         }
       }  
@@ -299,5 +308,9 @@ int kfree(uint32_t* base, uint32_t length)
   return K_SUCCESS;
 }
 
-int get_bitmap_size() { return bitmap_size; }
-int get_bitmap_addr() { return bitmap_addr; }
+uint64_t get_bitmap_size() { return bitmap_size; }
+uint32_t get_bitmap_addr() { return bitmap_addr; }
+
+uint32_t get_kernel_location() { return kernel_location; }
+uint32_t get_kernel_size() { return kernel_size; }
+uint32_t get_kernel_end() { return kernel_end; }
