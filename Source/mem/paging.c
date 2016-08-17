@@ -12,7 +12,7 @@ int init_paging() {
   This basic paging code just identity maps the entire 4GB address space.
   */
   
-  printf("address of page directory: 0x%x / %d / %d KB", (uint32_t)&page_directory, (uint32_t)&page_directory, ((uint32_t)&page_directory)/1024);
+  printf("page_directory addr: 0x%x / %d / %d KB\n", (uint32_t)&page_directory, (uint32_t)&page_directory, ((uint32_t)&page_directory)/1024);
   
   //first, set all entries in page directory to NP
   unsigned int i;

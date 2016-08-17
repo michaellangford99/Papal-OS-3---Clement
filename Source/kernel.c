@@ -22,6 +22,8 @@ void kernel_main(struct multiboot_header* mboot_header, uint32_t multiboot_magic
 	idt_init();                                        //.
 	clock_init();                                      //.
 	keyboard_init();                                   //.
+	//init paging
+	init_paging();
 	
 	//start higher level drivers
 	ata_init();                                        //.
@@ -29,9 +31,6 @@ void kernel_main(struct multiboot_header* mboot_header, uint32_t multiboot_magic
 	
 	//data dump
 	multiboot_dump(multiboot_get_address());           //.
-	
-	//init paging
-	init_paging();
 	
 	/*
 	uint32_t kernel_location = get_kernel_location();
