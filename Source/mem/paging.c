@@ -1,15 +1,21 @@
 #include "../system.h"
 
-uint32_t* page_directory;
-//page_table_t* page_tables[1024]
+uint32_t page_directory[1024] __attribute__((aligned(4096)));
+page_table_t page_tables[1024] __attribute__((aligned(4096)));;
 
-uint32_t page_table_1[1024] __attribute__((aligned(4096)));
+//link to assembly routines
+extern void loadPageDirectory(uint32_t*);
+extern void enablePaging();
 
 int init_paging() {
-  page_directory = kmalloc(1024);
+  /*
+  This basic paging code just identity maps the entire 4GB address space.
+  */
   
-  //from : http://wiki.osdev.org/Setting_Up_Paging
-  int i;
+  printf("address of page directory: 0x%x / %d / %d KB", (uint32_t)&page_directory, (uint32_t)&page_directory, ((uint32_t)&page_directory)/1024);
+  
+  //first, set all entries in page directory to NP
+  unsigned int i;
   for(i = 0; i < 1024; i++)
   {
       // This sets the following flags to the pages:
@@ -19,20 +25,28 @@ int init_paging() {
       page_directory[i] = 0x00000002;
   }
   
-  // holds the physical address where we want to start mapping these pages to.
-  // in this case, we want to map these pages to the very beginning of memory.
-  unsigned int j;
-   
-  //we will fill all 1024 entries in the table, mapping 4 megabytes
-  for(j = 0; j < 1024; j++)
+  //Fill all 1024 entries in all 1024 page tables
+  for (int pt = 0; pt < 1024; pt++)
   {
-      // As the address is page aligned, it will always leave 12 bits zeroed.
-      // Those bits are used by the attributes ;)
-      page_table_1[j] = (j * 0x1000) | 3; // attributes: supervisor level, read/write, present.
+    for(i = 0; i < 1024; i++)
+    {
+        // As the address is page aligned, it will always leave 12 bits zeroed.
+        // Those bits are used by the attributes ;)
+        page_tables[pt].page_table[i] = ((1024*pt + i) * 0x1000) | 3; // attributes: supervisor level, read/write, present.
+    }
   }
   
+  //put all 1024 page tables into the page directory
   // attributes: supervisor level, read/write, present
-  page_directory[0] = ((unsigned int)first_page_table) | 3;
+  for (i = 0; i < 1024; i++)
+  {
+    page_directory[i] = ((unsigned int)&page_tables[i]) | 3;
+  }
+  
+  loadPageDirectory(&(page_directory[0]));
+  enablePaging();
+  
+  printf("paging: ready\n");
   
   return K_SUCCESS;
 }
