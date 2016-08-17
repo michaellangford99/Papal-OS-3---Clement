@@ -12,6 +12,7 @@ int init_paging() {
   This basic paging code just identity maps the entire 4GB address space.
   */
   
+  //allocate 1KB for page directory
   page_directory = kmalloc(1024);
   
   printf("page_directory addr: 0x%x / %d / %d KB\n", (uint32_t)&page_directory, (uint32_t)&page_directory, ((uint32_t)&page_directory)/1024);
