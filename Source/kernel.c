@@ -23,8 +23,6 @@ void kernel_main(struct multiboot_header* mboot_header, uint32_t multiboot_magic
 	clock_init();                                      //.
 	keyboard_init();                                   //.
 	
-	//graphics_test();
-	
 	//start higher level drivers
 	ata_init();                                        //.
 	fs_init();                                         //.
@@ -32,6 +30,10 @@ void kernel_main(struct multiboot_header* mboot_header, uint32_t multiboot_magic
 	//data dump
 	multiboot_dump(multiboot_get_address());           //.
 	
+	//init paging
+	init_paging();
+	
+	/*
 	uint32_t kernel_location = get_kernel_location();
   uint32_t kernel_size = get_kernel_size();
   uint32_t kernel_end = get_kernel_end();
@@ -42,10 +44,7 @@ void kernel_main(struct multiboot_header* mboot_header, uint32_t multiboot_magic
 	printf("kernel_size     : 0x%x,   %d bytes,    %d KB\n", kernel_size, kernel_size, kernel_size/1024);
 	printf("kernel_end      : 0x%x,   %d bytes,    %d KB\n", kernel_end, kernel_end, kernel_end/1024);
 	
-	printf("bitmap location : 0x%x,   %d bytes     %d KB\n", bitmap_addr, bitmap_addr, bitmap_addr/1024);
-	
-	uint32_t ptr = (uint32_t)kmalloc((uint32_t)4096);
-	printf("kmalloc(4096) returns address: %d, %d KB\n", ptr, ptr/1024);
+	printf("memory bitmap location : 0x%x,   %d bytes     %d KB\n", bitmap_addr, bitmap_addr, bitmap_addr/1024);
 	
 	//fs_format(1, FS_CLEMENT_VFS);
 	//clement_vfs_mkfile("file1", get_device(1));
@@ -56,7 +55,7 @@ void kernel_main(struct multiboot_header* mboot_header, uint32_t multiboot_magic
 	//clement_vfs_write("file3", get_device(1), FILE_OVERWRITE, "hi again!\n\n\n\n\n\nmore of eols!\n");
 	
 	//clement_vfs_delfile("file2", get_device(1));
-	
+	*/
 	printf("Clement 2.0 @ VirtualBox Ubuntu >> ");
 	
 	
