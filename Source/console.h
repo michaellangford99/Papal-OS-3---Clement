@@ -1,7 +1,4 @@
 /*
-Copyright (C) 2016 Michael Langford
-This software is distributed under the GNU General Public License.
-
 The bulk of this code is based off of software in the 'base_kernel' project
 by Douglas Thain (dthain, Github), but in many cases has been heavily modified.
 */

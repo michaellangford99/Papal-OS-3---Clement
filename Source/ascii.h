@@ -1,6 +1,5 @@
 /*
-Copyright (C) 2015 The University of Notre Dame
-This software is distributed under the GNU General Public License.
+from 'BaseKernel' project of Douglas Thain (dthain, Github)
 */
 
 #ifndef _ASCII_H

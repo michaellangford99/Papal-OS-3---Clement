@@ -1,10 +1,3 @@
-/*
-Copyright (C) 2016 Michael Langford
-This software is distributed under the GNU General Public License.
-
-This kernel is based off of the "Bare Bones" demo on osdev.org
-*/
-
 #include "system.h"
 
 void kernel_main(struct multiboot_header* mboot_header, uint32_t multiboot_magic) {

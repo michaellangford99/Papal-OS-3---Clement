@@ -1,7 +1,5 @@
 /*
-Copyright (C) 2015 The University of Notre Dame
-This software is distributed under the GNU General Public License.
-
+loosely based off of 'BaseKernel' project of Douglas Thain (dthain, Github)
 used as basic irq functions
 */
 

@@ -1,3 +1,4 @@
+//closely based off of 'BaseKernel' project of Douglas Thain (dthain, Github)
 #include "system.h"
 
 #define CLICKS_PER_SECOND 60

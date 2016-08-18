@@ -1,6 +1,3 @@
-# Copyright (C) 2016 Michael Langford
-# This software is distributed under the GNU General Public License.
-
 # This .s file is based off of the "Bare Bones" demo on osdev.org
 
 # Declare constants used for creating a multiboot header.

@@ -1,7 +1,4 @@
 /*
-Copyright (C) 2016 Michael Langford
-This software is distributed under the GNU General Public License.
-
 'enum vga_color' and
 'putpixel()' are basic vga code based off of osdev "Drawing in Protected Mode" demo.
 

@@ -1,7 +1,4 @@
 /*
-Copyright (C) 2016 Michael Langford
-This software is distributed under the GNU General Public License.
-
 This is the main system header
 */
 
