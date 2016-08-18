@@ -15,6 +15,8 @@ int init_paging() {
   //allocate 1KB for page directory
   page_directory = kmalloc(1024);
   
+  //page_tables = (page_table_t*)kmalloc(1024 * sizeof(page_table_t));
+  
   printf("page_directory addr: 0x%x / %d / %d KB\n", (uint32_t)&page_directory, (uint32_t)&page_directory, ((uint32_t)&page_directory)/1024);
   
   //first, set all entries in page directory to NP
