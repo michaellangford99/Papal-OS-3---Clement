@@ -16,7 +16,7 @@ void kernel_main(struct multiboot_header* mboot_header, uint32_t multiboot_magic
 	clock_init();                                      //.
 	keyboard_init();                                   //.
 	//init paging
-	init_paging();
+	//init_paging();
 	
 	//start higher level drivers
 	ata_init();                                        //.
@@ -48,8 +48,8 @@ void kernel_main(struct multiboot_header* mboot_header, uint32_t multiboot_magic
 	
 	//clement_vfs_delfile("file2", get_device(1));
 	*/
-	printf("Clement 2.0 @ VirtualBox Ubuntu >> ");
-	
+				
+	fs_format(1, FS_FAT16);
 	
 	while(true)
 	{

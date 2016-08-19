@@ -294,7 +294,7 @@ int ata_probe( int id, int *nblocks, int *blocksize, char *name )
 
 	uint8_t t = inb(ata_base[id]+ATA_STATUS);
 	if(t==0xff) {
-		printf("....ata unit %d: nothing attached\n",id);
+		printf("....ata u%d: nothing attached\n",id);
 		return 0;
 	}
 	/* Now reset the unit to check for register signatures. */
