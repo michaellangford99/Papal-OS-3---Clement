@@ -66,20 +66,34 @@ int fat16_format(ata_atapi_device device)
   boot_sector.number_of_fats = 1; // no backup FAT in  this version of the driver
   */
   
+  //read in partition table
   PartitionBlock pb;
   ata_read(device.device_num, &pb, 1, 0);
   
-  
-  for(int i=0; i<4; i++) {
-        printf("Partition %d:\n  type: %x\n", i, pb.pt[i].partition_type);
-        printf("  Start sector: %x\n  %d sectors long\n", 
-                pb.pt[i].start_sector, pb.pt[i].length_sectors);
-    }
+  //dump contents of partition table
+  int i;
+  for(i=0; i<4; i++)
+  {
+      printf("Partition %d:\n  type: %x\n", i, pb.pt[i].partition_type);
+      printf("  Start sector: %x\n  %d sectors long\n", 
+          pb.pt[i].start_sector, pb.pt[i].length_sectors);
+  }
 
+  //determine whether partition table contains FAT16 partition
+  for (i = 0; i < 4; i++)
+  {
+    if (pb.pt[i].partition_type == 6)
+    {
+      printf("Partition %d contains a FAT16 partition!", i);
+      break;
+    }
+  }
   
+  //read in FAT16 boot sector
   Fat16BootSector boot_sector;
-  ata_read(device.device_num, &boot_sector, 1, pb.pt[0].start_sector);
+  ata_read(device.device_num, &boot_sector, 1, pb.pt[i].start_sector);
   
+  //dump contents of boot sector
   printf("jmp: 0x%x 0x%x 0x%x\n", boot_sector.jmp[0], boot_sector.jmp[1], boot_sector.jmp[2]);
   printf("oem: %s\n", &boot_sector.oem[0]);
   printf("sector size: %d\n", (uint32_t)boot_sector.sector_size);
@@ -94,7 +108,6 @@ int fat16_format(ata_atapi_device device)
   //uint16_t number_of_heads;
   //uint32_t hidden_sectors;
   printf("total sectors: %d\n", boot_sector.total_sectors_long);
-  
   //uint8_t drive_number;
   //uint8_t current_head;
   //uint8_t boot_signature;
@@ -103,6 +116,10 @@ int fat16_format(ata_atapi_device device)
   printf("fs_type: %s\n", &boot_sector.fs_type[0]);
   printf("boot code: %s\n", &boot_sector.boot_code[0]);
   printf("boot sector signature: %d\n", boot_sector.boot_sector_signature);
+  
+  //read in root directory
+  
+  
   
   return K_SUCCESS;
   
