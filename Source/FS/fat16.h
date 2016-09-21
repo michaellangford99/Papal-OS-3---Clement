@@ -58,9 +58,9 @@ typedef struct {
     uint8_t current_head;
     uint8_t boot_signature;
     uint32_t volume_id;
-    char volume_label[11];
-    char fs_type[8];
-    char boot_code[448];
+    uint8_t volume_label[11];
+    uint8_t fs_type[8];
+    uint8_t boot_code[448];
     uint16_t boot_sector_signature;
 } __attribute((packed)) Fat16BootSector;
 
@@ -80,14 +80,14 @@ typedef struct {
 } __attribute((packed)) PartitionBlock;
 
 typedef struct {
-    unsigned char filename[8];
-    unsigned char ext[3];
-    unsigned char attributes;
-    unsigned char reserved[10];
-    unsigned short modify_time;
-    unsigned short modify_date;
-    unsigned short starting_cluster;
-    unsigned long file_size;
+    uint8_t filename[8];
+    uint8_t ext[3];
+    uint8_t attributes;
+    uint8_t reserved[10];
+    uint16_t modify_time;
+    uint16_t modify_date;
+    uint16_t starting_cluster;
+    uint32_t file_size;
 } __attribute((packed)) fat16_root_dir_entry;
 
 typedef struct {
@@ -117,6 +117,16 @@ typedef struct {
   uint8_t  last_2_characters[4];  
 } __attribute__((packed)) fat16_lfn;
 
+typedef struct {
+  ata_atapi_device device;
+  uint32_t partition_number;
+  PartitionBlock pb;
+  Fat16BootSector boot_sector;
+} FAT16_Partition_Info;
+
 int fat16_format(ata_atapi_device device);
+
+
+void print_file_info(ata_atapi_device device, fat16_root_dir_entry *entry, PartitionBlock pb, int partition, Fat16BootSector boot_sector);
 
 #endif

@@ -96,31 +96,169 @@ int fat16_format(ata_atapi_device device)
   //dump contents of boot sector
   printf("jmp: 0x%x 0x%x 0x%x\n", boot_sector.jmp[0], boot_sector.jmp[1], boot_sector.jmp[2]);
   printf("oem: %s\n", &boot_sector.oem[0]);
-  printf("sector size: %d\n", (uint32_t)boot_sector.sector_size);
-  printf("sectors per cluster: %d\n", (uint32_t)boot_sector.sectors_per_cluster);
-  printf("reserved sectors: %d\n", (uint32_t)boot_sector.reserved_sectors);
-  printf("num of FATs: %d\n", (uint32_t)boot_sector.number_of_fats);
-  printf("root directory entries: %d\n", (uint32_t)boot_sector.root_dir_entries);
-  printf("total sectors: %d\n", (uint32_t)boot_sector.total_sectors_short); // if zero, later field is used
-  printf("media_descriptor: %d\n", boot_sector.media_descriptor);
-  printf("fat size (in sectors): %d\n", boot_sector.fat_size_sectors);
+  printf("sector size: %d\n", (int32_t)boot_sector.sector_size);
+  printf("sectors per cluster: %d\n", (int32_t)boot_sector.sectors_per_cluster);
+  printf("reserved sectors: %d\n", (int32_t)boot_sector.reserved_sectors);
+  printf("num of FATs: %d\n", (int32_t)boot_sector.number_of_fats);
+  printf("root directory entries: %d\n", (int32_t)boot_sector.root_dir_entries);
+  printf("total sectors: %d\n", (int32_t)boot_sector.total_sectors_short); // if zero, later field is used
+  printf("media_descriptor: %d\n", (int32_t)boot_sector.media_descriptor);
+  printf("fat size (in sectors): %d\n", (int32_t)boot_sector.fat_size_sectors);
   //uint16_t sectors_per_track;
   //uint16_t number_of_heads;
   //uint32_t hidden_sectors;
-  printf("total sectors: %d\n", boot_sector.total_sectors_long);
+  printf("total sectors: %d\n", (int32_t)boot_sector.total_sectors_long);
   //uint8_t drive_number;
   //uint8_t current_head;
   //uint8_t boot_signature;
-  printf("volume_id: %d\n", boot_sector.volume_id);
-  printf("volume_label: %s\n", &boot_sector.volume_label[0]);
-  printf("fs_type: %s\n", &boot_sector.fs_type[0]);
-  printf("boot code: %s\n", &boot_sector.boot_code[0]);
-  printf("boot sector signature: %d\n", boot_sector.boot_sector_signature);
+  printf("volume_id: %d\n", (int32_t)boot_sector.volume_id);
+  //printf("volume_label: %s\n", &boot_sector.volume_label[0]);
+  //printf("fs_type: %s\n", &boot_sector.fs_type[0]);
+  //printf("boot code: %s\n", &boot_sector.boot_code[0]);
+  //printf("boot sector signature: %d\n", boot_sector.boot_sector_signature);
   
   //read in root directory
+  int root_dir_sectors = (((int32_t)boot_sector.root_dir_entries * 32) + ((int32_t)boot_sector.sector_size - 1)) / (int32_t)boot_sector.sector_size;
+  printf("root_dir_sectors: %d\n", (int32_t)root_dir_sectors);
+  int fat_size = (int32_t)boot_sector.fat_size_sectors;
+  printf("fat size: %d\n", (int32_t)fat_size);
+  int first_data_sector = (int32_t)boot_sector.reserved_sectors + ((int32_t)boot_sector.number_of_fats * (int32_t)fat_size) + (int32_t)root_dir_sectors;
+  printf("first_data_sector: %d\n", (int32_t)first_data_sector);
+  int first_root_dir_sector = (int32_t)first_data_sector - (int32_t)root_dir_sectors;
+  printf("first root directory sector: %d\n", (int32_t)first_root_dir_sector);
   
+  printf("calculation: %d\n", (int)((uint32_t)boot_sector.reserved_sectors-1 + (uint32_t)boot_sector.fat_size_sectors * (uint32_t)boot_sector.number_of_fats));
+  
+  fat16_root_dir_entry root_dir[(int32_t)boot_sector.root_dir_entries];
+  ata_read(device.device_num, &root_dir[0], root_dir_sectors, first_root_dir_sector + pb.pt[i].start_sector);
+  
+  for (int j = 0; j < (int32_t)boot_sector.root_dir_entries; j++)
+  {
+    //printf("file entry %d\n", j);
+    print_file_info(device, &root_dir[j], pb, i, boot_sector);
+    /*
+    switch (root_dir[j].filename[0])
+    {
+      case 0xE5: 
+        printf("deleted file!\n"); 
+        break;
+      case 0x00:
+        break;
+      case 0x2D:
+        printf("This is a directory!!!!!\n");
+        printf("first char of name: 0x%x\n", root_dir[j].ext[0]);
+        for (k = 1; k < 8; k++)
+        {
+          printf_putchar(root_dir[j].filename[k]);
+        }
+        printf("\nExtention: ");
+        for (k = 0; k < 3; k++)
+        {
+          printf_putchar(root_dir[j].ext[k]);
+        }
+        printf("\n");
+        break;
+        default:
+          printf("File %d\nfile name: ", j);
+          for (k = 0; k < 8; k++)
+          {
+            printf_putchar(root_dir[j].filename[k]);
+          }
+          printf("\nfirst char of name: 0x%x\n", root_dir[j].ext[0]);
+          printf("Extension : ");
+          for (k = 0; k < 3; k++)
+          {
+            printf_putchar(root_dir[j].ext[k]);
+          }
+          printf("\n");
+          break;
+    }*/
+  }
   
   
   return K_SUCCESS;
   
+}
+
+void print_file_info(ata_atapi_device device, fat16_root_dir_entry *entry, PartitionBlock pb, int partition, Fat16BootSector boot_sector) {
+    switch(entry->filename[0]) {
+    case 0x00:
+        return; // unused entry
+    case 0xE5:
+        printf("Deleted file: [");
+        for (int k = 0; k < 8; k++)
+        {
+          printf_putchar(entry->filename[k]);
+        }
+        printf(".");
+        for (int k = 0; k < 3; k++)
+        {
+          printf_putchar(entry->ext[k]);
+        }
+        printf("]\n");
+        return;
+    case 0x05:
+        printf("File starting with 0xE5: [");
+        for (int k = 0; k < 8; k++)
+        {
+          printf_putchar(entry->filename[k]);
+        }
+        printf(".");
+        for (int k = 0; k < 3; k++)
+        {
+          printf_putchar(entry->ext[k]);
+        }
+        printf("]\n");
+        break;
+    case 0x2E:
+        printf("Directory: [");
+        for (int k = 0; k < 8; k++)
+        {
+          printf_putchar(entry->filename[k]);
+        }
+        printf(".");
+        for (int k = 0; k < 3; k++)
+        {
+          printf_putchar(entry->ext[k]);
+        }
+        printf("]\n");
+        break;
+    default:
+        printf("File: [");
+        for (int k = 0; k < 8; k++)
+        {
+          if (entry->filename[k] > 41)
+            printf_putchar(entry->filename[k]);
+          
+        }
+        printf(".");
+        for (int k = 0; k < 3; k++)
+        {
+          printf_putchar(entry->ext[k]);
+        }
+        printf("]\n");
+    }
+    
+    printf("  Modified: %d-%d-%d %d:%d.%d    Start: [%x]    Size: %d\n", 
+        1980 + (entry->modify_date >> 9), (entry->modify_date >> 5) & 0xF, entry->modify_date & 0x1F,
+        (entry->modify_time >> 11), (entry->modify_time >> 5) & 0x3F, entry->modify_time & 0x1F,
+        entry->starting_cluster, entry->file_size);
+    
+    if (entry->file_size == (uint32_t)-1)
+      return;
+        
+    //print out first block of file:
+    int root_dir_sectors = (((int32_t)boot_sector.root_dir_entries * 32) + ((int32_t)boot_sector.sector_size - 1)) / (int32_t)boot_sector.sector_size;
+    int fat_size = (int32_t)boot_sector.fat_size_sectors;
+    int first_data_sector = (int32_t)boot_sector.reserved_sectors + ((int32_t)boot_sector.number_of_fats * (int32_t)fat_size) + (int32_t)root_dir_sectors;
+    
+    int datablock = ((entry->starting_cluster-2)*(int32_t)boot_sector.sectors_per_cluster) + first_data_sector;
+    printf("first block of data in file : 0x%x / %d\n", datablock, datablock);
+    
+    uint8_t data_buffer[(int32_t)boot_sector.sectors_per_cluster*512];
+    ata_read(device.device_num, &data_buffer, (int32_t)boot_sector.sectors_per_cluster,  + pb.pt[partition].start_sector + datablock);
+    for (int i = 0; i < (int32_t)boot_sector.sectors_per_cluster*512; i++)
+    {
+      printf_putchar(data_buffer[i]);
+    }
 }

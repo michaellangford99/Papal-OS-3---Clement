@@ -208,6 +208,7 @@ void printf( const char *s, ... )
 
 	uint32_t u;
 	int32_t i;
+	char c;
 	char *str;
 
 	va_start(args,s);
@@ -226,6 +227,10 @@ void printf( const char *s, ... )
 					u = va_arg(args,uint32_t);
 					printf_puthex(u);
 					break;
+				case 'c':
+					c = va_arg(args,uint32_t);
+					printf_putchar(c);
+					break;					
 				case 's':
 					str = va_arg(args,char*);
 					printf_putstring(str);
