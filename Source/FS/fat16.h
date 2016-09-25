@@ -125,6 +125,8 @@ typedef struct {
 } FAT16_Partition_Info;
 
 int fat16_format(ata_atapi_device device);
+PartitionBlock fat16_read_partition_table(ata_atapi_device device);
+
 
 
 void print_file_info(ata_atapi_device device, fat16_root_dir_entry *entry, PartitionBlock pb, int partition, Fat16BootSector boot_sector);
