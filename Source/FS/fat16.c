@@ -104,13 +104,7 @@ int fat16_format(ata_atapi_device device)
   printf("total sectors: %d\n", (int32_t)boot_sector.total_sectors_short); // if zero, later field is used
   printf("media_descriptor: %d\n", (int32_t)boot_sector.media_descriptor);
   printf("fat size (in sectors): %d\n", (int32_t)boot_sector.fat_size_sectors);
-  //uint16_t sectors_per_track;
-  //uint16_t number_of_heads;
-  //uint32_t hidden_sectors;
   printf("total sectors: %d\n", (int32_t)boot_sector.total_sectors_long);
-  //uint8_t drive_number;
-  //uint8_t current_head;
-  //uint8_t boot_signature;
   printf("volume_id: %d\n", (int32_t)boot_sector.volume_id);
   //printf("volume_label: %s\n", &boot_sector.volume_label[0]);
   //printf("fs_type: %s\n", &boot_sector.fs_type[0]);
@@ -134,45 +128,7 @@ int fat16_format(ata_atapi_device device)
   
   for (int j = 0; j < (int32_t)boot_sector.root_dir_entries; j++)
   {
-    //printf("file entry %d\n", j);
     print_file_info(device, &root_dir[j], pb, i, boot_sector);
-    /*
-    switch (root_dir[j].filename[0])
-    {
-      case 0xE5: 
-        printf("deleted file!\n"); 
-        break;
-      case 0x00:
-        break;
-      case 0x2D:
-        printf("This is a directory!!!!!\n");
-        printf("first char of name: 0x%x\n", root_dir[j].ext[0]);
-        for (k = 1; k < 8; k++)
-        {
-          printf_putchar(root_dir[j].filename[k]);
-        }
-        printf("\nExtention: ");
-        for (k = 0; k < 3; k++)
-        {
-          printf_putchar(root_dir[j].ext[k]);
-        }
-        printf("\n");
-        break;
-        default:
-          printf("File %d\nfile name: ", j);
-          for (k = 0; k < 8; k++)
-          {
-            printf_putchar(root_dir[j].filename[k]);
-          }
-          printf("\nfirst char of name: 0x%x\n", root_dir[j].ext[0]);
-          printf("Extension : ");
-          for (k = 0; k < 3; k++)
-          {
-            printf_putchar(root_dir[j].ext[k]);
-          }
-          printf("\n");
-          break;
-    }*/
   }
   
   
