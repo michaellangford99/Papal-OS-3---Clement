@@ -1,8 +1,8 @@
 #include "system.h"
 #include "FS/fs_types.h"
 
-const int ata_base[4] = {ATA_BASE0,ATA_BASE0,ATA_BASE1,ATA_BASE1};
-int ata_interrupt_active = 0;
+const uint32_t ata_base[4] = {ATA_BASE0,ATA_BASE0,ATA_BASE1,ATA_BASE1};
+uint32_t ata_interrupt_active = 0;
 
 void ata_interrupt(struct x86_registers *regs)
 {
@@ -294,7 +294,7 @@ int ata_probe( int id, int *nblocks, int *blocksize, char *name )
 
 	uint8_t t = inb(ata_base[id]+ATA_STATUS);
 	if(t==0xff) {
-		printf("....ata unit %d: nothing attached\n",id);
+		printf("....ata u%d: nothing attached\n",id);
 		return 0;
 	}
 	/* Now reset the unit to check for register signatures. */
