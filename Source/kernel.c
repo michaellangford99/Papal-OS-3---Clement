@@ -16,7 +16,7 @@ void kernel_main(struct multiboot_header* mboot_header, uint32_t multiboot_magic
 	clock_init();                                      //.
 	keyboard_init();                                   //.
 	//init paging
-	//init_paging();
+	init_paging();
 	
 	//start higher level drivers
 	ata_init();                                        //.

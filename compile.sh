@@ -1,15 +1,11 @@
-#!/bin/bash
 # written by Michael Langford, based off tutorials "Bare Bones"
 # and "Setting up a Cross Compiler" in osdev.org
 clear
-echo "Preparing to compile Clement..."
+
 export PREFIX="$HOME/opt/cross"
 export TARGET=i686-elf
 export PATH="$PREFIX/bin:$PATH"
 export PATH="$HOME/opt/cross/bin:$PATH"
-cd
-cd 'Operating System/Clement'
-clear
 
 i686-elf-as Source/boot.s            -o Bin/boot.o
 nasm -felf  Source/gdt.asm           -o Bin/gdts.o
