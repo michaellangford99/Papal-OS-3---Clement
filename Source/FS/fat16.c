@@ -217,6 +217,8 @@ void print_file_info(ata_atapi_device device, fat16_root_dir_entry *entry, Parti
     ata_read(device.device_num, &data_buffer, (int32_t)boot_sector.sectors_per_cluster,  + pb.pt[partition].start_sector + datablock);
     for (int i = 0; i < (int32_t)boot_sector.sectors_per_cluster*512; i++)
     {
+      
       printf_putchar(data_buffer[i]);
+      if (data_buffer[i] == "\n") { break; }
     }
 }
