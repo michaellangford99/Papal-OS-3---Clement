@@ -16,19 +16,15 @@ uint32_t mem_map_end;
 
 uint32_t total_memory_size = 0;
 
-uint64_t alloc_size = 0; 
-uint64_t bitmap_size = 0;
+uint8_t memory_bitmap[MEM_MNGR_SIZE_OF_MEMORY_BITMAP];
 
-uint32_t bitmap_addr = 0;
-
-void mark_blocks_as_used(uint32_t start, uint32_t length);
-
-//TODO align memory blocks on 1kb boundaries. will be useful once paging is enabled
+void mark_block(uint8_t value, uint64_t bit);
+uint8_t test_block(uint64_t bit);
 
 int memory_init(struct multiboot_header* mboot_header)
 {
-  //1. find size & location of kernel
-  //2. modify free slots to exclude memory, multiboot header, and kernel
+  
+  //Step 1 - clean up memory slots - remove kernel from list of free mamory, align on 4K boundaries, remove memory map from list of free memory...
   
   memory_slots = mboot_header->mmap_length / sizeof(mboot_memmap_t);
   
@@ -60,7 +56,7 @@ int memory_init(struct multiboot_header* mboot_header)
         {
           mmap_entries[i].base_addr += (uint64_t)kernel_size;
           mmap_entries[i].length -= (uint64_t)kernel_size;
-            //printf("::::shrunk slot %d %d / %dKB\n", i, (uint32_t)kernel_size, (uint32_t)kernel_size / MEM_MNGR_SLOT_SIZE);
+          //printf("::::shrunk slot %d %d / %dKB\n", i, (uint32_t)kernel_size, (uint32_t)kernel_size / MEM_MNGR_SLOT_SIZE);
         }
         
         //exclude memory map
@@ -85,68 +81,49 @@ int memory_init(struct multiboot_header* mboot_header)
       }
       else{
         mmap_entries[i].type = MULTIBOOT_MMAP_RESERVED;
+        //printf("----forced memory slot %d into reserved type, as its base address is below KERNEL_START----\n", i);
       }
     }
   }
-  
-  //printf("total free memory: %d\n", total_memory_size);
-  
-  //find size of bitmap
-  
-  alloc_size = ((uint64_t)(total_memory_size) * (uint64_t)MEM_MNGR_SLOT_SIZE) / (uint64_t)(MEM_MNGR_SLOT_SIZE+1);  
-  bitmap_size = (uint64_t)(total_memory_size) - (uint64_t)(alloc_size);
-  
-  //printf("bitmap size: %d\n", (uint32_t)(bitmap_size));
-  //printf("allocatable memory: %d\n", (uint32_t)(alloc_size));
-   
-  //find if bitmap will fit in a free slot
-  
-  for (uint32_t j = 0; j < memory_slots; j++)
+  /*
+  for (uint32_t i = 0; i < memory_slots; i++)
   {
-    if ((uint32_t)mmap_entries[j].type == MULTIBOOT_MMAP_FREE_MEMORY)
+    printf("Memory Map Entry - %d:\n", i);
+    printf("  base_addr: %d, %d KB\n", (uint32_t)mmap_entries[i].base_addr, (uint32_t)mmap_entries[i].base_addr/1024);
+    printf("  length   : %d, %d KB\n", (uint32_t)mmap_entries[i].length   , (uint32_t)mmap_entries[i].length/1024);
+    printf("  type     : %d\n", (uint32_t)mmap_entries[i].type);
+    printf("\n");
+  }
+  
+  printf("total free memory: %d, %d KB, %d MB\n", total_memory_size, total_memory_size/1024, total_memory_size/(1024*1024));
+  */
+  //Now we have to mark every slot of memory as used, then go throught every free slot, and mark it as free. This way we won't miss any.
+  
+  //mark all as used
+  
+  //printf("size of memory bitmap: %d\n", MEM_MNGR_SIZE_OF_MEMORY_BITMAP);
+  memset((char*)(&memory_bitmap), 255, MEM_MNGR_SIZE_OF_MEMORY_BITMAP); //255 >> binary == %11111111 - all used
+  
+  
+  //mark free as free
+  for (uint32_t i = 0; i < memory_slots; i++)
+  {
+    if ((uint32_t)mmap_entries[i].type == MULTIBOOT_MMAP_FREE_MEMORY)
     {
-      if ((uint32_t)mmap_entries[j].base_addr >= kernel_location)
+      uint32_t starting_chunk = (uint32_t)(mmap_entries[i].base_addr / (4096));
+      //printf("starting 4K page of memory slot %d is : %d\n", i, starting_chunk);
+      uint32_t ending_chunk = starting_chunk + (uint32_t)(mmap_entries[i].length / (4096));
+      //printf("ending 4K page of memory slot %d is : %d\n", i, ending_chunk);
+      
+      mark_block(0, starting_chunk);
+      mark_block(0, ending_chunk);
+      for (uint32_t _4kblock = starting_chunk; _4kblock < ending_chunk; _4kblock++)
       {
-        if ((uint32_t)mmap_entries[j].length >= bitmap_size)
-        {
-          //if it does, save it there, and shrink the slot. allocate the bitmap for the memmanager
-          bitmap_addr = (uint32_t)mmap_entries[j].base_addr;
-          
-          mmap_entries[j].base_addr += (uint64_t)bitmap_size;
-          mmap_entries[j].length -= (uint64_t)bitmap_size;
-          
-          
-          //align slot on 4K boundary
-          uint32_t decrease = MEM_MNGR_ALIGN - ((uint32_t)mmap_entries[j].base_addr % MEM_MNGR_ALIGN);
-          decrease = decrease % MEM_MNGR_ALIGN;
-          mmap_entries[j].base_addr += (uint64_t)decrease;
-          mmap_entries[j].length -= (uint64_t)decrease;
-          
-          mmap_entries[j].length -= mmap_entries[j].length % (uint64_t)MEM_MNGR_SLOT_SIZE; // make each entry try to fit in block size
-          
-          
-          
-          //printf("bitmap will fit in and has been stored in memory slot %d\n", j);
-          break;
-        }
+        mark_block(0, _4kblock);
       }
+      
     }
   }
-  
-  //debug contents..
-  /*for (uint32_t k = 0; k < memory_slots; k++)
-  {
-    printf("mmap entry     %d\n", k);
-    printf("....entry size %d\n", (uint32_t)mmap_entries[k].size);
-    printf("....addr       %d / %dKB\n", (uint32_t)mmap_entries[k].base_addr, (uint32_t)mmap_entries[k].base_addr/MEM_MNGR_SLOT_SIZE);
-    printf("....length     %d / %dKB\n", (uint32_t)mmap_entries[k].length, (uint32_t)mmap_entries[k].length/MEM_MNGR_SLOT_SIZE);
-    printf("....end addr   %d / %dKB\n", (uint32_t)mmap_entries[k].base_addr + (uint32_t)mmap_entries[k].length, ((uint32_t)mmap_entries[k].base_addr + (uint32_t)mmap_entries[k].length)/MEM_MNGR_SLOT_SIZE);
-    printf("....type       %d\n\n", (uint32_t)mmap_entries[k].type);
-  }*/
-  
-  //zero the bitmap, as all of it is unused.
-  memset((char*)bitmap_addr, 0, bitmap_size);
-  
   
   //now we nead to copy back the new memory map table:
   memcpy((char*)mboot_header->mmap_addr, (char*)&mmap_entries, mboot_header->mmap_length);
@@ -157,8 +134,9 @@ int memory_init(struct multiboot_header* mboot_header)
 uint32_t* kmalloc(uint32_t length)
 {
   uint32_t mem_blocks = (length / MEM_MNGR_SLOT_SIZE);  //number of blocks needed to grant requested memory
-  if (length % MEM_MNGR_SLOT_SIZE != 0)            // if it isn't a multiple of 1K, add a block to the nedded blocks
+  if (length % MEM_MNGR_SLOT_SIZE != 0)            // if it isn't a multiple of 4K, add a block to the amount of needed blocks
     mem_blocks += 1;
+  //printf("allocating %d blocks...\n", mem_blocks);
   
   mboot_memmap_t mmap_entries[memory_slots];
   
@@ -166,176 +144,90 @@ uint32_t* kmalloc(uint32_t length)
   mboot_header = multiboot_get_address();
   memcpy((char*)&mmap_entries, (char*)mboot_header->mmap_addr, mboot_header->mmap_length);
   
-  //find a free block, then see if there are contiguous blocks for the length required
-  //if so, mark them all as used, and return the pointer to the first block
-  //if not, we need to compact the memory map! we can't do this until we have paging.
-  uint32_t failed = 0;
-  uint32_t slots_declined = 0;
-  uint32_t* block_addr = (uint32_t*)(bitmap_addr);
-  for (uint32_t i = 0; i < (uint32_t)bitmap_size; i++)
+  //go through memory bitmap, searching for a free block:
+  
+  uint32_t free_chunk_start = 0;
+  uint32_t free_chunk_end = 0;
+  
+  for (uint32_t i = 0; i < MEM_MNGR_SIZE_OF_MEMORY_BITMAP; i++)
   {
-    if (mem_blocks*MEM_MNGR_SLOT_SIZE > mmap_entries[slots_declined].length)
+    if (test_block(i) == MEM_MNGR_FREE_SLOT)
     {
-      
-      //printf("skipped slot %d, increased index by %d\n", slots_declined, (uint32_t)mmap_entries[slots_declined].length/MEM_MNGR_SLOT_SIZE + 1);
-      i += (uint32_t)mmap_entries[slots_declined].length/MEM_MNGR_SLOT_SIZE + 1;
-      slots_declined++;
-    }
-    //is the current block free?
-    if (block_addr[i] == 0)
-    {
-      //printf("free block %d\n", i);
-      //loop through...
-      for (uint32_t cont = 0; cont < mem_blocks; cont++)
+      //printf("found free block corresponding to address %d\n", i * 4096);
+      //if we find a free block, keep going until we find the proper number...
+      for (uint32_t j = 0; j < mem_blocks; j++)
       {
-        if (block_addr[i + cont] == 1)
+        if (test_block(i + j) != MEM_MNGR_FREE_SLOT) { break; }
+        //did we get through?
+        if (j == mem_blocks-1)
         {
-          goto no_contigous_slot;
-        }
-      }
-      //a contiguous array of free blocks in the required number has been found. return the address and mark them as used.
-      mark_blocks_as_used(i, mem_blocks);
-      
-      //find memory location pointed to by i
-      
-      uint32_t blocks_passed = 0;
-      
-      for (uint32_t slot = 0; slot < memory_slots; slot++)
-      {
-        if ((uint32_t)mmap_entries[slot].type == MULTIBOOT_MMAP_FREE_MEMORY)
-        {
-          if ((uint32_t)mmap_entries[slot].base_addr >= kernel_location)
+          free_chunk_start = i;
+          free_chunk_end = i+j;
+          for (uint32_t allocated_blocks = free_chunk_start; allocated_blocks < (free_chunk_end+1); allocated_blocks++)
           {
-            blocks_passed += (uint32_t)mmap_entries[slot].length/MEM_MNGR_SLOT_SIZE;
-            if (blocks_passed > i)
-            {
-              uint32_t addr_to_return = (i - (blocks_passed - (uint32_t)mmap_entries[slot].length/MEM_MNGR_SLOT_SIZE))*MEM_MNGR_SLOT_SIZE + (uint32_t)mmap_entries[slot].base_addr;
-              //printf("returning address %d\n", addr_to_return);
-              return (uint32_t*)addr_to_return;
-            }
+            mark_block(MEM_MNGR_USED_SLOT, allocated_blocks);
           }
-        }
-      }  
-      
-      //printf("a contiguous array of free blocks in the required number has been found.\n");
-    }
-    no_contigous_slot:
-    failed++;
-    
-  }
-  
-  /*
-  
-  for (uint32_t i = 0; i < memory_slots; i++) {
-    //printf("in memory slot %d, with base addr of %d\n", i, (uint32_t)mmap_entries[i].base_addr);
-    if (mmap_entries[i].type == MULTIBOOT_MMAP_FREE_MEMORY) {
-      //printf("..found free memory slot %d\n", i);
-      
-      for (uint32_t e = (uint32_t)mmap_entries[i].base_addr; e < (uint32_t)mmap_entries[i].base_addr + (uint32_t)mmap_entries[i].length; e += MEM_MNGR_SLOT_SIZE) {
-        //printf("....in memory chunk %d\n", e);
-        uint32_t* addr = (uint32_t*)e;
-        
-        if (addr[0] == MEM_MNGR_FREE_SLOT) {
-          //printf("......found free chunk %d\n", e);
-          for(uint32_t block = 0; block < mem_blocks; block++)
-          {
-            //printf("......looping through memory chunk %d\n", e+(block*MEM_MNGR_SLOT_SIZE));
-            if (addr[block*MEM_MNGR_SLOT_SIZE] != MEM_MNGR_FREE_SLOT)
-            {
-              //printf("........chunk %d is not free\n", e+(block*MEM_MNGR_SLOT_SIZE));
-              goto no_slot_found;
-            }
-            else
-            {
-              //printf("........chunk %d is free\n", e+(block*MEM_MNGR_SLOT_SIZE));
-            }
-          }
-          for (uint32_t marking = 0; marking < mem_blocks; marking++)
-          {
-            uint32_t* marker = (uint32_t*)(e+(marking*MEM_MNGR_SLOT_SIZE));
-            marker[0] = MEM_MNGR_USED_SLOT;
-          }
-          return (uint32_t*)(e);
-          no_slot_found:
-          failed++;
-        }
-        else
-        {
-          //printf("......chunk %d is not free\n", e);
-        }
-      }
-    }
-  }
-  //printf("sorry, no memory slot was found with a length of %d blocks.\n", mem_blocks);
-  
-  return (uint32_t*)0;  
-  //---------------------------------------------------------------------------------
-  
-  mboot_memmap_t mmap_entries[memory_slots];
-  
-  struct multiboot_header* mboot_header;
-  mboot_header = multiboot_get_address();
-  
-  memcpy((char*)&mmap_entries, (char*)mboot_header->mmap_addr, mboot_header->mmap_length);
-  
-  int free_slots_found = 0;
-  uint32_t addr_free_blocks[mem_blocks];
-  
-  for (uint32_t i = 0; i < memory_slots; i++)
-  {
-    if (mmap_entries[i].type == MULTIBOOT_MMAP_FREE_MEMORY)
-    {
-      for (uint32_t e = (uint32_t)mmap_entries[i].base_addr; e < (uint32_t)mmap_entries[i].base_addr + (uint32_t)mmap_entries[i].length; e += MEM_MNGR_SLOT_SIZE)
-      {
-        if ((uint64_t*)(e) == MEM_MNGR_FREE_SLOT)
-        {
-          free_slots_found++;
-          if (free_slots_found > mem_blocks)
-          {
-            goto slot_search_done;
-          }
-          addr_free_blocks[free_slots_found-1] = e;
+          //printf("%d\n", free_chunk_start * 4096);
+          return (uint32_t*)(free_chunk_start * 4096);
         }
       }
     }
   }
   
-  slot_search_done:
-  for (int i = 0; i < mem_blocks; i++)
-  {
-    uint64_t* ptr = (uint64_t*)addr_free_blocks[i];
-    ptr[0] = MEM_MNGR_USED_SLOT;
-    if (i  == (mem_blocks-1))
-    {
-      ptr[1] = MEM_MNGR_LAST_BLOCK;
-    }
-    else
-    {
-      ptr[1] = (uint64_t)addr_free_blocks[i+1];
-    }
-  }
-  return (uint64_t*)addr_free_blocks[0];*/
   return (uint32_t*)0;
 }
 
-void mark_blocks_as_used(uint32_t start, uint32_t length)
+uint32_t kfree(uint32_t* base, uint32_t length)
 {
-  memset((char*)start, 1, length);
-}
-
-
-int kfree(uint32_t* base, uint32_t length)
-{
-  uint32_t mem_blocks = (length / MEM_MNGR_SLOT_SIZE);  //number of blocks needed to grant requested memory
+  uint32_t mem_blocks = (length / MEM_MNGR_SLOT_SIZE);  //number of blocks needed to release requested memory
   if (length % MEM_MNGR_SLOT_SIZE != 0)            // if it isn't a multiple of 1K, add a block to the nedded blocks
     mem_blocks += 1;
     
-  memset((char*)base, 0, mem_blocks);
+  if ((uint32_t)base % 4096 != 0) { return K_ERROR_M; }
+  
+  for (uint32_t i = 0; i < (length/4096); i++)
+  {
+    mark_block(MEM_MNGR_FREE_SLOT, ((uint32_t)base / 4096) + i);
+  }
+  
   return K_SUCCESS;
 }
 
-uint64_t get_bitmap_size() { return bitmap_size; }
-uint32_t get_bitmap_addr() { return bitmap_addr; }
+void mark_block(uint8_t value, uint64_t bit)
+{
+  uint32_t byte = (uint32_t)(bit / (uint64_t)8);
+  uint32_t bit_in_byte = (uint32_t)(bit % (uint64_t)8);
+  
+  //printf("bit: %d\n", (uint32_t)bit);
+  //printf("byte: %d\n", (uint32_t)byte);
+  //printf("bit_in_byte: %d\n", (uint32_t)bit_in_byte);
+  //printf("address of bitmap: %d\n", &memory_bitmap[0]);
+  
+  if (value == 1)
+  {
+    set_bit(bit_in_byte, (uint8_t*)(&memory_bitmap[0] + byte));
+  }
+  if (value == 0)
+  {
+    clear_bit(bit_in_byte, (uint8_t*)(&memory_bitmap[0] + byte));
+  }
+  
+}
+
+uint8_t test_block(uint64_t bit)
+{
+  uint32_t byte = (uint32_t)(bit / (uint64_t)8);
+  uint32_t bit_in_byte = (uint32_t)(bit % (uint64_t)8);
+  
+  //printf("bit: %d\n", (uint32_t)bit);
+  //printf("byte: %d\n", (uint32_t)byte);
+  //printf("bit_in_byte: %d\n", (uint32_t)bit_in_byte);
+  //printf("address of bitmap: %d\n", &memory_bitmap[0]);
+  uint8_t result = (uint8_t)test_bit(bit_in_byte, (uint8_t*)(&memory_bitmap[0] + byte));
+  //printf(" %d ", (uint32_t)result);
+  return result;
+  
+}
 
 uint32_t get_kernel_location() { return kernel_location; }
 uint32_t get_kernel_size() { return kernel_size; }
@@ -350,9 +242,6 @@ memory_info_t get_memory_info() {
   m.mem_map_size=mem_map_size;
   m.mem_map_end=mem_map_end;
   m.total_memory_size=total_memory_size;
-  m.alloc_size=alloc_size; 
-  m.bitmap_size=bitmap_size;
-  m.bitmap_addr=bitmap_addr;
   
   return m;
 }

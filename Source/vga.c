@@ -168,7 +168,7 @@ void graphics_init(vbe_info_t* vbe_info) {
   
   pitch = vbe_info->bpp/8;
   
-  fbuffer = (pixel*)kmalloc(video_width * video_height * pitch);
+  fbuffer = (pixel*)kmalloc(video_width*video_height*pitch);
   
 	graphics_buffer = (pixel*) memory_location;
   

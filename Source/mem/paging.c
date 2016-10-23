@@ -1,6 +1,6 @@
 #include "../system.h"
 
-uint32_t* page_directory;//[1024] __attribute__((aligned(4096)));
+uint32_t page_directory[1024] __attribute__((aligned(4096)));
 page_table_t page_tables[1024] __attribute__((aligned(4096)));
 
 //link to assembly routines
@@ -13,7 +13,7 @@ int init_paging() {
   */
   
   //allocate 1KB for page directory
-  page_directory = kmalloc(1024);
+  //page_directory = kmalloc(1024);
   
   //page_tables = (page_table_t*)kmalloc(1024 * sizeof(page_table_t));
   

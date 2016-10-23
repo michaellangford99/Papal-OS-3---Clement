@@ -5,6 +5,7 @@ void kernel_main(struct multiboot_header* mboot_header, uint32_t multiboot_magic
 	int continue_boot = multiboot_init(mboot_header, multiboot_magic);
 	if (continue_boot == K_FATAL) { /*loop forever, don't boot*/ printf("multiboot panic!!!!"); while(true) { } }
 	
+	
 	memory_init(multiboot_get_address());              //. gotta be first
 	
 	graphics_init(multiboot_get_vbe_address());        //basic initial boot-time drivers
@@ -15,6 +16,7 @@ void kernel_main(struct multiboot_header* mboot_header, uint32_t multiboot_magic
 	idt_init();                                        //.
 	clock_init();                                      //.
 	keyboard_init();                                   //.
+	
 	//init paging
 	init_paging();
 	
