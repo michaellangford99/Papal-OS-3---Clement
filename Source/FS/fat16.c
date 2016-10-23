@@ -219,6 +219,6 @@ void print_file_info(ata_atapi_device device, fat16_root_dir_entry *entry, Parti
     {
       
       printf_putchar(data_buffer[i]);
-      if (data_buffer[i] == "\n") { break; }
+      if (data_buffer[i] == 0) { break; }
     }
 }
