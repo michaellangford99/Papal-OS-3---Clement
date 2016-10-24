@@ -86,7 +86,7 @@ int fat16_format(ata_atapi_device device)
   {
     if (pb.pt[i].partition_type == 6)
     {
-      printf("Partition %d contains a FAT16 partition!", i);
+      printf("Partition %d contains a FAT16 partition!\n", i);
       break;
     }
   }
@@ -104,14 +104,14 @@ int fat16_format(ata_atapi_device device)
   printf("num of FATs: %d\n", (int32_t)boot_sector.number_of_fats);
   printf("root directory entries: %d\n", (int32_t)boot_sector.root_dir_entries);
   printf("total sectors: %d\n", (int32_t)boot_sector.total_sectors_short); // if zero, later field is used
-  printf("media_descriptor: %d\n", (int32_t)boot_sector.media_descriptor);
+  //printf("media_descriptor: %d\n", (int32_t)boot_sector.media_descriptor);
   printf("fat size (in sectors): %d\n", (int32_t)boot_sector.fat_size_sectors);
   printf("total sectors: %d\n", (int32_t)boot_sector.total_sectors_long);
   printf("volume_id: %d\n", (int32_t)boot_sector.volume_id);
   //printf("volume_label: %s\n", &boot_sector.volume_label[0]);
   //printf("fs_type: %s\n", &boot_sector.fs_type[0]);
   //printf("boot code: %s\n", &boot_sector.boot_code[0]);
-  //printf("boot sector signature: %d\n", boot_sector.boot_sector_signature);
+  printf("boot sector signature: %d\n", boot_sector.boot_sector_signature);
   
   //read in root directory
   int root_dir_sectors = (((int32_t)boot_sector.root_dir_entries * 32) + ((int32_t)boot_sector.sector_size - 1)) / (int32_t)boot_sector.sector_size;
