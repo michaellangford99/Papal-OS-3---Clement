@@ -173,7 +173,7 @@ uint32_t* kmalloc(uint32_t length)
       }
     }
   }
-  
+  printf("!!!!!MEMORY MANAGER WAS UNABLE TO FIND FREE MEMORY OF SIZE %d bytes !!!!!!!\n", length);
   return (uint32_t*)0;
 }
 

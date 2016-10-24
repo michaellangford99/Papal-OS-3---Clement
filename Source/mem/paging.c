@@ -1,6 +1,6 @@
 #include "../system.h"
 
-uint32_t page_directory[1024] __attribute__((aligned(4096)));
+uint32_t* page_directory = 0;//[1024] __attribute__((aligned(4096)));
 page_table_t page_tables[1024] __attribute__((aligned(4096)));
 
 //link to assembly routines
@@ -12,12 +12,13 @@ int init_paging() {
   This basic paging code just identity maps the entire 4GB address space.
   */
   
-  //allocate 1KB for page directory
-  //page_directory = kmalloc(1024);
+  //allocate 4KB for page directory
+  page_directory = kmalloc(1024*4);
   
+  memset((char*)&page_directory[0], 0, 1024 * 4);
   //page_tables = (page_table_t*)kmalloc(1024 * sizeof(page_table_t));
   
-  printf("page_directory addr: 0x%x / %d / %d KB\n", (uint32_t)&page_directory, (uint32_t)&page_directory, ((uint32_t)&page_directory)/1024);
+  printf("page_directory addr: 0x%x / %d / %d KB\n", (uint32_t)&page_directory[0], (uint32_t)&page_directory[0], ((uint32_t)&page_directory[0])/1024);
   
   //first, set all entries in page directory to NP
   unsigned int i;
@@ -52,6 +53,5 @@ int init_paging() {
   enablePaging();
   
   printf("paging: ready\n");
-  
   return K_SUCCESS;
 }
