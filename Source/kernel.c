@@ -32,27 +32,12 @@ void kernel_main(struct multiboot_header* mboot_header, uint32_t multiboot_magic
   uint32_t kernel_size = get_kernel_size();
   uint32_t kernel_end = get_kernel_end();
 	
-	uint32_t bitmap_addr = get_bitmap_addr();
-	
 	printf("kernel_location : 0x%x,   %d bytes,    %d KB\n", kernel_location, kernel_location, kernel_location/1024);
 	printf("kernel_size     : 0x%x,   %d bytes,    %d KB\n", kernel_size, kernel_size, kernel_size/1024);
 	printf("kernel_end      : 0x%x,   %d bytes,    %d KB\n", kernel_end, kernel_end, kernel_end/1024);
 	
-	printf("memory bitmap location : 0x%x,   %d bytes     %d KB\n", bitmap_addr, bitmap_addr, bitmap_addr/1024);
-	
-	//fs_format(1, FS_CLEMENT_VFS);
-	//clement_vfs_mkfile("file1", get_device(1));
-	//clement_vfs_write("file1", get_device(1), FILE_OVERWRITE, "hi, this is a very stupid test\nI hope you like it! Bye!");	
-	//clement_vfs_mkfile("file2", get_device(1));
-	//clement_vfs_write("file2", get_device(1), FILE_OVERWRITE, "hi again!\n\n\n\n\n\n\nlots of eols!\n");
-	//clement_vfs_mkfile("file3", get_device(1));
-	//clement_vfs_write("file3", get_device(1), FILE_OVERWRITE, "hi again!\n\n\n\n\n\nmore of eols!\n");
-	
-	//clement_vfs_delfile("file2", get_device(1));
-	*/
-				
 	//fs_format(1, FS_FAT16);
-	
+	*/
 	while(true)
 	{
 		
