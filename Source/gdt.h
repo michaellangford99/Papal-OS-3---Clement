@@ -5,8 +5,8 @@
 #define SEGMENT_DESCRIPTORS    3
 #define SECTOR_CODE_DPL_0      0x9A
 #define SECTOR_DATA_DPL_0      0x92
-#define SECTOR_CODE_DPL_3      0x00 // not yet impl.
-#define SECTOR_DATA_DPL_3      0x00 // not yet impl.
+#define SECTOR_CODE_DPL_3      0xFA // not yet impl.
+#define SECTOR_DATA_DPL_3      0xF2 // not yet impl.
 #define SECTOR_TSS_DPL_0       0x89
 
 struct GDT_sector_descriptor

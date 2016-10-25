@@ -9,8 +9,8 @@ GDT Sectors:
    0   , 0          , 0      null descriptor
    0   , 0xffffffff , 0x9a   kernel code (DPL_0)
    0   , 0xffffffff , 0x92   kernel data (DPL_0)
-   0   , 0xffffffff , 0x__   -user   code (DPL_3) - not impl. yet
-   0   , 0xffffffff , 0x__   -user   data (DPL_3) - not impl. yet
+   0   , 0xffffffff , 0xFA   -user   code (DPL_3) - not impl. yet
+   0   , 0xffffffff , 0xF2   -user   data (DPL_3) - not impl. yet
    &TSS, sizeof(TSS), 0x89   -task state segment  - not impl. yet
 
 
