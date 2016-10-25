@@ -42,7 +42,7 @@ void multiboot_dump(struct multiboot_header* mboot_header) {
 	printf("drives_length:     0x%x / %d\n", mboot_header->drives_length, mboot_header->drives_length);
 	printf("drives_addr:       0x%x / %d\n", mboot_header->drives_addr, mboot_header->drives_addr);
 	printf("config_table:      0x%x / %d\n", mboot_header->config_table, mboot_header->config_table);
-	printf("boot_loader_name:  0x%x / %d\n", mboot_header->boot_loader_name, mboot_header->boot_loader_name);
+	printf("boot_loader_name:  0x%x - '%s'\n", mboot_header->boot_loader_name, mboot_header->boot_loader_name);
 	printf("apm_table:         0x%x / %d\n", mboot_header->apm_table, mboot_header->apm_table);
 	printf("vbe_control_info:  0x%x / %d\n", mboot_header->vbe_control_info, mboot_header->vbe_control_info);
 	printf("vbe_mode_info:     0x%x / %d\n", mboot_header->vbe_mode_info, mboot_header->vbe_mode_info);

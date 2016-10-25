@@ -51,7 +51,7 @@ void kernel_main(struct multiboot_header* mboot_header, uint32_t multiboot_magic
 	//clement_vfs_delfile("file2", get_device(1));
 	*/
 				
-	fs_format(1, FS_FAT16);
+	//fs_format(1, FS_FAT16);
 	
 	while(true)
 	{

@@ -2,7 +2,7 @@
 #define GDT_H
 
 //constants for GDT
-#define SEGMENT_DESCRIPTORS    3
+#define SEGMENT_DESCRIPTORS    5
 #define SECTOR_CODE_DPL_0      0x9A
 #define SECTOR_DATA_DPL_0      0x92
 #define SECTOR_CODE_DPL_3      0xFA // not yet impl.

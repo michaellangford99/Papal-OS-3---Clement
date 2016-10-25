@@ -9,8 +9,8 @@ GDT Sectors:
    0   , 0          , 0      null descriptor
    0   , 0xffffffff , 0x9a   kernel code (DPL_0)
    0   , 0xffffffff , 0x92   kernel data (DPL_0)
-   0   , 0xffffffff , 0xFA   -user   code (DPL_3) - not impl. yet
-   0   , 0xffffffff , 0xF2   -user   data (DPL_3) - not impl. yet
+   0   , 0xffffffff , 0xFA   user   code (DPL_3)
+   0   , 0xffffffff , 0xF2   user   data (DPL_3)
    &TSS, sizeof(TSS), 0x89   -task state segment  - not impl. yet
 
 
@@ -38,6 +38,14 @@ void gdt_init()
 	GDT_sect_desc[2].base =0;
 	GDT_sect_desc[2].limit=0xffffffff;
 	GDT_sect_desc[2].type =SECTOR_DATA_DPL_0;
+	
+	GDT_sect_desc[3].base =0;
+	GDT_sect_desc[3].limit=0xffffffff;
+	GDT_sect_desc[3].type =SECTOR_CODE_DPL_3;
+
+	GDT_sect_desc[4].base =0;
+	GDT_sect_desc[4].limit=0xffffffff;
+	GDT_sect_desc[4].type =SECTOR_DATA_DPL_3;
 
 	//zero our GDT descriptors (the actual descriptors, not the structs describing them)...
 	for (int i = 0; i < SEGMENT_DESCRIPTORS * 8; i++) {
@@ -48,9 +56,11 @@ void gdt_init()
 	encode_GDT_entry(&GDT_table_entries[0 *8], GDT_sect_desc[0]);
 	encode_GDT_entry(&GDT_table_entries[1 *8], GDT_sect_desc[1]);
 	encode_GDT_entry(&GDT_table_entries[2 *8], GDT_sect_desc[2]);
+	encode_GDT_entry(&GDT_table_entries[3 *8], GDT_sect_desc[3]);
+	encode_GDT_entry(&GDT_table_entries[4 *8], GDT_sect_desc[4]);
 
 	//tell CPU where our table is stored (in assembly... )
-	setGDT((uint32_t) &GDT_table_entries, sizeof(GDT_table_entries) - 1);
+	setGDT((uint32_t) &GDT_table_entries, sizeof(GDT_table_entries)-1);
 	//load segment descr. into actual segments (in assembly...)
 	reloadSegments();
 	
