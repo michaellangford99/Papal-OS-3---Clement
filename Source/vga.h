@@ -52,6 +52,7 @@ void graphics_string( int x, int y, const char *ch, _24bit_color forecolor, _24b
 void graphics_test();
 _24bit_color create_24bit_color(uint8_t r, uint8_t g, uint8_t b);
 graphics_point get_display_size();
+void startup_graphics_init(vbe_info_t* vbe_info);
 void graphics_init(vbe_info_t* vbe_info);
 
 #endif
