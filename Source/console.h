@@ -21,6 +21,7 @@ void console_setcolors(_24bit_color fore, _24bit_color back);
 void console_putchar( char c );
 void console_putstring( const char *s );
 int console_write(const void *buffer, int length);
+void console_refresh();
 void console_init();
 void printf_putchar( char c );
 void printf_putstring( char *s );

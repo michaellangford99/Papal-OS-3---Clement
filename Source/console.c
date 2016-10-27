@@ -147,6 +147,19 @@ int console_write(const void *buffer, int length)
 	return 1;
 }
 
+void console_refresh()
+{
+	// reprint the data
+	for (int i = 0; i < ysize; i++)
+	{
+		for (int j = 0; j < xsize; j++)
+		{
+			console_writechar(j, i, console_buffer[j + i*xsize]);
+
+		}
+	}
+}
+
 void console_init()
 {
 	console_reset();
