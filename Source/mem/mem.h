@@ -30,6 +30,7 @@ int memory_init(struct multiboot_header* mboot_header);
 
 uint32_t* kmalloc(uint32_t length);
 uint32_t kfree(uint32_t* base, uint32_t length);
+uint32_t kunfree(uint32_t* base, uint32_t length);
 
 uint32_t get_kernel_location();
 uint32_t get_kernel_size();
