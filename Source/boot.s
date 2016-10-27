@@ -36,14 +36,15 @@ _start:
 	# To set up a stack, we simply set the esp register to point to the top of
 	# our stack (as it grows downwards).
 	movl $stack_top, %esp
+  /* Make sure our stack is 16-byte aligned */
+  and $-16, %esp
 	movl $stack_bottom, %ebp
 	
 	pushl %eax
 	pushl %ebx # Pointer to multiboot header
 	
-	# We are now ready to actually execute C code. We cannot embed that in an
-	# assembly file, so we'll create a kernel.c file in a moment. In that file,
-	# we'll create a C entry point called kernel_main and call it here.
+  cli
+	# We are now ready to actually execute C code.
 	call kernel_main
 
 	# In case the function returns, we'll want to put the computer into an
