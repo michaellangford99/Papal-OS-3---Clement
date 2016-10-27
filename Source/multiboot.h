@@ -69,6 +69,13 @@ typedef struct {
 	uint32_t type;
 } __attribute__ ((packed)) mboot_memmap_t;
 
+typedef struct {
+	uint32_t start;
+	uint32_t end;
+	uint32_t string;
+	uint32_t reserved;
+} __attribute__ ((packed)) mboot_mod_desc_t;
+
 int multiboot_init(struct multiboot_header* mboot_header, uint32_t multiboot_magic);
 struct multiboot_header* multiboot_get_address();
 vbe_info_t* multiboot_get_vbe_address();
