@@ -32,27 +32,14 @@ pixel* graphics_buffer;
 pixel* fbuffer;
 
 void putpixel(int x,int y, _24bit_color color) {
-  if (basic == 1) //if other stuffs not ready yet, copy directly to video memory
-  {
-    unsigned where = x*pitch + y*video_width*pitch;
-    fbuffer[where] = color.b;
-    fbuffer[where+1] = color.g;
-    fbuffer[where+2] = color.r;
-  }
-  if (basic == 0) // normal driver mode
-  {
-    unsigned where = x*pitch + y*video_width*pitch;
-    graphics_buffer[where] = color.b;
-    graphics_buffer[where+1] = color.g;
-    graphics_buffer[where+2] = color.r;
-  }
+  unsigned where = x*pitch + y*video_width*pitch;
+  fbuffer[where] = color.b;
+  fbuffer[where+1] = color.g;
+  fbuffer[where+2] = color.r;
 }
 
 void graphics_update_fb() {
-  if (basic == 0) //normal driver mode
-  {
-    memcpy((char*)graphics_buffer, (char*)fbuffer, video_width*video_height*pitch);
-  }
+  memcpy((char*)graphics_buffer, (char*)fbuffer, video_width*video_height*pitch);
 }
 
 void graphics_clear(_24bit_color color) {
@@ -184,16 +171,11 @@ void startup_graphics_init(vbe_info_t* vbe_info) {
 }
 
 void graphics_init(vbe_info_t* vbe_info) {
-  basic = 0;
-  memory_location = vbe_info->physbase;
-  video_width = vbe_info->Xres;
-  video_height = vbe_info->Yres;
-  
-  pitch = vbe_info->bpp/8;
+  console_setcolors(create_24bit_color(0,255,0), create_24bit_color(0,0,0));
   
   fbuffer = (pixel*)kmalloc(video_width*video_height*pitch);
-  
-	graphics_buffer = (pixel*) memory_location;
-  
-	graphics_clear(create_24bit_color(0,0,0));
+  graphics_buffer = (pixel*) memory_location;
+  graphics_clear(create_24bit_color(0,0,0));
+  console_refresh();
+	basic = 0;
 }
