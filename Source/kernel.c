@@ -26,7 +26,7 @@ void kernel_main(struct multiboot_header* mboot_header, uint32_t multiboot_magic
 	//data dump
 	graphics_init(multiboot_get_vbe_address());
 	multiboot_dump(multiboot_get_address());
-		
+	
 	/*
 	uint32_t kernel_location = get_kernel_location();
   uint32_t kernel_size = get_kernel_size();
@@ -35,9 +35,10 @@ void kernel_main(struct multiboot_header* mboot_header, uint32_t multiboot_magic
 	printf("kernel_location : 0x%x,   %d bytes,    %d KB\n", kernel_location, kernel_location, kernel_location/1024);
 	printf("kernel_size     : 0x%x,   %d bytes,    %d KB\n", kernel_size, kernel_size, kernel_size/1024);
 	printf("kernel_end      : 0x%x,   %d bytes,    %d KB\n", kernel_end, kernel_end, kernel_end/1024);
+	*/
 	
 	//fs_format(1, FS_FAT16);
-	*/
+	
 	while(true)
 	{
 		

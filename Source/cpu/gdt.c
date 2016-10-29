@@ -1,4 +1,4 @@
-#include "system.h"
+#include "../system.h"
 
 struct GDT_sector_descriptor GDT_sect_desc[SEGMENT_DESCRIPTORS];
 

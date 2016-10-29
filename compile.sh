@@ -8,8 +8,8 @@ export PATH="$PREFIX/bin:$PATH"
 export PATH="$HOME/opt/cross/bin:$PATH"
 
 i686-elf-as Source/boot.s            -o Bin/boot.o
-nasm -felf  Source/gdt.asm           -o Bin/gdts.o
-nasm -felf  Source/idt.asm           -o Bin/idts.o
+nasm -felf  Source/cpu/gdt.asm       -o Bin/gdts.o
+nasm -felf  Source/cpu/idt.asm       -o Bin/idts.o
 i686-elf-as Source/mem/paging.s      -o Bin/pagings.o
 
 i686-elf-gcc -c Source/kernel.c         -o Bin/kernel.o          -std=gnu99 -ffreestanding -O2 -Wall -Wextra
@@ -18,15 +18,15 @@ i686-elf-gcc -c Source/mem/mem.c        -o Bin/mem.o             -std=gnu99 -ffr
 i686-elf-gcc -c Source/mem/paging.c     -o Bin/paging.o          -std=gnu99 -ffreestanding -O2 -Wall -Wextra
 i686-elf-gcc -c Source/tools/bintools.c -o Bin/bintools.o        -std=gnu99 -ffreestanding -O2 -Wall -Wextra
 i686-elf-gcc -c Source/console.c        -o Bin/console.o         -std=gnu99 -ffreestanding -O2 -Wall -Wextra
-i686-elf-gcc -c Source/io.c             -o Bin/io.o              -std=gnu99 -ffreestanding -O2 -Wall -Wextra
+i686-elf-gcc -c Source/cpu/io.c         -o Bin/io.o              -std=gnu99 -ffreestanding -O2 -Wall -Wextra
 i686-elf-gcc -c Source/keyboard.c       -o Bin/keyboard.o        -std=gnu99 -ffreestanding -O2 -Wall -Wextra
 i686-elf-gcc -c Source/vga.c            -o Bin/vga.o             -std=gnu99 -ffreestanding -O2 -Wall -Wextra
-i686-elf-gcc -c Source/interrupt.c      -o Bin/interrupt.o       -std=gnu99 -ffreestanding -O2 -Wall -Wextra
-i686-elf-gcc -c Source/pic.c            -o Bin/pic.o             -std=gnu99 -ffreestanding -O2 -Wall -Wextra
+i686-elf-gcc -c Source/cpu/interrupt.c  -o Bin/interrupt.o       -std=gnu99 -ffreestanding -O2 -Wall -Wextra
+i686-elf-gcc -c Source/cpu/pic.c        -o Bin/pic.o             -std=gnu99 -ffreestanding -O2 -Wall -Wextra
 i686-elf-gcc -c Source/string.c         -o Bin/string.o          -std=gnu99 -ffreestanding -O2 -Wall -Wextra
 i686-elf-gcc -c Source/math.c           -o Bin/math.o            -std=gnu99 -ffreestanding -O2 -Wall -Wextra
-i686-elf-gcc -c Source/gdt.c            -o Bin/gdt.o             -std=gnu99 -ffreestanding -O2 -Wall -Wextra
-i686-elf-gcc -c Source/idt.c            -o Bin/idt.o             -std=gnu99 -ffreestanding -O2 -Wall -Wextra
+i686-elf-gcc -c Source/cpu/gdt.c        -o Bin/gdt.o             -std=gnu99 -ffreestanding -O2 -Wall -Wextra
+i686-elf-gcc -c Source/cpu/idt.c        -o Bin/idt.o             -std=gnu99 -ffreestanding -O2 -Wall -Wextra
 i686-elf-gcc -c Source/clock.c          -o Bin/clock.o           -std=gnu99 -ffreestanding -O2 -Wall -Wextra
 i686-elf-gcc -c Source/ata.c            -o Bin/ata.o             -std=gnu99 -ffreestanding -O2 -Wall -Wextra
 i686-elf-gcc -c Source/FS/fs.c          -o Bin/fs.o              -std=gnu99 -ffreestanding -O2 -Wall -Wextra
