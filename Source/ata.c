@@ -1,5 +1,4 @@
 #include "system.h"
-#include "FS/fs_types.h"
 
 const uint32_t ata_base[4] = {ATA_BASE0,ATA_BASE0,ATA_BASE1,ATA_BASE1};
 uint32_t ata_interrupt_active = 0;

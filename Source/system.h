@@ -42,5 +42,5 @@ This is the main system header
 #include "keyboard.h"
 #include "clock.h"
 #include "ata.h"
-#include "FS/file_system.h"
+#include "fs/file_system.h"
 #endif
