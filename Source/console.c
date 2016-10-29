@@ -14,7 +14,7 @@ int ysize = 0;
 _24bit_color bgcolor = {0, 0, 0};
 _24bit_color fgcolor = {0, 255, 0};
 
-char console_buffer[1024*768];
+char console_buffer[1024*768*2];//the times 2 is just in case
 
 void console_reset()
 {
