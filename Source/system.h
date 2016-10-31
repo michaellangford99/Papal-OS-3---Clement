@@ -37,7 +37,6 @@ This is the main system header
 #include "multiboot.h"
 #include "vga.h"
 #include "mem/memory.h"
-#include "mem/paging.h"
 #include "console.h"
 #include "keyboard.h"
 #include "clock.h"
