@@ -16,7 +16,7 @@ void kernel_main(struct multiboot_header* mboot_header, uint32_t multiboot_magic
 	memory_init(multiboot_get_address());
 	init_paging();
 	
-	//??????
+	//misc drivers
 	clock_init();
 	keyboard_init();
 	
