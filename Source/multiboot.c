@@ -35,13 +35,16 @@ void multiboot_dump(struct multiboot_header* mboot_header) {
 	printf("mods_addr:         0x%x / %d\n", mboot_header->mods_addr, mboot_header->mods_addr);
   
 	//attempt to print as string first module
-	mboot_mod_desc_t* mod_info = (mboot_mod_desc_t*) mboot_header->mods_addr;
   
-  printf("module 1 start : %d, '%s'\n", mod_info->start, mod_info->start);
-  printf("module 1 end : %d, '%s'\n", mod_info->end, mod_info->end);
-  printf("module 1 string : %d, '%s'\n", mod_info->string, mod_info->string);
-  printf("module 1 reserved : %d\n", mod_info->start, mod_info->start);
-  
+  if (mboot_header->mods_count > 0)
+  {
+  	mboot_mod_desc_t* mod_info = (mboot_mod_desc_t*) mboot_header->mods_addr;
+    
+    printf("module 1 start : %d, '%s'\n", mod_info->start, mod_info->start);
+    printf("module 1 end : %d, '%s'\n", mod_info->end, mod_info->end);
+    printf("module 1 string : %d, '%s'\n", mod_info->string, mod_info->string);
+    printf("module 1 reserved : %d\n", mod_info->start, mod_info->start);
+  }
   
 	printf("num:               0x%x / %d\n", mboot_header->num, mboot_header->num);
 	printf("size:              0x%x / %d\n", mboot_header->size, mboot_header->size);
