@@ -20,12 +20,14 @@ void kernel_main(struct multiboot_header* mboot_header, uint32_t multiboot_magic
 	clock_init();
 	keyboard_init();
 	
-	ata_init();
-	fs_init();
+	//ata_init();
+	//fs_init();
 	
 	//data dump
 	graphics_init(multiboot_get_vbe_address());
-	multiboot_dump(multiboot_get_address());
+	//multiboot_dump(multiboot_get_address());
+	
+	main();
 	
 	/*
 	uint32_t kernel_location = get_kernel_location();
