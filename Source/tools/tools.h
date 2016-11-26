@@ -2,5 +2,6 @@
 #define TOOLS_H
 
 #include "bintools.h"
+#include "list.h"
 
 #endif
