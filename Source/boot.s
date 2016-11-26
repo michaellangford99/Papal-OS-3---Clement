@@ -17,7 +17,7 @@
 .long CHECKSUM
 .long 0, 0, 0, 0, 0
 .long 0 #set graphics mode
-.long 1152, 864, 32  #width, height, depth. This is the preferred mode for the OS, 
+.long 1024, 768, 32  #width, height, depth. This is the preferred mode for the OS, 
                      #however, other modes chosen by GRUB will be detected and used
 
 .section .bootstrap_stack, "aw", @nobits
