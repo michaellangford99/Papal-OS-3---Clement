@@ -17,6 +17,7 @@ i686-elf-gcc -c Source/multiboot.c      -o Bin/multiboot.o       -std=gnu99 -ffr
 i686-elf-gcc -c Source/mem/mem.c        -o Bin/mem.o             -std=gnu99 -ffreestanding -O2 -Wall -Wextra
 i686-elf-gcc -c Source/mem/paging.c     -o Bin/paging.o          -std=gnu99 -ffreestanding -O2 -Wall -Wextra
 i686-elf-gcc -c Source/tools/bintools.c -o Bin/bintools.o        -std=gnu99 -ffreestanding -O2 -Wall -Wextra
+i686-elf-gcc -c Source/tools/list.c     -o Bin/list.o            -std=gnu99 -ffreestanding -O2 -Wall -Wextra
 i686-elf-gcc -c Source/console.c        -o Bin/console.o         -std=gnu99 -ffreestanding -O2 -Wall -Wextra
 i686-elf-gcc -c Source/cpu/io.c         -o Bin/io.o              -std=gnu99 -ffreestanding -O2 -Wall -Wextra
 i686-elf-gcc -c Source/keyboard.c       -o Bin/keyboard.o        -std=gnu99 -ffreestanding -O2 -Wall -Wextra
@@ -34,7 +35,7 @@ i686-elf-gcc -c Source/fs/clement_vfs.c -o Bin/clement_vfs.o     -std=gnu99 -ffr
 i686-elf-gcc -c Source/fs/fat16.c       -o Bin/fat16.o           -std=gnu99 -ffreestanding -O2 -Wall -Wextra
 i686-elf-gcc -c Source/pm/pm.c          -o Bin/pm.o              -std=gnu99 -ffreestanding -O2 -Wall -Wextra
 
-i686-elf-gcc -T Source/linker.ld -o Bin/clement.bin -ffreestanding -O2 -nostdlib Bin/boot.o Bin/io.o Bin/mem.o Bin/paging.o Bin/pagings.o Bin/multiboot.o Bin/kernel.o Bin/console.o Bin/keyboard.o Bin/ata.o Bin/vga.o Bin/interrupt.o Bin/pic.o Bin/string.o Bin/math.o Bin/gdt.o Bin/gdts.o Bin/idt.o Bin/idts.o Bin/clock.o Bin/fs.o Bin/pm.o Bin/clement_vfs.o Bin/fat16.o Bin/bintools.o -lgcc
+i686-elf-gcc -T Source/linker.ld -o Bin/clement.bin -ffreestanding -O2 -nostdlib Bin/boot.o Bin/io.o Bin/mem.o Bin/paging.o Bin/pagings.o Bin/multiboot.o Bin/kernel.o Bin/console.o Bin/keyboard.o Bin/ata.o Bin/vga.o Bin/interrupt.o Bin/pic.o Bin/string.o Bin/math.o Bin/gdt.o Bin/gdts.o Bin/idt.o Bin/idts.o Bin/clock.o Bin/fs.o Bin/pm.o Bin/clement_vfs.o Bin/fat16.o Bin/bintools.o Bin/list.o -lgcc
 
 cp Bin/clement.bin Grub/boot/clement.bin
 cp Grub/grub.cfg Grub/boot/grub/grub.cfg
