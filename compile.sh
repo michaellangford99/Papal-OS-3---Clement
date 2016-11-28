@@ -2,48 +2,78 @@
 # and "Setting up a Cross Compiler" in osdev.org
 clear
 
+#prep cross-compiler
 export PREFIX="$HOME/opt/cross"
 export TARGET=i686-elf
 export PATH="$PREFIX/bin:$PATH"
 export PATH="$HOME/opt/cross/bin:$PATH"
+#settings
+Ccolor=220
+LINKcolor=21
+GRUBcolor=121
 
+CFLAGS="-std=gnu99 -ffreestanding -O2 -Wextra -Wall -fdiagnostics-color=always"
+LD_BIN_FLAGS="-T Source/linker.ld -o Bin/clement.bin -ffreestanding -O2 -nostdlib"
+LD_O_FLAGS="-lgcc -fdiagnostics-color=always"
+
+LOGFILE="buildlog.log"
+
+#assemble special assembly files
 i686-elf-as Source/boot.s            -o Bin/boot.o
 nasm -felf  Source/cpu/gdt.asm       -o Bin/gdts.o
 nasm -felf  Source/cpu/idt.asm       -o Bin/idts.o
 i686-elf-as Source/mem/paging.s      -o Bin/pagings.o
 
-i686-elf-gcc -c Source/kernel.c         -o Bin/kernel.o          -std=gnu99 -ffreestanding -O2 -Wall -Wextra
-i686-elf-gcc -c Source/multiboot.c      -o Bin/multiboot.o       -std=gnu99 -ffreestanding -O2 -Wall -Wextra
-i686-elf-gcc -c Source/mem/mem.c        -o Bin/mem.o             -std=gnu99 -ffreestanding -O2 -Wall -Wextra
-i686-elf-gcc -c Source/mem/paging.c     -o Bin/paging.o          -std=gnu99 -ffreestanding -O2 -Wall -Wextra
-i686-elf-gcc -c Source/tools/bintools.c -o Bin/bintools.o        -std=gnu99 -ffreestanding -O2 -Wall -Wextra
-i686-elf-gcc -c Source/tools/list.c     -o Bin/list.o            -std=gnu99 -ffreestanding -O2 -Wall -Wextra
-i686-elf-gcc -c Source/console.c        -o Bin/console.o         -std=gnu99 -ffreestanding -O2 -Wall -Wextra
-i686-elf-gcc -c Source/cpu/io.c         -o Bin/io.o              -std=gnu99 -ffreestanding -O2 -Wall -Wextra
-i686-elf-gcc -c Source/keyboard.c       -o Bin/keyboard.o        -std=gnu99 -ffreestanding -O2 -Wall -Wextra
-i686-elf-gcc -c Source/vga.c            -o Bin/vga.o             -std=gnu99 -ffreestanding -O2 -Wall -Wextra
-i686-elf-gcc -c Source/cpu/interrupt.c  -o Bin/interrupt.o       -std=gnu99 -ffreestanding -O2 -Wall -Wextra
-i686-elf-gcc -c Source/cpu/pic.c        -o Bin/pic.o             -std=gnu99 -ffreestanding -O2 -Wall -Wextra
-i686-elf-gcc -c Source/string.c         -o Bin/string.o          -std=gnu99 -ffreestanding -O2 -Wall -Wextra
-i686-elf-gcc -c Source/math.c           -o Bin/math.o            -std=gnu99 -ffreestanding -O2 -Wall -Wextra
-i686-elf-gcc -c Source/cpu/gdt.c        -o Bin/gdt.o             -std=gnu99 -ffreestanding -O2 -Wall -Wextra
-i686-elf-gcc -c Source/cpu/idt.c        -o Bin/idt.o             -std=gnu99 -ffreestanding -O2 -Wall -Wextra
-i686-elf-gcc -c Source/clock.c          -o Bin/clock.o           -std=gnu99 -ffreestanding -O2 -Wall -Wextra
-i686-elf-gcc -c Source/ata.c            -o Bin/ata.o             -std=gnu99 -ffreestanding -O2 -Wall -Wextra
-i686-elf-gcc -c Source/fs/fs.c          -o Bin/fs.o              -std=gnu99 -ffreestanding -O2 -Wall -Wextra
-i686-elf-gcc -c Source/fs/clement_vfs.c -o Bin/clement_vfs.o     -std=gnu99 -ffreestanding -O2 -Wall -Wextra
-i686-elf-gcc -c Source/fs/fat16.c       -o Bin/fat16.o           -std=gnu99 -ffreestanding -O2 -Wall -Wextra
-i686-elf-gcc -c Source/pm/pm.c          -o Bin/pm.o              -std=gnu99 -ffreestanding -O2 -Wall -Wextra
+#compile c files
+cd Source
+#find all directories in Source dir
+SRC_DIRS=`ls -d */ | sed 's#/##'`
 
-i686-elf-gcc -T Source/linker.ld -o Bin/clement.bin -ffreestanding -O2 -nostdlib Bin/boot.o Bin/io.o Bin/mem.o Bin/paging.o Bin/pagings.o Bin/multiboot.o Bin/kernel.o Bin/console.o Bin/keyboard.o Bin/ata.o Bin/vga.o Bin/interrupt.o Bin/pic.o Bin/string.o Bin/math.o Bin/gdt.o Bin/gdts.o Bin/idt.o Bin/idts.o Bin/clock.o Bin/fs.o Bin/pm.o Bin/clement_vfs.o Bin/fat16.o Bin/bintools.o Bin/list.o -lgcc
+#compile all c files in Source dir
+for cfile in `ls *.c`
+do
+	i686-elf-gcc -c  $cfile -o "../Bin/$cfile.o" $CFLAGS
+	tput setaf $Ccolor
+	echo $cfile
+	tput sgr0
+done
 
+#compile all c files in Source subdirectories
+for dir in $SRC_DIRS
+do
+        cd $dir
+	for cfile in `ls *.c`
+	do
+		i686-elf-gcc -c  $cfile -o "../../Bin/$cfile.o" $CFLAGS
+		tput setaf $Ccolor
+		echo $cfile
+		tput sgr0
+	done
+	cd ..
+done
+cd ..
+
+#done with c files
+
+#link
+O_FILES=`ls Bin/*.o`
+tput setaf $LINKcolor
+echo $O_FILES
+tput sgr0
+i686-elf-gcc $LD_BIN_FLAGS $O_FILES $LD_O_FLAGS
+
+#prepare GRUB
 cp Bin/clement.bin Grub/boot/clement.bin
 cp Grub/grub.cfg Grub/boot/grub/grub.cfg
 
+#create .iso
+tput setaf $GRUBcolor
 grub-mkrescue -o Build/clement.iso Grub
 
-echo "--Build Clement OS--" >> buildlog.log
-date >> buildlog.log
-echo "" >> buildlog.log
+#we're done!
+echo "--Build Clement OS--" >> $LOGFILE
+date >> $LOGFILE
+echo "" >> $LOGFILE
 
 echo "Finished!"
+tput sgr0
