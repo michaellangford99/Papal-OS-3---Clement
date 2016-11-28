@@ -45,6 +45,18 @@ int list_remove_node(node_t** head, int index)
   return 1;
 }
 
+node_t* list_access_node(node_t* head, int index)
+{
+  node_t* current = head;
+  for (int i = 0; i < index; i++)
+  {
+    current = current->next;
+    if (current == NULL)
+      return NULL;
+  }
+  return current;
+}
+
 void list_print(node_t* head)
 {
   node_t* current = head;
@@ -73,6 +85,11 @@ int main() {
     printf("\n");
     list_remove_node(&list, 4);
     list_print(list);
+    printf("\n");
+    
+    list_print(list_access_node(list->next, 2));
+    printf("\n");
+  
     
     return 1;
 }
