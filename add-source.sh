@@ -4,7 +4,6 @@ echo "creating c file $1"
 #if necessary, create directory
 if [[ $1 == */* ]] ; then
 	DIR=${1%/*}
-	echo $DIR 
 	mkdir $DIR
 fi
 
