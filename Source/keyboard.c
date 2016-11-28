@@ -20,7 +20,7 @@ struct keymap {
 };
 
 static struct keymap keymap[] = {
-	#include "keymap.us.c"
+	#include "keymap.us.h"
 };
 
 
