@@ -27,6 +27,8 @@ void kernel_main(struct multiboot_header* mboot_header, uint32_t multiboot_magic
 	graphics_init(multiboot_get_vbe_address());
 	//multiboot_dump(multiboot_get_address());
 	
+	load_ramdisk(multiboot_get_address());
+	
 	main();
 	
 	/*
