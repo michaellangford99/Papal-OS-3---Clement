@@ -1,5 +1,5 @@
 cd Source
-echo "creating c file $1"
+echo "creating c file ${1}.c"
 
 #if necessary, create directory
 if [[ $1 == */* ]] ; then
