@@ -1,3 +1,3 @@
 # Papal-OS-3---Clement
 
-Simple kernel currently all in ring 0
+Simple kernel / operating system, currently working on drivers and multithreading
