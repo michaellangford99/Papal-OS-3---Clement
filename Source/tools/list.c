@@ -12,9 +12,31 @@ void list_add_node(node_t* head, uint32_t val)
       current->next = (node_t*)kmalloc(sizeof(node_t));
       current->next->next = NULL;
       current->next->val = val;
+      current->next->child = NULL;
+      current->next->data = NULL;
       break;
     }
     current = current->next;
+    
+  }
+}
+
+void list_add_child(node_t* head, uint32_t val)
+{
+  node_t* current = head;
+  while(true)
+  {
+    if (current->child == NULL)
+    {
+      //we're at the end of the list.
+      current->child = (node_t*)kmalloc(sizeof(node_t));
+      current->child->next = NULL;
+      current->child->val = val;
+      current->child->child = NULL;
+      current->child->data = NULL;
+      break;
+    }
+    current = current->child;
     
   }
 }
@@ -72,10 +94,43 @@ void list_print(node_t* head)
   }
 }
 
+void list_print_children(node_t* head)
+{
+  node_t* current = head;
+  while(true)
+  {
+    printf("%d\n", current->val);
+    current = current->child;
+    if (current == NULL)
+    {
+      //we're at the end of the list.
+      break;
+    }
+  }
+}
+
+void list_print_tree(node_t* head)
+{
+  //take current node, and print its value
+  //advance node to child, print value
+  //continue doing previous line until we reach NULL
+  //go back one node, and advance node to next, print value
+  //keep doing last two lines
+  
+  node_t* root_tree = head;
+  while(root_tree != NULL)
+  {
+    printf_list_children(root_tree);
+    root_tree = root_tree->child;
+  }
+}
+
 int main() {
     node_t* list = (node_t*)kmalloc(sizeof(node_t));
     list->val = 0;
     list->next = NULL;
+    list->child = NULL;
+    list->data = NULL;
     list_add_node(list, 1);
     list_add_node(list, 2);
     list_add_node(list, 3);
