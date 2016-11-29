@@ -3,6 +3,8 @@
 
 typedef struct node {
     uint32_t val;
+    uint32_t* data;
+    struct node* child;
     struct node* next;
 }  __attribute__((packed)) node_t;
 
