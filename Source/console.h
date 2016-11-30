@@ -30,6 +30,8 @@ void printf_puthex( uint32_t i );
 void printf_putint( int32_t i );
 void printf( const char *s, ... );
 void printf_xy(int x, int y,  const char *s, ... );
+void console_set_xy(int x, int y);
+void console_set_xy_point(point xy);
 point console_get_xy();
 point console_get_size();
 

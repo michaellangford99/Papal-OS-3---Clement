@@ -311,6 +311,36 @@ void printf_xy(int x, int y,  const char *s, ... )
 	ypos = reg_y;
 }
 
+void console_set_xy(int x, int y)
+{
+	xpos = x;
+	ypos = y;
+	if (xpos > xsize-1)
+	{
+		ypos += 1;
+		xpos = xsize;
+	}
+	if (ypos > ysize-1)
+	{
+		ypos = ysize-1;
+	}
+}
+
+void console_set_xy_point(point xy)
+{
+	xpos = xy.x;
+	ypos = xy.y;
+	if (xpos > xsize-1)
+	{
+		ypos += 1;
+		xpos = xsize;
+	}
+	if (ypos > ysize-1)
+	{
+		ypos = ysize-1;
+	}
+}
+
 point console_get_xy()
 {
 	point p;
