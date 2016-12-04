@@ -1,9 +1,10 @@
 #include "../system.h"
 
-//add node to beggining of list
-void list_add_node(node_t* head, uint32_t val)
+//add node to end of list
+int list_add_node(node_t* head, uint32_t val)
 {
   node_t* current = head;
+  int index = 0;
   while(true)
   {
     if (current->next == NULL)
@@ -17,8 +18,9 @@ void list_add_node(node_t* head, uint32_t val)
       break;
     }
     current = current->next;
-    
+    index++;
   }
+  return index;
 }
 
 void list_add_child(node_t* head, uint32_t val)

@@ -8,7 +8,7 @@ typedef struct node {
     struct node* next;
 }  __attribute__((packed)) node_t;
 
-void list_add_node(node_t* head, uint32_t val);
+int list_add_node(node_t* head, uint32_t val);
 void list_add_child(node_t* head, uint32_t val);
 int list_remove_node(node_t** head, int index);
 node_t* list_access_node(node_t* head, int index);

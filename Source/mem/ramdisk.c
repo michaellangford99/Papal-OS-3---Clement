@@ -26,6 +26,45 @@ int load_ramdisk(struct multiboot_header* mboot_header)
   
   disk_head = (node_t*)kmalloc(sizeof(node_t));
   
+  node_t* new_file = create_rd_file(disk_head, "hi", RAMDISK_FILE);
+  printf("debug dump of test rd file:\n");
+  printf("directory inode:\n");
+  printf(" val: %d\n", new_file->val);
+  printf(" data: %d\n", (uint32_t)new_file->data);
+  printf("file descriptor:\n");
+  
+  ramdisk_file_descriptor_t* file_desc = (ramdisk_file_descriptor_t*)new_file->data;
+  
+  printf(" type: %d\n", file_desc->type);
+  printf(" size: %d\n", file_desc->size);
+  printf(" name: %s\n", file_desc->name);
+  printf(" val: %d\n", (uint32_t)file_desc->file_head->data);
   return K_SUCCESS;
 }
 
+node_t* create_rd_file(node_t* directory_node, char* file_name, uint32_t type)
+{
+  int d_index = list_add_node(directory_node, type);
+  node_t* file = list_access_node(directory_node, d_index);
+  
+  file->data = (uint32_t*)kmalloc(sizeof(ramdisk_file_descriptor_t));
+  ramdisk_file_descriptor_t* file_desc = (ramdisk_file_descriptor_t*)file->data;
+  file_desc->type = type;
+  file_desc->size = RAMDISK_BLOCKSIZE;
+  file_desc->name = file_name;
+  
+  //allocate a block for the new file
+  file_desc->file_head = (node_t*)kmalloc(sizeof(node_t));
+  file_desc->file_head->val = 0;
+  file_desc->file_head->next = NULL;
+  file_desc->file_head->child = NULL;
+  
+  file_desc->file_head->data = (uint32_t*)kmalloc(RAMDISK_BLOCKSIZE);
+    
+  return file;
+}
+
+node_t* get_root_dir_node()
+{
+  return disk_head;
+}
