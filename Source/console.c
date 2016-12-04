@@ -58,13 +58,24 @@ void console_putchar( char c )
 	// check for special keys (i.e. enter, backspace, TAB, ctrl, alt...)
 	switch(c) {
 		case 10:
+		/*fall through*/
 		case 13:
 			xpos=0;
 			ypos++;
 			break;
 		case '\f':
+				xpos-=1;
+			  ypos++;
+				break;
+		case '\a':
+				xpos-=1;
+				break;
+		case '\e':
+				ypos-=2;
+				break;
+		/*case '\f':
 			console_reset();
-			break;
+			break;*/
 		case '\b':
 			xpos--;
 			break;
