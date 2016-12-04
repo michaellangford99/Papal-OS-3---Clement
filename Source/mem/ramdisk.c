@@ -1,5 +1,7 @@
 #include "../system.h"
 
+node_t* disk_head;
+
 int load_ramdisk(struct multiboot_header* mboot_header)
 {
   //later we will also parse the ramdisk file (if there is one in the module list)
@@ -22,7 +24,8 @@ int load_ramdisk(struct multiboot_header* mboot_header)
     printf("-no modules found, and no initrd image-\n");
   }
   
-  
+  disk_head = (node_t*)kmalloc(sizeof(node_t));
   
   return K_SUCCESS;
 }
+

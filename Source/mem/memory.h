@@ -4,5 +4,5 @@
 #include "mem.h"
 #include "paging.h"
 #include "ramdisk.h"
-
+#include "heap.h"
 #endif
