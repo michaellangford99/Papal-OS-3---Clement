@@ -9,6 +9,8 @@ typedef struct {
 typedef struct {
   uint32_t type;
   uint32_t size;
+  char* name;
+  
   node_t* file_head;
   /* more coming */
 } __attribute__((packed)) ramdisk_file_descriptor;
