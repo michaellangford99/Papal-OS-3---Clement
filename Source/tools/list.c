@@ -24,16 +24,26 @@ void list_add_node(node_t* head, uint32_t val)
 void list_add_child(node_t* head, uint32_t val)
 {
   node_t* current = head;
+  if (current->child == NULL)
+  {
+    current->child = (node_t*)kmalloc(sizeof(node_t));
+    current->child->next = NULL;
+    current->child->val = val;
+    current->child->child = NULL;
+    current->child->data = NULL;
+    return;
+  }
+  current = current->child;
   while(true)
   {
-    if (current->child == NULL)
+    if (current->next == NULL)
     {
       //we're at the end of the list.
-      current->child = (node_t*)kmalloc(sizeof(node_t));
-      current->child->next = NULL;
-      current->child->val = val;
-      current->child->child = NULL;
-      current->child->data = NULL;
+      current->next = (node_t*)kmalloc(sizeof(node_t));
+      current->next->next = NULL;
+      current->next->val = val;
+      current->next->child = NULL;
+      current->next->data = NULL;
       break;
     }
     current = current->child;
@@ -111,17 +121,23 @@ void list_print_children(node_t* head)
 
 void list_print_tree(node_t* head)
 {
-  //take current node, and print its value
-  //advance node to child, print value
-  //continue doing previous line until we reach NULL
-  //go back one node, and advance node to next, print value
-  //keep doing last two lines
-  
+  if (head == NULL)
+  {
+    return;
+  }
+  printf("-");
   node_t* root_tree = head;
   while(root_tree != NULL)
   {
-    printf_list_children(root_tree);
-    root_tree = root_tree->child;
+    printf("%d", root_tree->val);
+    list_print_tree(root_tree->child);
+    root_tree = root_tree->next;
+    printf("\f|\f");
+    if (root_tree==NULL)
+    {
+      printf("\a");
+      return;
+    }
   }
 }
 
@@ -135,15 +151,21 @@ int main() {
     list_add_node(list, 2);
     list_add_node(list, 3);
     list_add_node(list, 4);
+    list_add_child(list->next, 9);
+    list_add_child(list->next->child, 9);
+    list_add_node(list->next->child, 9);
+    list_add_node(list->next->child->child, 9);
     
-    list_print(list);
-    printf("\n");
-    list_remove_node(&list, 4);
-    list_print(list);
-    printf("\n");
+    list_print_tree(list);
     
-    list_print(list_access_node(list->next, 2));
-    printf("\n");
+    //list_print(list);
+    //printf("\n");
+    //list_remove_node(&list, 4);
+    //list_print(list);
+    //printf("\n");
+    
+    //list_print(list_access_node(list->next, 2));
+    //printf("\n");
   
     
     return 1;
