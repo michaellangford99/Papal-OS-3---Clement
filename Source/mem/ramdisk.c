@@ -64,6 +64,28 @@ node_t* create_rd_file(node_t* directory_node, char* file_name, uint32_t type)
   return file;
 }
 
+void write_rd_file(node_t* file, uint32_t* data, int overwrite)
+{
+  ramdisk_file_descriptor_t* file_desc = (ramdisk_file_descriptor_t*)file->data;
+  uint32_t* data_start = NULL;
+  if (overwrite == RAMDISK_OVERWRITE)
+    data_start = file_desc->file_head->data;
+  if (overwrite == RAMDISK_APPEND)
+  {
+    //traverse file_head until next == NULL
+    //then read the data block until we find a null terminating character. mark that as beginning of file.
+    
+    //when writing make sure that when block size has been exceeded, allocate a new linked list node, 
+    //and allocate a data block for it to point to. then write to it.repeat.
+  }
+  
+  //no directories
+  if (file_desc->type == RAMDISK_DIRECTORY)
+    return;
+    
+  
+}
+
 node_t* get_root_dir_node()
 {
   return disk_head;

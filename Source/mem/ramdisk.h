@@ -2,9 +2,19 @@
 #define RAMDISK_H
 
 #define RAMDISK_BLOCKSIZE 4096
-#define RAMDISK_FILE 9
+#define RAMDISK_FILE      9
 #define RAMDISK_DIRECTORY 1
 
+#define RAMDISK_FILE_R    0
+#define RAMDISK_FILE_W    1
+#define RAMDISK_FILE_E    2
+#define RAMDISK_FILE_RW   3
+#define RAMDISK_FILE_RE   4
+#define RAMDISK_FILE_WE   5
+#define RAMDISK_FILE_RWE  6
+
+#define RAMDISK_OVERWRITE  1
+#define RAMDISK_APPEND     0
 
 typedef struct {
   uint32_t* base_ptr;
