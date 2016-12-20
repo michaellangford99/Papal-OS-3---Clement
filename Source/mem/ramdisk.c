@@ -72,12 +72,20 @@ void write_rd_file(node_t* file, uint32_t* data, int overwrite)
     data_start = file_desc->file_head->data;
   if (overwrite == RAMDISK_APPEND)
   {
+    node_t* data_block = file_desc->file_head;
     //traverse file_head until next == NULL
+    while (data_block != NULL)
+    {
+      data_block = data_block->next;
+      data_start = data_block->data;
+    }
     //then read the data block until we find a null terminating character. mark that as beginning of file.
     
-    //when writing make sure that when block size has been exceeded, allocate a new linked list node, 
-    //and allocate a data block for it to point to. then write to it.repeat.
   }
+  //when writing make sure that when block size has been exceeded, allocate a new linked list node, 
+  //and allocate a data block for it to point to. then write to it.repeat.
+  
+  
   
   //no directories
   if (file_desc->type == RAMDISK_DIRECTORY)
