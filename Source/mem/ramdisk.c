@@ -80,7 +80,14 @@ void write_rd_file(node_t* file, uint32_t* data, int overwrite)
       data_start = data_block->data;
     }
     //then read the data block until we find a null terminating character. mark that as beginning of file.
-    
+    for (int i = 0; i < RAMDISK_BLOCKSIZE; i++)
+    {
+      if (data_start[i] == '\0')
+      {
+        data_start = (uint32_t*)((uint32_t)data_start + i);
+        break;
+      }
+    }
   }
   //when writing make sure that when block size has been exceeded, allocate a new linked list node, 
   //and allocate a data block for it to point to. then write to it.repeat.
