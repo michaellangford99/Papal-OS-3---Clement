@@ -32,6 +32,7 @@ typedef struct {
 
 int load_ramdisk(struct multiboot_header* mboot_header);
 node_t* create_rd_file(node_t* directory_node, char* file_name, uint32_t type);
+void write_rd_file(node_t* file, uint32_t* data, int overwrite);
 node_t* get_root_dir_node();
 
 #endif
