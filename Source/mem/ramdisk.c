@@ -43,8 +43,14 @@ int load_ramdisk(struct multiboot_header* mboot_header)
   //===========
   
   printf("\ndebug dump of rd_write - OVERWRITE:\n");
-  write_rd_file(new_file, (uint32_t*)("hello"), RAMDISK_OVERWRITE);
-  list_print(file_desc->file_head);
+  write_rd_file(new_file, (uint8_t*)("OVERWRITE"), RAMDISK_OVERWRITE);
+  printf("%s\n", (char*)file_desc->file_head->data);
+  
+  printf("\ndebug dump of rd_write - APPEND:\n");
+  for (int i = 0; i < RAMDISK_BLOCKSIZE; i++)
+  {
+    write_rd_file(new_file, (uint8_t*)("----"), RAMDISK_APPEND);
+  }
   printf("%s\n", (char*)file_desc->file_head->data);
   
   return K_SUCCESS;
@@ -66,39 +72,45 @@ node_t* create_rd_file(node_t* directory_node, char* file_name, uint32_t type)
   file_desc->file_head->val = 0;
   file_desc->file_head->next = NULL;
   file_desc->file_head->child = NULL;
-  
-  file_desc->file_head->data = (uint32_t*)kmalloc(RAMDISK_BLOCKSIZE);
-    
+  if (type == RAMDISK_FILE)
+    file_desc->file_head->data = (uint32_t*)kmalloc(RAMDISK_BLOCKSIZE);
+  else
+    file_desc->file_head->data = NULL;
   return file;
 }
 
-void write_rd_file(node_t* file, uint32_t* data, int overwrite)
+void write_rd_file(node_t* file, uint8_t* data, int overwrite)
 {
   ramdisk_file_descriptor_t* file_desc = (ramdisk_file_descriptor_t*)file->data;
   
-  uint32_t* data_start = NULL;
+  uint8_t* data_start = NULL;
   
-  uint32_t* data_current = NULL;
-  uint32_t* data_current_local = NULL;
+  uint8_t* data_current = NULL;
+  uint8_t* data_current_local = NULL;
   
   node_t* data_block = file_desc->file_head;
   int data_index = 0;
   
-  if (overwrite == RAMDISK_OVERWRITE)
-    data_start = file_desc->file_head->data;
+  data_start = (uint8_t*)data_block->data;
   if (overwrite == RAMDISK_APPEND) {
     //traverse file_head until next == NULL
-    while (data_block != NULL)
+    while (data_block->next != NULL)
     {
       data_block = data_block->next;
-      data_start = data_block->data;
+      data_start = (uint8_t*)data_block->data;
     }
     //then read the data block until we find a null terminating character. mark that as beginning of file.
     for (int i = 0; i < RAMDISK_BLOCKSIZE; i++)
     {
+      //printf("i: %d data[i] = '%c'\n", (uint32_t)i, data_start[i]);
+      //printf("data start: %d\n", (uint32_t)data_start);
+      //printf("block start: %d\n", (uint32_t)data_block->data);
       if (data_start[i] == '\0')
       {
-        data_start = (uint32_t*)((uint32_t)data_start + i);
+        data_start = (uint8_t*)(data_start + i); //the - 1 is to remove the null terminating character
+        //printf("data start: %d\n", (uint32_t)data_start);
+        //printf("block start: %d\n", (uint32_t)data_block->data);
+        
         break;
       }
     }
@@ -109,18 +121,17 @@ void write_rd_file(node_t* file, uint32_t* data, int overwrite)
   //when writing make sure that when block size has been exceeded, allocate a new linked list node, 
   //and allocate a data block for it to point to. then write to it.repeat.
   data_current = data_start;
-  data_current_local = (uint32_t*)((uint32_t)data_current - (uint32_t)data_block->data);
+  data_current_local = (uint8_t*)(data_current - (uint8_t*)data_block->data);
   
   while(data[data_index] != '\0')
   {
-    if ((uint32_t)data_current_local >= RAMDISK_BLOCKSIZE)
+    if ((uint32_t)data_current_local == RAMDISK_BLOCKSIZE)
     {
-      data_block->next = (node_t*)kmalloc(sizeof(node_t));
-      data_block->child = NULL;
+      list_add_node(file_desc->file_head, 0);
       data_block = data_block->next;
       data_block->data = (uint32_t*)kmalloc(RAMDISK_BLOCKSIZE);
       
-      data_current = data_block->data;
+      data_current = (uint8_t*)data_block->data;
       data_current_local = 0;
     }
     
