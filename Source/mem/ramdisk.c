@@ -26,7 +26,7 @@ int load_ramdisk(struct multiboot_header* mboot_header)
   
   disk_head = (node_t*)kmalloc(sizeof(node_t));
   
-  node_t* new_file = create_rd_file(disk_head, "hi", RAMDISK_FILE);
+  /*node_t* new_file = create_rd_file(disk_head, "hi", RAMDISK_FILE);
   printf("debug dump of test rd file:\n");
   printf("directory inode:\n");
   printf(" val: %d\n", new_file->val);
@@ -39,7 +39,7 @@ int load_ramdisk(struct multiboot_header* mboot_header)
   printf(" size: %d\n", file_desc->size);
   printf(" name: %s\n", file_desc->name);
   printf(" val: %d\n", (uint32_t)file_desc->file_head->data);
-  
+  */
   //===========
   
   /*printf("\ndebug dump of rd_write - OVERWRITE:\n");
@@ -52,7 +52,7 @@ int load_ramdisk(struct multiboot_header* mboot_header)
     write_rd_file(new_file, (uint8_t*)("----"), RAMDISK_APPEND);
   }
   printf("%s\n", (char*)file_desc->file_head->data);*/
-  
+  printf("ramdisk : ready!\n");
   return K_SUCCESS;
 }
 

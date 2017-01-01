@@ -143,7 +143,7 @@ void list_print_tree(node_t* head)
   }
 }
 
-int list_test() {
+int test_list() {
     printf("\n");
     node_t* list = (node_t*)kmalloc(sizeof(node_t));
     list->val = 0;

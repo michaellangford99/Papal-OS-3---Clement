@@ -29,7 +29,7 @@ void kernel_main(struct multiboot_header* mboot_header, uint32_t multiboot_magic
 	
 	load_ramdisk(multiboot_get_address());
 	
-	list_test();//test list.c
+	test_list();//test list.c
 	
 	/*
 	uint32_t kernel_location = get_kernel_location();
