@@ -42,7 +42,7 @@ int load_ramdisk(struct multiboot_header* mboot_header)
   
   //===========
   
-  printf("\ndebug dump of rd_write - OVERWRITE:\n");
+  /*printf("\ndebug dump of rd_write - OVERWRITE:\n");
   write_rd_file(new_file, (uint8_t*)("OVERWRITE"), RAMDISK_OVERWRITE);
   printf("%s\n", (char*)file_desc->file_head->data);
   
@@ -51,7 +51,7 @@ int load_ramdisk(struct multiboot_header* mboot_header)
   {
     write_rd_file(new_file, (uint8_t*)("----"), RAMDISK_APPEND);
   }
-  printf("%s\n", (char*)file_desc->file_head->data);
+  printf("%s\n", (char*)file_desc->file_head->data);*/
   
   return K_SUCCESS;
 }
