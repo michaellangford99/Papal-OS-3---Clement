@@ -12,7 +12,7 @@ Ccolor=220
 LINKcolor=21
 GRUBcolor=121
 
-CFLAGS="-std=gnu99 -ffreestanding -O2 -Wextra -Wall -fdiagnostics-color=always"
+CFLAGS="-std=gnu99 -ffreestanding -O2 -Wextra -Wall -fdiagnostics-color=always -Wno-unused-variable -Wno-unused-parameter"
 LD_BIN_FLAGS="-T Source/linker.ld -o Bin/clement.bin -ffreestanding -O2 -nostdlib"
 LD_O_FLAGS="-lgcc -fdiagnostics-color=always"
 
