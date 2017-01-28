@@ -4,6 +4,7 @@
 #define PM_MAX_KERNEL_THREADS    255
 #define PM_INTERRUPT_STACK_SIZE  65536 //64 KB
 #define PM_PROC_0_ID             0
+#define PM_THREAD_TIME_QUANTUM   0 //TBD
 
 /*typedef struct
 {
@@ -19,6 +20,7 @@ typedef struct {
     uint32_t stack_top;
     uint32_t thread_id;
     struct x86_registers thread_regs;
+    uint32_t quantum;
     //uint32_t* entry_point;
     //node_t memory_pages;
 } thread_t;
