@@ -19,6 +19,7 @@ typedef uint16_t idt_entry;
 
 struct x86_registers
 {
+  uint32_t proc_id;
   unsigned int gs, fs, es, ds;
   unsigned int edi, esi, ebp, esp, ebx, edx, ecx, eax;
   unsigned int int_no, err_code;
@@ -37,4 +38,4 @@ void irq_handler(struct x86_registers *regs);
 void irq_send_EOI_8259(uint8_t irq);
 void irq_zero_handlers();
 
-#endif 
+#endif

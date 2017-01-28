@@ -440,12 +440,23 @@ _irq15:
   jmp _irq_stub  
 
 ;===========================================_irq_stub======================================================================
+
+extern int_stack
+extern saved_esp
+extern saved_ebp
+
 _irq_stub:
+
+  cli
+
+  ;push all data onto current stack
   pusha
   push ds
   push es
   push fs
   push gs
+  
+  push 1 ;proc id
 
   mov ax, 0x10
   mov ds, ax
@@ -454,12 +465,37 @@ _irq_stub:
   mov gs, ax
 
   mov eax, esp
+  ;push eax
+  
+  ; ====switch stacks
+  
+  ; save old stack
+  ;TODO: change this to just moving them into eax and ebx, and 
+  ;      just push them and let th int handler deal with them
+  mov [saved_esp], esp
+  mov [saved_ebp], ebp
+  
+  ; load new stack
+  mov esp, [int_stack]
+  mov ebp, [int_stack+4]
+  
   push eax
   
   mov eax, irq_handler
   call eax
   
   pop eax
+  
+  ; save stack 2
+  mov [int_stack], esp
+  mov [int_stack+4], ebp
+  
+  ;reload stack 1
+  mov esp, [saved_esp]
+  mov ebp, [saved_ebp]
+  
+  
+  pop eax ;pop proc id
 
   pop gs
   pop fs
@@ -467,6 +503,8 @@ _irq_stub:
   pop ds
   popa
   add esp, 8
+  
+  sti
   
   iret
   

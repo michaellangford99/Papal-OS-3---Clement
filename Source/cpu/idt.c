@@ -189,6 +189,7 @@ void isr_init()
 
 void isr_handler(struct x86_registers *regs)
 {
+	//proc_save(regs);
 	if (regs->int_no < 32)
 	{
 		printf("unhandled ");
@@ -265,6 +266,8 @@ void ir_clear_handler(int irq)
 
 void irq_handler(struct x86_registers *regs)
 {
+	//proc_save(regs);
+		
 	void (*handler)(struct x86_registers *regs);
 	
 	handler = irq_handlers[regs->int_no - 32];

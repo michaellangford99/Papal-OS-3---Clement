@@ -16,6 +16,9 @@ static void clock_interrupt(struct x86_registers *regs)
 {
 	clicks++;
 	graphics_update_fb(); //copy the framebuffer to video memory
+	
+	//proc_schedule();
+	
 	if(clicks>=CLICKS_PER_SECOND) {
 		clicks=0;
 		seconds++;

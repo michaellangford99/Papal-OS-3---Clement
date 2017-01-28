@@ -21,8 +21,10 @@
                      #however, other modes chosen by GRUB will be detected and used
 
 .section .bootstrap_stack, "aw", @nobits
+.global stack_bottom
 stack_bottom:
 .skip 65536 # 64 KiB
+.global stack_top
 stack_top:
 
 # The linker script specifies _start as the entry point to the kernel and the
@@ -42,7 +44,7 @@ _start:
 	
 	pushl %eax
 	pushl %ebx # Pointer to multiboot header
-	
+  
   cli
 	# We are now ready to actually execute C code.
 	call kernel_main

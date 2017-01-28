@@ -22,7 +22,6 @@ void interrupt_init()
 		interrupt_disable(i);
 		interrupt_acknowledge(i);
 	}
-	interrupt_unblock();
 }
 
 void interrupt_enable( int i )
