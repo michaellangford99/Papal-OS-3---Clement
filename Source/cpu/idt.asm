@@ -471,7 +471,7 @@ _irq_stub:
   
   ; save old stack
   ;TODO: change this to just moving them into eax and ebx, and 
-  ;      just push them and let th int handler deal with them
+  ;      just push them and let the int handler deal with them
   mov [saved_esp], esp
   mov [saved_ebp], ebp
   
