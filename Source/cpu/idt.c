@@ -2,15 +2,15 @@
 
 /*
 	Section 1 - declarations
-	
+
 	Section 2 - idt_init, idt_zero, idt_set_gate
-	
+
 	Section 3 - extern isrs, isr_handler, isr_init
-	
-	Section 4 - extern irqs, irq_handlers, irq_init, 
-							irq_set_handler, irq_clear_handler, irq_remap, 
+
+	Section 4 - extern irqs, irq_handlers, irq_init,
+							irq_set_handler, irq_clear_handler, irq_remap,
 							irq_send_EOI_8259, irq_zero_handlers
-						
+
 */
 
 // Section 1 - declarations
@@ -71,17 +71,17 @@ void idt_init()
 {
 	interrupt_block();
 	idt_zero();
-	
+
 	isr_init();
 	irq_init();
-	
+
 	idtp.limit = (64*256) -1;
 	idtp.base = (uint32_t)&idt_entries;
-	
+
 	idt_load();
-	
+
 	interrupt_init(); // inits 8259, and does remapping
-	
+
 	printf("idt: ready\n");
 }
 
@@ -98,7 +98,7 @@ void idt_set_gate(char interrupt, offset int_offset, flags int_flags, segment in
 	// 2nd 16 bits is the segment selector
 	// 3rd 16 bits is the int_flags
 	// 4th 16 bits are the last 16 bits of int_offset
-	
+
 	idt_entries[(interrupt * 4) + 0] = (uint16_t)(int_offset) & 0xFFFF;
 	idt_entries[(interrupt * 4) + 1] = (uint16_t)(int_segment);
 	idt_entries[(interrupt * 4) + 2] = (uint16_t)(int_flags);
@@ -225,7 +225,7 @@ void irq_init()
 {
 	//irq_remap();
 	irq_zero_handlers();
-	
+
 	idt_set_gate(32, (uint32_t)_irq0, irq_flags, irq_segment);
 	idt_set_gate(33, (uint32_t)_irq1, irq_flags, irq_segment);
 	idt_set_gate(34, (uint32_t)_irq2, irq_flags, irq_segment);
@@ -261,19 +261,21 @@ void irq_set_handler(int irq, void (*handler)(struct x86_registers *regs))
 void ir_clear_handler(int irq)
 {
 	interrupt_disable(irq+32);
-	irq_handlers[irq] = 0;	
+	irq_handlers[irq] = 0;
 }
 
-void irq_handler(struct x86_registers *regs)
+//extern stack_t int_stack;
+
+void irq_handler(uint32_t ebp, struct x86_registers *regs)
 {
 	//proc_save(regs);
-		
+
 	void (*handler)(struct x86_registers *regs);
-	
+
 	handler = irq_handlers[regs->int_no - 32];
 	if (handler)
 		handler(regs);
-		
+
 	irq_send_EOI_8259(regs->int_no);
 }
 
@@ -281,7 +283,7 @@ void irq_send_EOI_8259(uint8_t irq)
 {
 	if (irq >= 40)
 		outb(0xA0, 0x20);
-		
+
 	outb(0x20, 0x20);
 }
 

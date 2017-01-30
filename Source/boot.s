@@ -2,11 +2,11 @@
 
 # Declare constants used for creating a multiboot header.
 
-.set ALIGN,    1<<0             
-.set MEMINFO,  1<<1 
+.set ALIGN,    1<<0
+.set MEMINFO,  1<<1
 .set VIDINFO,  1<<2
 .set FLAGS,    ALIGN | MEMINFO | VIDINFO
-.set MAGIC,    0x1BADB002       
+.set MAGIC,    0x1BADB002
 .set CHECKSUM, -(MAGIC + FLAGS)
 
 #the multiboot header
@@ -34,17 +34,17 @@ stack_top:
 .global _start
 .type _start, @function
 _start:
-	
+
 	# To set up a stack, we simply set the esp register to point to the top of
 	# our stack (as it grows downwards).
 	movl $stack_top, %esp
   /* Make sure our stack is 16-byte aligned */
   and $-16, %esp
 	movl $stack_bottom, %ebp
-	
+
 	pushl %eax
 	pushl %ebx # Pointer to multiboot header
-  
+
   cli
 	# We are now ready to actually execute C code.
 	call kernel_main

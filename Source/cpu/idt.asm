@@ -47,227 +47,227 @@ extern isr_handler
 ;===========================================isr handlers======================================================================
 
 _isr0:
-  
+
   push byte 0
   push byte 0
-  
+
   jmp _isr_stub
-  
+
 _isr1:
-  
+
   push byte 0
   push byte 1
-  
+
   jmp _isr_stub
-  
+
 _isr2:
-  
+
   push byte 0
   push byte 2
-  
+
   jmp _isr_stub
-  
+
 _isr3:
-  
+
   push byte 0
   push byte 3
-  
+
   jmp _isr_stub
-  
+
 _isr4:
-  
+
   push byte 0
   push byte 4
-  
+
   jmp _isr_stub
-  
+
 _isr5:
-  
+
   push byte 0
   push byte 5
-  
+
   jmp _isr_stub
-  
+
 _isr6:
-  
+
   push byte 0
   push byte 6
-  
+
   jmp _isr_stub
-  
+
 _isr7:
-  
+
   push byte 0
   push byte 7
-  
+
   jmp _isr_stub
-  
+
 _isr8:
-  
-  
+
+
   push byte 8
-  
+
   jmp _isr_stub
-  
+
 _isr9:
-  
+
   push byte 0
   push byte 9
-  
+
   jmp _isr_stub
-  
+
 _isr10:
-  
-  
+
+
   push byte 10
-  
+
   jmp _isr_stub
-  
+
 _isr11:
-  
-  
+
+
   push byte 11
-  
+
   jmp _isr_stub
-  
+
 _isr12:
-  
-  
+
+
   push byte 12
-  
+
   jmp _isr_stub
-  
+
 _isr13:
-  
-  
+
+
   push byte 13
-  
+
   jmp _isr_stub
-  
+
 _isr14:
-  
-  
+
+
   push byte 14
-  
+
   jmp _isr_stub
-  
+
 _isr15:
-  
+
   push byte 0
   push byte 15
-  
+
   jmp _isr_stub
-  
+
 _isr16:
-  
+
   push byte 0
   push byte 16
-  
+
   jmp _isr_stub
-  
+
 _isr17:
-  
+
   push byte 0
   push byte 17
-  
+
   jmp _isr_stub
-  
+
 _isr18:
-  
+
   push byte 0
   push byte 18
-  
+
   jmp _isr_stub
-  
+
 _isr19:
-  
+
   push byte 0
   push byte 19
-  
+
   jmp _isr_stub
-  
+
 _isr20:
-  
+
   push byte 0
   push byte 20
-  
+
   jmp _isr_stub
-  
+
 _isr21:
-  
+
   push byte 0
   push byte 21
-  
+
   jmp _isr_stub
-  
+
 _isr22:
-  
+
   push byte 0
   push byte 22
-  
+
   jmp _isr_stub
-  
+
 _isr23:
-  
+
   push byte 0
   push byte 23
-  
+
   jmp _isr_stub
-  
+
 _isr24:
-  
+
   push byte 0
   push byte 24
-  
+
   jmp _isr_stub
-  
+
 _isr25:
-  
+
   push byte 0
   push byte 25
-  
+
   jmp _isr_stub
-  
+
 _isr26:
-  
+
   push byte 0
   push byte 26
-  
+
   jmp _isr_stub
-  
+
 _isr27:
-  
+
   push byte 0
   push byte 27
-  
+
   jmp _isr_stub
-  
+
 _isr28:
-  
+
   push byte 0
   push byte 28
-  
+
   jmp _isr_stub
-  
+
 _isr29:
-  
+
   push byte 0
   push byte 29
-  
+
   jmp _isr_stub
-  
+
 _isr30:
-  
+
   push byte 0
   push byte 30
-  
+
   jmp _isr_stub
-  
+
 _isr31:
-  
+
   push byte 0
   push byte 31
-  
+
   jmp _isr_stub
 
 ;===========================================_isr_stub======================================================================
@@ -283,30 +283,30 @@ _isr_stub:
   mov es, ax
   mov fs, ax
   mov gs, ax
-  
+
   mov eax, esp
   push eax
-  
+
   mov eax, isr_handler
   call eax
-  
+
   pop eax
-    
+
   pop gs
   pop fs
   pop es
   pop ds
   popa
-  
+
   add esp, 8
 
-  
+
   iret
 
 
 ;===========================================global irqs======================================================================
 
-global _irq0  
+global _irq0
 global _irq1
 global _irq2
 global _irq3
@@ -328,126 +328,127 @@ extern irq_handler
 ;===========================================irq handlers======================================================================
 
 _irq0:
-  
+
   push byte 0
   push byte 32
-  
+
   jmp _irq_stub
-  
+
 _irq1:
-  
+
   push byte 0
   push byte 33
-  
+
   jmp _irq_stub
-  
+
 _irq2:
-  
+
   push byte 0
   push byte 34
-  
+
   jmp _irq_stub
-  
+
 _irq3:
-  
+
   push byte 0
   push byte 35
-  
+
   jmp _irq_stub
-  
+
 _irq4:
-  
+
   push byte 0
   push byte 36
-  
+
   jmp _irq_stub
-  
+
 _irq5:
-  
+
   push byte 0
   push byte 37
-  
+
   jmp _irq_stub
-  
+
 _irq6:
-  
+
   push byte 0
   push byte 38
-  
+
   jmp _irq_stub
-  
+
 _irq7:
-  
+
   push byte 0
   push byte 39
-  
+
   jmp _irq_stub
-  
+
 _irq8:
-  
+
   push byte 0
   push byte 40
-  
+
   jmp _irq_stub
-  
+
 _irq9:
-  
+
   push byte 0
   push byte 41
-  
+
   jmp _irq_stub
-  
+
 _irq10:
-  
+
   push byte 0
   push byte 42
-  
+
   jmp _irq_stub
-  
+
 _irq11:
-  
+
   push byte 0
   push byte 43
-  
+
   jmp _irq_stub
-  
+
 _irq12:
-  
+
   push byte 0
   push byte 44
-  
+
   jmp _irq_stub
-  
+
 _irq13:
-  
+
   push byte 0
   push byte 45
-  
+
   jmp _irq_stub
-  
+
 _irq14:
-  
+
   push byte 0
   push byte 46
-  
+
   jmp _irq_stub
-  
+
 _irq15:
-  
+
   push byte 0
   push byte 47
-  
-  jmp _irq_stub  
+
+  jmp _irq_stub
 
 ;===========================================_irq_stub======================================================================
 
 extern int_stack
+
 extern saved_esp
 extern saved_ebp
 
 _irq_stub:
 
-  cli
+  ;cli
 
   ;push all data onto current stack
   pusha
@@ -455,9 +456,8 @@ _irq_stub:
   push es
   push fs
   push gs
-  
-  push 1 ;proc id
 
+  ;set up for handler
   mov ax, 0x10
   mov ds, ax
   mov es, ax
@@ -465,46 +465,47 @@ _irq_stub:
   mov gs, ax
 
   mov eax, esp
-  ;push eax
-  
-  ; ====switch stacks
-  
-  ; save old stack
-  ;TODO: change this to just moving them into eax and ebx, and 
-  ;      just push them and let the int handler deal with them
-  mov [saved_esp], esp
-  mov [saved_ebp], ebp
-  
-  ; load new stack
+  mov ebx, ebp
+
+  ; ====switch stacks:
+  ;save stack
+  ;mov [saved_esp], esp
+  ;mov [saved_ebp], ebp
+
+
+  ; load interrupt stack
   mov esp, [int_stack]
   mov ebp, [int_stack+4]
-  
+
+  ;push process stack
   push eax
-  
+  push ebx
+
   mov eax, irq_handler
   call eax
-  
+
+  pop ebx
   pop eax
-  
-  ; save stack 2
+
+  ; save interrupt stack
   mov [int_stack], esp
   mov [int_stack+4], ebp
-  
-  ;reload stack 1
-  mov esp, [saved_esp]
-  mov ebp, [saved_ebp]
-  
-  
-  pop eax ;pop proc id
+
+
+  ;reload process stack
+  mov esp, eax
+  mov ebp, ebx
+
+  ;mov esp, [saved_esp]
+  ;mov ebp, [saved_ebp]
 
   pop gs
   pop fs
   pop es
   pop ds
   popa
-  add esp, 8
-  
-  sti
-  
+  add esp, 8 ; jump past interrupt number and code
+
+  ;sti
+
   iret
-  

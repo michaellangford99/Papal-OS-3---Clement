@@ -15,9 +15,6 @@
 */
 
 typedef struct {
-    uint32_t stack_esp;
-    uint32_t stack_bottom;
-    uint32_t stack_top;
     uint32_t thread_id;
     struct x86_registers thread_regs;
     uint32_t quantum;
