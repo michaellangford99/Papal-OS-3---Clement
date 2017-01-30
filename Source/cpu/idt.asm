@@ -167,7 +167,7 @@ _isr16:
 
 _isr17:
 
-  push byte 0
+  ;push byte 0
   push byte 17
 
   jmp _isr_stub
@@ -258,7 +258,7 @@ _isr29:
 
 _isr30:
 
-  push byte 0
+  ;push byte 0
   push byte 30
 
   jmp _isr_stub
