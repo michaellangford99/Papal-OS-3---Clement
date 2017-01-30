@@ -52,8 +52,6 @@ void kernel_main(struct multiboot_header* mboot_header, uint32_t multiboot_magic
 
 	while(true)
 	{
-		printf_xy(40, 20, "aabb");
-		printf_xy(40, 20, "bbaa");
-		printf("0");
+		
 	}
 }

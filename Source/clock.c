@@ -14,8 +14,6 @@ static uint32_t seconds=0;
 
 static void clock_interrupt(struct x86_registers *regs)
 {
-	printf_xy(0, 2, "clock tick\n");
-		
 	clicks++;
 	graphics_update_fb(); //copy the framebuffer to video memory
 	
