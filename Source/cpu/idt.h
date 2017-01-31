@@ -33,7 +33,7 @@ void isr_handler(struct x86_registers *regs);
 void irq_init();
 void irq_set_handler(int irq, void (*handler)(struct x86_registers *regs));
 void ir_clear_handler(int irq);
-void irq_handler(uint32_t ebp, struct x86_registers *regs);
+void irq_handler(struct x86_registers *regs);
 void irq_send_EOI_8259(uint8_t irq);
 void irq_zero_handlers();
 

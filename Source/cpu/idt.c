@@ -266,7 +266,7 @@ void ir_clear_handler(int irq)
 
 //extern stack_t int_stack;
 
-void irq_handler(uint32_t ebp, struct x86_registers *regs)
+void irq_handler(struct x86_registers *regs)
 {
 	//proc_save(regs);
 

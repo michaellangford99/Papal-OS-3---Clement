@@ -448,8 +448,6 @@ extern saved_ebp
 
 _irq_stub:
 
-  ;cli
-
   ;push all data onto current stack
   pusha
   push ds
@@ -465,26 +463,19 @@ _irq_stub:
   mov gs, ax
 
   mov eax, esp
-  mov ebx, ebp
-
+  
   ; ====switch stacks:
-  ;save stack
-  ;mov [saved_esp], esp
-  ;mov [saved_ebp], ebp
-
-
+    
   ; load interrupt stack
   mov esp, [int_stack]
   mov ebp, [int_stack+4]
 
   ;push process stack
   push eax
-  push ebx
-
+  
   mov eax, irq_handler
   call eax
 
-  pop ebx
   pop eax
 
   ; save interrupt stack
@@ -494,18 +485,12 @@ _irq_stub:
 
   ;reload process stack
   mov esp, eax
-  mov ebp, ebx
-
-  ;mov esp, [saved_esp]
-  ;mov ebp, [saved_ebp]
-
+  
   pop gs
   pop fs
   pop es
   pop ds
   popa
   add esp, 8 ; jump past interrupt number and code
-
-  ;sti
 
   iret
