@@ -23,6 +23,22 @@ int list_add_node(node_t* head, uint32_t val)
   return index;
 }
 
+int list_count_nodes(node_t* head)
+{
+  node_t* current = head;
+  int index = -1;
+  while(true)
+  {
+    if (current->next == NULL)
+    {
+      break;
+    }
+    current = current->next;
+    index++;
+  }
+  return index;
+}
+
 void list_add_child(node_t* head, uint32_t val)
 {
   node_t* current = head;
@@ -143,6 +159,31 @@ void list_print_tree(node_t* head)
   }
 }
 
+void list_move_to_end(node_t** head)
+{
+  if ((*head)->next == NULL) return;
+  /*//save head
+  node_t** old_head = head;
+  node_t** current = head;
+  //make head point to next node
+  *head = (*head)->next;
+  (*old_head)->next = NULL;
+  */
+  node_t* current = *head;
+  while(true)
+  {
+    if (current->next == NULL)
+    {
+      break;
+    }
+    current = current->next;
+  }
+  current->next=*head;
+  node_t* temp = (*head)->next;
+  current->next->next = NULL;
+  *head = temp;
+}
+
 int test_list() {
     printf("\n");
     node_t* list = (node_t*)kmalloc(sizeof(node_t));
@@ -150,16 +191,21 @@ int test_list() {
     list->next = NULL;
     list->child = NULL;
     list->data = NULL;
-    list_add_node(list, 1);
-    list_add_node(list, 2);
-    list_add_node(list, 3);
-    list_add_node(list, 4);
-    list_add_child(list->next, 9);
+    //list_add_node(list, 1);
+    //list_add_node(list, 2);
+    //list_add_node(list, 3);
+    //list_add_node(list, 4);
+    /*list_add_child(list->next, 9);
     list_add_child(list->next->child, 9);
     list_add_node(list->next->child, 9);
-    list_add_node(list->next->child->child, 9);
+    list_add_node(list->next->child->child, 9);*/
     
-    list_print_tree(list);
+    list_print(list);
+    
+    printf("..shifting...\n");
+    
+    list_move_to_end(&list);
+    list_print(list);
     
     //list_print(list);
     //printf("\n");
