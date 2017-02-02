@@ -3,5 +3,6 @@
 
 #include "bintools.h"
 #include "list.h"
+#include "lock.h"
 
 #endif
