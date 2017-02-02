@@ -1,3 +1,6 @@
+/*
+closely based off of 'BaseKernel' project of Douglas Thain (dthain, Github)
+*/
 #ifndef ATA_H
 #define ATA_H
 

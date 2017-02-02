@@ -1,3 +1,6 @@
+/*
+closely based off of 'BaseKernel' project of Douglas Thain (dthain, Github)
+*/
 {	KEY_INVALID,	KEY_INVALID,	KEY_INVALID,	0		},
 {	ASCII_ESC,	ASCII_ESC,	ASCII_NUL,	0		},
 {	'1',		'!',		'1',		0		},
