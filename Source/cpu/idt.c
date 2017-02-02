@@ -264,12 +264,15 @@ void ir_clear_handler(int irq)
 	irq_handlers[irq] = 0;
 }
 
-//extern stack_t int_stack;
+extern uint32_t stack_bottom;
+extern uint32_t stack_top;
 
-void irq_handler(struct x86_registers *regs)
+uint32_t irq_handler(struct x86_registers *regs)
 {
-	//proc_save(regs);
-
+	//interrupt_block();
+	
+	proc_save(regs);
+	
 	void (*handler)(struct x86_registers *regs);
 
 	handler = irq_handlers[regs->int_no - 32];
@@ -277,6 +280,38 @@ void irq_handler(struct x86_registers *regs)
 		handler(regs);
 
 	irq_send_EOI_8259(regs->int_no);
+	
+	regs = proc_schedule(regs);
+	/*
+	printf("\n\n");
+	printf("regs      0x%x                      \n", (uint32_t)regs);
+	printf("gs        0x%x                      \n", (uint8_t)regs->gs);
+	printf("fs        0x%x                      \n", (uint8_t)regs->fs);
+	printf("es        0x%x                      \n", (uint8_t)regs->es);
+	printf("ds        0x%x                      \n", (uint8_t)regs->ds);
+
+	printf("edi       0x%x                      \n", regs->edi);
+	printf("esi       0x%x                      \n", regs->esi);
+	printf("ebp       0x%x                      \n", regs->ebp);
+	printf("esp       0x%x                      \n", regs->esp);
+	printf("ebx       0x%x                      \n", regs->ebx);
+	printf("edx       0x%x                      \n", regs->edx);
+	printf("ecx       0x%x                      \n", regs->ecx);
+	printf("eax       0x%x                      \n", regs->eax);
+
+	printf("int_no    %d                        \n", regs->int_no);
+	printf("err_code  %d                        \n", regs->err_code);
+
+	printf("eip       0x%x                      \n", regs->eip);
+	printf("cs        0x%x                      \n", regs->cs);
+	printf("eflags    0x%x                      \n", regs->eflags);
+	printf("useresp   0x%x                      \n", regs->useresp);
+	printf("ss        0x%x                      \n", regs->ss);
+	printf("s_bottom  0x%x                      \n", &stack_bottom);
+	printf("s_top     0x%x                      \n", &stack_top);
+	*/
+	//interrupt_unblock();
+	return (uint32_t)regs;
 }
 
 void irq_send_EOI_8259(uint8_t irq)

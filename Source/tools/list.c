@@ -20,7 +20,7 @@ int list_add_node(node_t* head, uint32_t val)
     current = current->next;
     index++;
   }
-  return index;
+  return index + 1;
 }
 
 int list_count_nodes(node_t* head)
@@ -112,7 +112,7 @@ void list_print(node_t* head)
   node_t* current = head;
   while(true)
   {
-    printf("%d\n", current->val);
+    printf("%d - %d\n", current->val, (uint32_t)current->data);
     current = current->next;
     if (current == NULL)
     {
@@ -191,31 +191,16 @@ int test_list() {
     list->next = NULL;
     list->child = NULL;
     list->data = NULL;
-    //list_add_node(list, 1);
-    //list_add_node(list, 2);
-    //list_add_node(list, 3);
-    //list_add_node(list, 4);
-    /*list_add_child(list->next, 9);
-    list_add_child(list->next->child, 9);
-    list_add_node(list->next->child, 9);
-    list_add_node(list->next->child->child, 9);*/
+    list_add_node(list, 1);
+    int index = list_add_node(list, 2); 
     
+    node_t* n = list_access_node(list, index);
+    printf("===%d\n", n->val);
+    list_print(list);
+    list_remove_node(&list, index);
+    printf("\n");
     list_print(list);
     
-    printf("..shifting...\n");
-    
-    list_move_to_end(&list);
-    list_print(list);
-    
-    //list_print(list);
-    //printf("\n");
-    //list_remove_node(&list, 4);
-    //list_print(list);
-    //printf("\n");
-    
-    //list_print(list_access_node(list->next, 2));
-    //printf("\n");
-  
     
     return 1;
 }

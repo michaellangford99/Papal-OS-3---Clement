@@ -476,15 +476,16 @@ _irq_stub:
   mov eax, irq_handler
   call eax
 
-  pop eax
+  ;handler places stack value in eax as return value
 
+  pop ebx ;pop eax off the stack into an arbitrary register
+  
   ; save interrupt stack
   mov [int_stack], esp
   mov [int_stack+4], ebp
 
-
   ;reload process stack
-  mov esp, eax
+  mov esp, eax ;move stack value back into esp
   
   pop gs
   pop fs

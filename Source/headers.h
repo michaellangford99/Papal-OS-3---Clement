@@ -1,5 +1,6 @@
 //headers for OS
 
+#include "kernel.h"
 #include "math.h"
 #include "string.h"
 #include "error.h"

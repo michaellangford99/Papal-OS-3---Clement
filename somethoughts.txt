@@ -1,0 +1,8 @@
+some threading thoughts:
+
+To move the list in round robin:
+
+remove node at index zero (after saving temporarily)
+add new node at end (this will be old node)
+
+now the node at index 0 is the next process to be executed
