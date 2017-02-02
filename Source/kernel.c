@@ -25,7 +25,7 @@ void kernel_main(struct multiboot_header* mboot_header, uint32_t multiboot_magic
 
 	//drivers
 	clock_init();
-	keyboard_init();
+	//keyboard_init();
 
 	//ata_init();
 	//fs_init();
@@ -35,9 +35,9 @@ void kernel_main(struct multiboot_header* mboot_header, uint32_t multiboot_magic
 	//multiboot_dump(multiboot_get_address());
 
 	//load_ramdisk(multiboot_get_address());
-
-	//test_list();//test list.c
-
+	
+	//pm_new_thread();
+	
 	/*
 	uint32_t kernel_location = get_kernel_location();
   uint32_t kernel_size = get_kernel_size();
@@ -50,8 +50,60 @@ void kernel_main(struct multiboot_header* mboot_header, uint32_t multiboot_magic
 
 	//fs_format(1, FS_FAT16);
 
+	pm_new_thread((uint32_t*)thread_2, 1024);
+
 	while(true)
 	{
-		
+		clock_wait(100);
+		printf_xy(60, 60, "0          ");
+		clock_wait(100);
+		printf_xy(60, 60, " 0         ");
+		clock_wait(100);
+		printf_xy(60, 60, "  0        ");
+		clock_wait(100);
+		printf_xy(60, 60, "   0       ");
+		clock_wait(100);
+		printf_xy(60, 60, "    0      ");
+		clock_wait(100);
+		printf_xy(60, 60, "     0     ");
+		clock_wait(100);
+		printf_xy(60, 60, "      0    ");
+		clock_wait(100);
+		printf_xy(60, 60, "       0   ");
+		clock_wait(100);
+		printf_xy(60, 60, "        0  ");
+		clock_wait(100);
+		printf_xy(60, 60, "         0 ");
+		clock_wait(100);
+		printf_xy(60, 60, "          0");
+	}
+}
+
+void thread_2()
+{
+	while(true)
+	{
+		clock_wait(100);
+		printf_xy(60, 90, "0          ");
+		clock_wait(100);
+		printf_xy(60, 90, " 0         ");
+		clock_wait(100);
+		printf_xy(60, 90, "  0        ");
+		clock_wait(100);
+		printf_xy(60, 90, "   0       ");
+		clock_wait(100);
+		printf_xy(60, 90, "    0      ");
+		clock_wait(100);
+		printf_xy(60, 90, "     0     ");
+		clock_wait(100);
+		printf_xy(60, 90, "      0    ");
+		clock_wait(100);
+		printf_xy(60, 90, "       0   ");
+		clock_wait(100);
+		printf_xy(60, 90, "        0  ");
+		clock_wait(100);
+		printf_xy(60, 90, "         0 ");
+		clock_wait(100);
+		printf_xy(60, 90, "          0");
 	}
 }
