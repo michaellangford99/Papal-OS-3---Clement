@@ -448,6 +448,8 @@ extern saved_ebp
 
 _irq_stub:
 
+  cli
+
   ;push all data onto current stack
   pusha
   push ds
@@ -493,5 +495,7 @@ _irq_stub:
   pop ds
   popa
   add esp, 8 ; jump past interrupt number and code
-
+  
+  sti
+  
   iret
