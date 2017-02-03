@@ -34,6 +34,8 @@ int pm_init()
   thread_t* thread = (thread_t*)threads->data;
   
   thread->thread_id = thread_count;
+  thread->quantum = PM_THREAD_TIME_QUANTUM;
+  
   thread->thread_regs.esp = (uint32_t)&stack_top;
   thread->thread_regs.ebp = (uint32_t)&stack_bottom;
   
@@ -56,6 +58,8 @@ int pm_new_thread(uint32_t* entry_point, uint32_t stack_size)
   thread_count++;
   
   thread->thread_id = thread_count;
+  
+  thread->quantum = PM_THREAD_TIME_QUANTUM;
   
   //set segments
   thread->thread_regs.gs = 0x10;
@@ -167,8 +171,16 @@ void proc_save(struct x86_registers* proc_regs)
 
 struct x86_registers* proc_schedule(struct x86_registers* proc_regs)
 {
+  ((thread_t*)threads->data)->quantum--;
+  
   //if (lock(proc_table_lock))
+  //{
+  if (((thread_t*)threads->data)->quantum <= 0)
+  {
+    ((thread_t*)threads->data)->quantum = PM_THREAD_TIME_QUANTUM;
     list_move_to_end(&threads);
+  }
+  //}
   
   //get registers of process in list position 0
   thread_t* thread = (thread_t*)threads->data;

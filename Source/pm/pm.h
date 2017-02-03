@@ -4,7 +4,7 @@
 #define PM_MAX_KERNEL_THREADS    255
 #define PM_INTERRUPT_STACK_SIZE  65536 //64 KB
 #define PM_PROC_0_ID             0
-#define PM_THREAD_TIME_QUANTUM   0 //TBD
+#define PM_THREAD_TIME_QUANTUM   4
 #define PM_ESP_OFFSET            (-12*4)
 
 /*typedef struct
