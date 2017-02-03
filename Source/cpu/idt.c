@@ -195,6 +195,31 @@ void isr_handler(struct x86_registers *regs)
 		printf("unhandled ");
 		printf(error_codes[regs->int_no]);
 		printf(" (%d), with code %d\nSystem execution halted indefinitely", regs->int_no, regs->err_code);
+		
+		
+		printf("gs        0x%x                      \n", regs->gs);
+		printf("fs        0x%x                      \n", regs->fs);
+		printf("es        0x%x                      \n", regs->es);
+		printf("ds        0x%x                      \n", regs->ds);
+
+		printf("edi       0x%x                      \n", regs->edi);
+		printf("esi       0x%x                      \n", regs->esi);
+		printf("ebp       0x%x                      \n", regs->ebp);
+		printf("esp       0x%x                      \n", regs->esp);
+		printf("ebx       0x%x                      \n", regs->ebx);
+		printf("edx       0x%x                      \n", regs->edx);
+		printf("ecx       0x%x                      \n", regs->ecx);
+		printf("eax       0x%x                      \n", regs->eax);
+
+		printf("int_no    %d                        \n", regs->int_no);
+		printf("err_code  %d                        \n", regs->err_code);
+
+		printf("eip       0x%x                      \n", regs->eip);
+		printf("cs        0x%x                      \n", regs->cs);
+		printf("eflags    0x%x                      \n", regs->eflags);
+		printf("useresp   0x%x                      \n", regs->useresp);
+		printf("ss        0x%x                      \n", regs->ss);
+		
 		for (;;);
 	}
 }
@@ -283,12 +308,11 @@ uint32_t irq_handler(struct x86_registers *regs)
 	
 	regs = proc_schedule(regs);
 	/*
-	printf("\n\n");
 	printf("regs      0x%x                      \n", (uint32_t)regs);
-	printf("gs        0x%x                      \n", (uint8_t)regs->gs);
-	printf("fs        0x%x                      \n", (uint8_t)regs->fs);
-	printf("es        0x%x                      \n", (uint8_t)regs->es);
-	printf("ds        0x%x                      \n", (uint8_t)regs->ds);
+	printf("gs        0x%x                      \n", regs->gs);
+	printf("fs        0x%x                      \n", regs->fs);
+	printf("es        0x%x                      \n", regs->es);
+	printf("ds        0x%x                      \n", regs->ds);
 
 	printf("edi       0x%x                      \n", regs->edi);
 	printf("esi       0x%x                      \n", regs->esi);
@@ -309,6 +333,7 @@ uint32_t irq_handler(struct x86_registers *regs)
 	printf("ss        0x%x                      \n", regs->ss);
 	printf("s_bottom  0x%x                      \n", &stack_bottom);
 	printf("s_top     0x%x                      \n", &stack_top);
+	printf("\n\n");
 	*/
 	//interrupt_unblock();
 	return (uint32_t)regs;
