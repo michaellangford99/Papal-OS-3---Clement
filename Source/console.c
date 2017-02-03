@@ -49,9 +49,17 @@ void console_setcolors(_24bit_color fore, _24bit_color back)
 	fgcolor=fore;
 	bgcolor=back;
 }
-
+int ints = 0;
 void console_putchar( char c )
 {
+	if (are_interrupts_enabled())
+	{
+		interrupt_block();
+		ints=1;
+	}
+	else{
+		ints = 0;
+	}
 	// erase '_' char that is already there
 	console_writechar(xpos,ypos,' ');
 
@@ -137,6 +145,9 @@ void console_putchar( char c )
 
 	// write the '_' position char in front of current char
 	console_writechar(xpos,ypos,'_');
+	
+	if (ints == 1)
+		interrupt_unblock();
 }
 
 void console_putstring( const char *s )
