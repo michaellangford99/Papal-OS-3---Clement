@@ -13,8 +13,11 @@ stack_t int_stack;
 extern uint32_t stack_bottom;
 extern uint32_t stack_top;
 
+uint32_t proc_table_lock=LOCK_FREE;
+
 int pm_init()
 {
+  //unlock(&proc_table_lock);
   //allocate memory for interrupt stack
   int_stack.stack_bottom = (uint32_t)kmalloc(PM_INTERRUPT_STACK_SIZE);
   int_stack.stack_top = int_stack.stack_bottom + PM_INTERRUPT_STACK_SIZE;
@@ -45,9 +48,12 @@ int pm_init()
 
 int pm_new_thread(uint32_t* entry_point, uint32_t stack_size)
 {
+  /*while(true)
+  {
+    if (lock(&proc_table_lock)==1)
+      break;
+  }*/
   interrupt_block();
-  //while(lock(proc_table_lock)==LOCK_LOCKED) { }
-  
   //add new node to proc_list, 
   int index = list_add_node(threads, 0);
   node_t* new_thread_node = list_access_node(threads, index);
@@ -62,10 +68,10 @@ int pm_new_thread(uint32_t* entry_point, uint32_t stack_size)
   thread->quantum = PM_THREAD_TIME_QUANTUM;
   
   //set segments
-  thread->thread_regs.gs = 0x10;
-  thread->thread_regs.fs = 0x10;
-  thread->thread_regs.es = 0x10;
-  thread->thread_regs.ds = 0x10;
+  thread->thread_regs.gs = 0x00000010;
+  thread->thread_regs.fs = 0x00000010;
+  thread->thread_regs.es = 0x00000010;
+  thread->thread_regs.ds = 0x00000010;
   
   //zero source & dest pointers
   thread->thread_regs.edi = 0;
@@ -74,7 +80,7 @@ int pm_new_thread(uint32_t* entry_point, uint32_t stack_size)
   //allocate stack
   thread->thread_regs.ebp = (uint32_t)kmalloc(stack_size);
   thread->thread_regs.esp = thread->thread_regs.ebp + stack_size - PM_ESP_OFFSET;
-  thread->thread_regs.useresp = thread->thread_regs.ebp + stack_size - PM_ESP_OFFSET;
+  thread->thread_regs.useresp = 0;
     
   //zero general purpose registers
   thread->thread_regs.ebx = 0;
@@ -84,9 +90,9 @@ int pm_new_thread(uint32_t* entry_point, uint32_t stack_size)
   
   //set cs:eip (important!!)
   thread->thread_regs.eip = (uint32_t)entry_point;
-  thread->thread_regs.cs = 0x08;
-  thread->thread_regs.eflags = 0x202;
-  thread->thread_regs.ss = 0x08;
+  thread->thread_regs.cs = 0x00000008;
+  thread->thread_regs.eflags = 0x202;//?
+  thread->thread_regs.ss = 0x00000008;
   
   //now that struct has correct registers, these must be copied onto the new stack
   uint32_t* thread_esp = (uint32_t*)(thread->thread_regs.esp - sizeof(struct x86_registers) + 28);
@@ -112,6 +118,7 @@ int pm_new_thread(uint32_t* entry_point, uint32_t stack_size)
   thread_esp[17] = thread->thread_regs.fs;
   thread_esp[18] = thread->thread_regs.gs;
   */
+  /*
   printf("dumping registers of new proc: %d\n", thread_count);
   
   printf("gs:          0x%x\n", thread->thread_regs.gs);
@@ -139,9 +146,9 @@ int pm_new_thread(uint32_t* entry_point, uint32_t stack_size)
   printf("cs:          0x%x\n", thread->thread_regs.cs);
   printf("eflags:      0x%x\n", thread->thread_regs.eflags);
   printf("ss:          0x%x\n", thread->thread_regs.ss);
-  
+  */
+  /*unlock(&proc_table_lock);*/
   interrupt_unblock();
-  
   return thread->thread_id;
 }
 
@@ -171,16 +178,18 @@ void proc_save(struct x86_registers* proc_regs)
 
 struct x86_registers* proc_schedule(struct x86_registers* proc_regs)
 {
-  ((thread_t*)threads->data)->quantum--;
+  if (((thread_t*)threads->data)->quantum>0)
+    ((thread_t*)threads->data)->quantum--;
   
-  //if (lock(proc_table_lock))
-  //{
-  if (((thread_t*)threads->data)->quantum <= 0)
-  {
-    ((thread_t*)threads->data)->quantum = PM_THREAD_TIME_QUANTUM;
-    list_move_to_end(&threads);
-  }
-  //}
+  /*if (lock(&proc_table_lock))
+  {*/
+    if (((thread_t*)threads->data)->quantum <= 0)
+    {
+      ((thread_t*)threads->data)->quantum = PM_THREAD_TIME_QUANTUM;
+      list_move_to_end(&threads);
+    }
+    /*unlock(&proc_table_lock);
+  }*/
   
   //get registers of process in list position 0
   thread_t* thread = (thread_t*)threads->data;

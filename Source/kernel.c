@@ -53,22 +53,13 @@ void kernel_main(struct multiboot_header* mboot_header, uint32_t multiboot_magic
 
 	//fs_format(1, FS_FAT16);
 
-	pm_new_thread((uint32_t*)thread_2, 4096);
+	pm_new_thread((uint32_t*)thread_2, 1024);
+	pm_new_thread((uint32_t*)thread_3, 1024);
+	pm_new_thread((uint32_t*)thread_4, 1024);
 
 	while(true)
 	{
-		
-		printf_xy(60, 60, "0          ");
-		printf_xy(60, 60, " 0         ");
-		printf_xy(60, 60, "  0        ");
-		printf_xy(60, 60, "   0       ");
-		printf_xy(60, 60, "    0      ");
-		printf_xy(60, 60, "     0     ");
-		printf_xy(60, 60, "      0    ");
-		printf_xy(60, 60, "       0   ");
-		printf_xy(60, 60, "        0  ");
-		printf_xy(60, 60, "         0 ");
-		printf_xy(60, 60, "          0");
+		printf("0");
 	}
 }
 
@@ -76,16 +67,22 @@ void thread_2()
 {
 	while(true)
 	{
-		printf_xy(60, 40, "1          ");
-		printf_xy(60, 40, " 1         ");
-		printf_xy(60, 40, "  1        ");
-		printf_xy(60, 40, "   1       ");
-		printf_xy(60, 40, "    1      ");
-		printf_xy(60, 40, "     1     ");
-		printf_xy(60, 40, "      1    ");
-		printf_xy(60, 40, "       1   ");
-		printf_xy(60, 40, "        1  ");
-		printf_xy(60, 40, "         1 ");
-		printf_xy(60, 40, "          1");
+		printf("1");
+	}
+}
+
+void thread_3()
+{
+	while(true)
+	{
+		printf("2");
+	}
+}
+
+void thread_4()
+{
+	while(true)
+	{
+		printf("3");
 	}
 }
