@@ -7,14 +7,6 @@
 #define PM_THREAD_TIME_QUANTUM   10
 #define PM_ESP_OFFSET            (-12*4)
 
-/*typedef struct
-{
-  unsigned int gs, fs, es, ds;
-  unsigned int edi, esi, ebp, esp, ebx, edx, ecx, eax;
-  unsigned int eip, cs, eflags, useresp, ss;
-} __attribute__((packed)) proc_registers_t;
-*/
-
 typedef struct {
     uint32_t thread_id;
     struct x86_registers thread_regs;
