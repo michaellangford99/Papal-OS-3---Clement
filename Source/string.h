@@ -1,6 +1,7 @@
 #ifndef STRING_H
 #define STRING_H
 
+#define null NULL //make null and NULL identical - not sure if this is a good idea...
 // Basic string functions
 
 void strcpy( char *d, const char *s );
