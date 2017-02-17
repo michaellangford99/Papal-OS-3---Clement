@@ -59,7 +59,7 @@ void kernel_main(struct multiboot_header* mboot_header, uint32_t multiboot_magic
 
 	while(true)
 	{
-		printf("0");
+		printf("0\n");
 	}
 }
 
@@ -67,7 +67,7 @@ void thread_2()
 {
 	while(true)
 	{
-		printf("1");
+		printf("1\n");
 	}
 }
 
@@ -75,7 +75,7 @@ void thread_3()
 {
 	while(true)
 	{
-		printf("2");
+		printf("2\n");
 	}
 }
 
@@ -83,6 +83,6 @@ void thread_4()
 {
 	while(true)
 	{
-		printf("3");
+		printf("3\n");
 	}
 }
