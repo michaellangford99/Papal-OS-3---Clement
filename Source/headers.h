@@ -17,3 +17,4 @@
 #include "clock.h"
 #include "ata.h"
 #include "fs/file_system.h"
+#include "rtc.h"
