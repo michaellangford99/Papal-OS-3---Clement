@@ -1,14 +1,6 @@
 //closely based off of 'BaseKernel' project of Douglas Thain (dthain, Github)
 #include "system.h"
 
-#define CLICKS_PER_SECOND 60
-
-#define TIMER0		0x40
-#define TIMER_MODE	0x43
-#define SQUARE_WAVE     0x36
-#define TIMER_FREQ	1193182
-#define TIMER_COUNT	(((unsigned)TIMER_FREQ)/CLICKS_PER_SECOND/2)
-
 static uint32_t clicks=0;
 static uint32_t seconds=0;
 
