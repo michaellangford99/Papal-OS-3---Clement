@@ -12,8 +12,8 @@ heap_node_t* heap_list;
 int heap_init()
 {
   printf("size of heap node is %d bytes\n", sizeof(heap_node_t));
-  heap_list = kmalloc(sizeof(heap_node_t));
-  heap_list->next = NULL:
+  heap_list = (heap_node_t*)kmalloc(sizeof(heap_node_t));
+  heap_list->next = NULL;
   return 1;
 }
 

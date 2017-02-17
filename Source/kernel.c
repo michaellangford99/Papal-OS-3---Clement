@@ -59,7 +59,13 @@ void kernel_main(struct multiboot_header* mboot_header, uint32_t multiboot_magic
 
 	while(true)
 	{
-		printf("0\n");
+		printf("year: %d\n", (uint32_t)rtc_get_year());
+		printf("month: %d\n", (uint32_t)rtc_get_month());
+		printf("day: %d\n", (uint32_t)rtc_get_day());
+		printf("weekday: %d\n", (uint32_t)rtc_get_weekday());
+		printf("hour: %d\n", (uint32_t)rtc_get_hour());
+		printf("minute: %d\n", (uint32_t)rtc_get_minute());
+		printf("second: %d\n", (uint32_t)rtc_get_second());
 	}
 }
 
