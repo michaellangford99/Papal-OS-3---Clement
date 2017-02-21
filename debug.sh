@@ -1,5 +1,5 @@
-date >> debuglog.log
-echo "" >> debuglog.log
+date >> logs/debuglog.log
+echo "" >> logs/debuglog.log
 VirtualBox --startvm Clement --debug
 
 

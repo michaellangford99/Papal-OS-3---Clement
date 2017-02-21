@@ -24,7 +24,7 @@ CFLAGS="$CFLAGS --sysroot=$PWD/$SYSROOT -isystem=/$INCLUDEDIR"
 LD_BIN_FLAGS="-T Source/linker.ld -o Bin/clement.bin -ffreestanding -O2 -nostdlib"
 LD_O_FLAGS="-lgcc -fdiagnostics-color=always"
 
-LOGFILE="buildlog.log"
+LOGFILE="logs/buildlog.log"
 
 #assemble special assembly files
 i686-elf-as Source/boot.s            -o Bin/boot.o
