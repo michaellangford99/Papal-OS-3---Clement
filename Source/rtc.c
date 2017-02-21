@@ -3,6 +3,7 @@
 uint8_t rtc_get_year()
 {
 outb(0x70, 0x09);
+clock_wait(5);
 return inb(0x71);
 }
 

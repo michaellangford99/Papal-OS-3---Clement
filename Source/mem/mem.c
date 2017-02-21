@@ -1,4 +1,4 @@
-#include "../system.h"
+#include <system.h>
 
 extern uint32_t __start;
 extern uint32_t __end;

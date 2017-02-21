@@ -10,7 +10,7 @@ getScancode(), and
 GetKey() are written by Michael Langford
 */
 
-#include "system.h"
+#include <system.h>
 
 struct keymap {
 	char	normal;
@@ -20,7 +20,7 @@ struct keymap {
 };
 
 static struct keymap keymap[] = {
-	#include "keymap.us.h"
+	#include <keymap.us.h>
 };
 
 

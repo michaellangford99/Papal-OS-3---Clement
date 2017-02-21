@@ -1,4 +1,4 @@
-#include "../system.h"
+#include <system.h>
 
 uint32_t* page_directory = 0;//[1024] __attribute__((aligned(4096)));
 page_table_t page_tables[1024] __attribute__((aligned(4096)));

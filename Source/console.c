@@ -3,7 +3,7 @@ The bulk of this code is based off of software in the 'base_kernel' project
 by Douglas Thain (dthain, Github), but in many cases has been heavily modified.
 */
 
-#include "system.h"
+#include <system.h>
 
 int xpos=0;
 int ypos=0;

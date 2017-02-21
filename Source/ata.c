@@ -1,7 +1,7 @@
 /*
 closely based off of 'BaseKernel' project of Douglas Thain (dthain, Github)
 */
-#include "system.h"
+#include <system.h>
 
 const uint32_t ata_base[4] = {ATA_BASE0,ATA_BASE0,ATA_BASE1,ATA_BASE1};
 uint32_t ata_interrupt_active = 0;

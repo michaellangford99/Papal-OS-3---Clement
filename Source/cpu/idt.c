@@ -1,4 +1,4 @@
-#include "../system.h"
+#include <system.h>
 
 /*
 	Section 1 - declarations

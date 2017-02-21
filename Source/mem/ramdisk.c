@@ -1,4 +1,4 @@
-#include "../system.h"
+#include <system.h>
 
 node_t* disk_head;
 

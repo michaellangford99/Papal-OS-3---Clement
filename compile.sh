@@ -2,7 +2,12 @@
 # and "Setting up a Cross Compiler" in osdev.org
 clear
 
+#first copy headers
+./headers.sh
+
 #prep cross-compiler
+export SYSROOT="sysroot"
+export INCLUDEDIR="usr/include"
 export PREFIX="$HOME/opt/cross"
 export TARGET=i686-elf
 export PATH="$PREFIX/bin:$PATH"
@@ -12,7 +17,10 @@ Ccolor=220
 LINKcolor=21
 GRUBcolor=121
 
-CFLAGS="-std=gnu99 -ffreestanding -O2 -Wextra -Wall -fdiagnostics-color=always -Wno-unused-variable -Wno-unused-parameter"
+CFLAGS="-std=gnu99 -ffreestanding -O2 -Wextra -Wall"
+CFLAGS="$CFLAGS -fdiagnostics-color=always -Wno-unused-variable -Wno-unused-parameter"
+CFLAGS="$CFLAGS --sysroot=$PWD/$SYSROOT -isystem=/$INCLUDEDIR"
+
 LD_BIN_FLAGS="-T Source/linker.ld -o Bin/clement.bin -ffreestanding -O2 -nostdlib"
 LD_O_FLAGS="-lgcc -fdiagnostics-color=always"
 

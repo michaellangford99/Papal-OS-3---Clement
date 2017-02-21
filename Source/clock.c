@@ -1,5 +1,5 @@
 //closely based off of 'BaseKernel' project of Douglas Thain (dthain, Github)
-#include "system.h"
+#include <system.h>
 
 static uint32_t clicks=0;
 static uint32_t seconds=0;

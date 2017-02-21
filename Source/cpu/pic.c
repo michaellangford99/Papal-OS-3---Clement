@@ -2,7 +2,7 @@
 closely based off of 'BaseKernel' project of Douglas Thain (dthain, Github)
 */
 
-#include "../system.h"
+#include <system.h>
 
 #define PIC_ICW1 0x11
 #define PIC_ICW4_MASTER 0x01

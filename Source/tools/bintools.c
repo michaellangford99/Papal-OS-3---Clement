@@ -1,4 +1,4 @@
-#include "../system.h"
+#include <system.h>
 
 void set_bit(uint8_t bit, uint8_t* byte_to_set)
 {

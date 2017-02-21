@@ -28,7 +28,7 @@ farpeekl() are based off of (or identical to) software in the 'base_kernel' proj
 
 */
 
-#include "../system.h"
+#include <system.h>
 
 uint8_t inb( int port ) {
 	uint8_t result;

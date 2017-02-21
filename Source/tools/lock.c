@@ -1,4 +1,4 @@
-#include "../system.h"
+#include <system.h>
 
 int lock(uint32_t* l)
 {

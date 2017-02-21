@@ -1,4 +1,4 @@
-#include "../system.h"
+#include <system.h>
 
 #define FAT_ENTRY_SIZE  16
 #define BLOCKS_PER_FAT  8

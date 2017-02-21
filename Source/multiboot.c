@@ -1,4 +1,4 @@
-#include "system.h"
+#include <system.h>
 
 struct multiboot_header cp_mboot_header;
 vbe_info_t cp_vbe_info;

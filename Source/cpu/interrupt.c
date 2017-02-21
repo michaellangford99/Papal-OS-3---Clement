@@ -3,7 +3,7 @@ loosely based off of 'BaseKernel' project of Douglas Thain (dthain, Github)
 used as basic irq functions
 */
 
-#include "../system.h"
+#include <system.h>
 
 static void interrupt_acknowledge( int i )
 {

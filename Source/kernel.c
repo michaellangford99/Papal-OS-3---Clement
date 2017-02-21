@@ -1,4 +1,4 @@
-#include "system.h"
+#include <system.h>
 
 void kernel_main(struct multiboot_header* mboot_header, uint32_t multiboot_magic) {
 

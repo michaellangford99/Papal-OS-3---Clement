@@ -1,4 +1,4 @@
-#include "../system.h"
+#include <system.h>
 
 ata_atapi_device devices[ATA_ATAPI_DEVICE_COUNT];
 file_system file_systems[ATA_ATAPI_DEVICE_COUNT];

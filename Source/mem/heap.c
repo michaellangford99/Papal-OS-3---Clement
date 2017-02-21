@@ -1,4 +1,4 @@
-#include "../system.h"
+#include <system.h>
 
 //used to determine whether a new block should be of size 1 or 2
 /*uint32_t chunk_size_1_requested = 0;

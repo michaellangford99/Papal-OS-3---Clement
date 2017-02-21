@@ -16,8 +16,8 @@ graphics_string() are based off of (or identical to) software in the 'base_kerne
 
 */
 
-#include "system.h"
-#include "font.h"
+#include <system.h>
+#include <font.h>
 
 
 int basic = 1;

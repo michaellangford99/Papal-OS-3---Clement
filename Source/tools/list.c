@@ -1,4 +1,4 @@
-#include "../system.h"
+#include <system.h>
 
 //add node to end of list
 int list_add_node(node_t* head, uint32_t val)

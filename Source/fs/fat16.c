@@ -1,4 +1,4 @@
-#include "../system.h"
+#include <system.h>
 
 //to be used later :
 /*printf("formatting device %d with a FAT16 file system\n", device.device_num);

@@ -1,4 +1,4 @@
-#include "../system.h"
+#include <system.h>
 
 uint32_t thread_count = 0;
 node_t* threads;
