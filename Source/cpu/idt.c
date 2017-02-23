@@ -187,9 +187,12 @@ void isr_init()
 	idt_set_gate(31, (uint32_t)_isr31, isr_flags, isr_segment);
 }
 
-void isr_handler(struct x86_registers *regs)
+uint32_t isr_handler(struct x86_registers *regs)
 {
-	//proc_save(regs);
+	//interrupt_block();
+	
+	proc_save(regs);
+	
 	if (regs->int_no < 32)
 	{
 		printf("unhandled ");
@@ -222,6 +225,10 @@ void isr_handler(struct x86_registers *regs)
 		
 		for (;;);
 	}
+	
+	//don't reschedule...
+	
+	return (uint32_t)regs;
 }
 
 // END Section 3 - extern isrs, isr_handlers, isr_init
@@ -305,8 +312,11 @@ uint32_t irq_handler(struct x86_registers *regs)
 		handler(regs);
 
 	irq_send_EOI_8259(regs->int_no);
-	
-	regs = proc_schedule(regs);
+		
+	//only reschedule on clock ticks
+	if (regs->int_no == INTERRUPT_SYSTEM_TIMER)
+		regs = proc_schedule(regs);
+		
 	/*
 	printf("regs      0x%x                      \n", (uint32_t)regs);
 	printf("gs        0x%x                      \n", regs->gs);
