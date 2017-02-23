@@ -272,12 +272,17 @@ _isr31:
 
 ;===========================================_isr_stub======================================================================
 _isr_stub:
+
+  cli
+
+  ;push all data onto current stack
   pusha
   push ds
   push es
   push fs
   push gs
 
+  ;set up for handler
   mov ax, 0x10
   mov ds, ax
   mov es, ax
@@ -285,22 +290,39 @@ _isr_stub:
   mov gs, ax
 
   mov eax, esp
-  push eax
+  
+  ; ====switch stacks:
+    
+  ; load interrupt stack
+  mov esp, [int_stack]
+  mov ebp, [int_stack+4]
 
+  ;push process stack
+  push eax
+  
   mov eax, isr_handler
   call eax
 
-  pop eax
+  ;handler places stack value in eax as return value
 
+  pop ebx ;pop eax off the stack into an arbitrary register
+  
+  ; save interrupt stack
+  mov [int_stack], esp
+  mov [int_stack+4], ebp
+
+  ;reload process stack
+  mov esp, eax ;move stack value back into esp
+  
   pop gs
   pop fs
   pop es
   pop ds
   popa
-
-  add esp, 8
-
-
+  add esp, 8 ; jump past interrupt number and code
+  
+  sti
+  
   iret
 
 
