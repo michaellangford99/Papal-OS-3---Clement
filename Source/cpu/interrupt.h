@@ -33,5 +33,12 @@ IRQ	Interrupt
 15	47	ATA 1
 */
 
+#define INTERRUPT_SYSTEM_TIMER 32
+#define INTERRUPT_KEYBOARD     33
+#define INTERRUPT_CASCADE      34
+#define INTERRUPT_SERIAL_2     35
+//...
+
+
 
 #endif
