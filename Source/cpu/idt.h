@@ -29,7 +29,7 @@ void idt_init();
 void idt_zero();
 void idt_set_gate(char interrupt, offset int_offset, flags int_flags, segment int_segment);
 void isr_init();
-void isr_handler(struct x86_registers *regs);
+uint32_t isr_handler(struct x86_registers *regs);
 void irq_init();
 void irq_set_handler(int irq, void (*handler)(struct x86_registers *regs));
 void ir_clear_handler(int irq);
