@@ -16,4 +16,9 @@ typedef struct heap_node {
   //data....  
 }  __attribute__((packed)) heap_node_t;//must be packed, in order to fit in 4096 bytes
 
+int heap_init();
+uint32_t* heap_alloc(uint32_t length);
+int heap_allocate_from_node(heap_node_t* node, int length);
+int heap_free(uint32_t* addr, uint32_t length);
+
 #endif
