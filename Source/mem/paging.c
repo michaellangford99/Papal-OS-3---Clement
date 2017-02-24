@@ -1,7 +1,7 @@
 #include <system.h>
 
-uint32_t* page_directory = 0;//[1024] __attribute__((aligned(4096)));
-page_table_t page_tables[1024] __attribute__((aligned(4096)));
+uint32_t* page_directory;//[1024] __attribute__((aligned(4096)));
+page_table_t* page_tables;//[1024] __attribute__((aligned(4096)));
 
 //link to assembly routines
 extern void loadPageDirectory(uint32_t*);
@@ -16,7 +16,7 @@ int init_paging() {
   page_directory = kmalloc(1024*4);
   
   memset((char*)&page_directory[0], 0, 1024 * 4);
-  //page_tables = (page_table_t*)kmalloc(1024 * sizeof(page_table_t));
+  page_tables = (page_table_t*)kmalloc(1024 * sizeof(page_table_t));
   
   printf("page_directory addr: 0x%x / %d / %d KB\n", (uint32_t)&page_directory[0], (uint32_t)&page_directory[0], ((uint32_t)&page_directory[0])/1024);
   
