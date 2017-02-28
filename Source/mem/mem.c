@@ -50,8 +50,9 @@ int memory_init(struct multiboot_header* mboot_header)
     mboot_mod_desc_t* mod_info = (mboot_mod_desc_t*)(mboot_header->mods_addr + (mod * sizeof(mboot_mod_desc_t)));
     if (mod_info->end > kernel_end)
     {
-      kernel_size += mod_info->end - kernel_end;
+      //kernel_size += mod_info->end - kernel_end; //possible bug here
       kernel_end = mod_info->end;
+      kernel_size = kernel_end - kernel_location;
       printf("extended 'kernel_end' to %d on mod%d\n", mod_info->end, mod);
     }
   }
