@@ -126,12 +126,12 @@ int fat16_format(ata_atapi_device device)
   printf("calculation: %d\n", (int)((uint32_t)boot_sector.reserved_sectors-1 + (uint32_t)boot_sector.fat_size_sectors * (uint32_t)boot_sector.number_of_fats));
   
   fat16_root_dir_entry root_dir[(int32_t)boot_sector.root_dir_entries];
-  ata_read(device.device_num, &root_dir[0], root_dir_sectors, first_root_dir_sector + pb.pt[i].start_sector);
+  //ata_read(device.device_num, &root_dir[0], root_dir_sectors, first_root_dir_sector + pb.pt[i].start_sector);
   
-  for (int j = 0; j < (int32_t)boot_sector.root_dir_entries; j++)
-  {
-    print_file_info(device, &root_dir[j], pb, i, boot_sector);
-  }
+  //for (int j = 0; j < (int32_t)boot_sector.root_dir_entries; j++)
+  //{
+  //  print_file_info(device, &root_dir[j], pb, i, boot_sector);
+  //}
   
   
   return K_SUCCESS;
