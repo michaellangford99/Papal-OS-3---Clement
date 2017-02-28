@@ -15,7 +15,7 @@ void kernel_main(struct multiboot_header* mboot_header, uint32_t multiboot_magic
 
 	//starts memory stuff
 	memory_init(multiboot_get_address());
-	//init_paging();
+	init_paging();
 
 	//prepare kernel multithreading
 	pm_init();
@@ -25,16 +25,16 @@ void kernel_main(struct multiboot_header* mboot_header, uint32_t multiboot_magic
 
 	//drivers
 	clock_init();
-	//keyboard_init();
+	keyboard_init();
 
-	//ata_init();
-	//fs_init();
+	ata_init();
+	fs_init();
 
 	//data dump
-	//graphics_init(multiboot_get_vbe_address());
-	//multiboot_dump(multiboot_get_address());
+	graphics_init(multiboot_get_vbe_address());
+	multiboot_dump(multiboot_get_address());
 
-	//load_ramdisk(multiboot_get_address());
+	load_ramdisk(multiboot_get_address());
 	
 	//pm_new_thread();
 	
