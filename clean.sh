@@ -24,7 +24,7 @@ echo $HFILES
 
 for file in $HFILES
 do
-  echo "removing $file"
+  echo "removing $PWD/$file"
   rm $file
 done
 
@@ -33,6 +33,6 @@ done
 SRC_DIRS=`ls -d */ | sed 's#/##'`
 for dir in $SRC_DIRS
 do
-  echo $dir
-	rm -d $dir
+  echo "removing $PWD/$dir"
+  rm -d $dir
 done
