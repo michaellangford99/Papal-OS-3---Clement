@@ -55,3 +55,40 @@ int init_paging() {
   printf("paging: ready\n");
   return K_SUCCESS;
 }
+
+uint32_t encode_page_directory_entry(uint32_t* page_table_address, 
+                                uint8_t page_size, 
+                                uint8_t write_through, 
+                                uint8_t privelege, 
+                                uint8_t rw, 
+                                uint8_t present)
+{
+  uint32_t page_dir_entry = (uint32_t)page_table_address;
+  
+  //set present bit
+  if (present == PAGE_DIR_ENTRY_PRESENT)
+    set_bit(0, (uint8_t*)&page_dir_entry);
+  if (present == PAGE_DIR_ENTRY_NOT_PRESENT)
+    clear_bit(0, (uint8_t*)&page_dir_entry);
+    
+  //set rw flag
+  if (rw == PAGE_DIR_ENTRY_RW)
+    set_bit(1, (uint8_t*)&page_dir_entry);
+  if (rw == PAGE_DIR_ENTRY_READ_ONLY)
+    clear_bit(1, (uint8_t*)&page_dir_entry);
+    
+  //set the supervisor bit
+  if (privelege == PAGE_DIR_ENTRY_SUPERVISOR)
+    clear_bit(2, (uint8_t*)&page_dir_entry);
+  if (privelege == PAGE_DIR_ENTRY_USER)
+    set_bit(2, (uint8_t*)&page_dir_entry);
+  
+  
+  
+  
+  
+  
+  
+  
+  
+}
