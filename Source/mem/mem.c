@@ -15,7 +15,7 @@ uint32_t mem_map_size;
 uint32_t mem_map_end;
 
 uint32_t total_memory_size = 0;
-
+uint32_t first_free_block = 0;
 uint8_t memory_bitmap[MEM_MNGR_SIZE_OF_MEMORY_BITMAP];
 
 void mark_block(uint8_t value, uint64_t bit);
@@ -73,6 +73,7 @@ int memory_init(struct multiboot_header* mboot_header)
         if (kernel_location >= (uint32_t)mmap_entries[i].base_addr && 
             kernel_end <= ((uint32_t)mmap_entries[i].length+(uint32_t)mmap_entries[i].base_addr))
         {
+          //wastes some memory here if the two overlap
           mmap_entries[i].base_addr += (uint64_t)kernel_size;
           mmap_entries[i].length -= (uint64_t)kernel_size;
           printf("::::shrunk slot %d %d / %dKB\n", i, (uint32_t)kernel_size, (uint32_t)kernel_size / MEM_MNGR_SLOT_SIZE);
@@ -82,6 +83,7 @@ int memory_init(struct multiboot_header* mboot_header)
         if (mem_map_start >= (uint32_t)mmap_entries[i].base_addr && 
             mem_map_end <= ((uint32_t)mmap_entries[i].length+(uint32_t)mmap_entries[i].base_addr))
         {
+          //same here
           mmap_entries[i].base_addr += (uint64_t)mem_map_size;
           mmap_entries[i].length -= (uint64_t)mem_map_size;
           printf("::::shrunk slot %d %d / %dKB\n", i, (uint32_t)mem_map_size, (uint32_t)mem_map_size / MEM_MNGR_SLOT_SIZE);
@@ -155,6 +157,7 @@ uint32_t* kmalloc(uint32_t length)
   uint32_t mem_blocks = (length / MEM_MNGR_SLOT_SIZE);  //number of blocks needed to grant requested memory
   if (length % MEM_MNGR_SLOT_SIZE != 0)            // if it isn't a multiple of 4K, add a block to the amount of needed blocks
     mem_blocks += 1;
+  //printf("allocating %d bytes....\n", length)  ;
   //printf("allocating %d blocks...\n", mem_blocks);
   
   mboot_memmap_t mmap_entries[memory_slots];
@@ -168,7 +171,7 @@ uint32_t* kmalloc(uint32_t length)
   uint32_t free_chunk_start = 0;
   uint32_t free_chunk_end = 0;
   
-  for (uint32_t i = 0; i < MEM_MNGR_SIZE_OF_MEMORY_BITMAP; i++)
+  for (uint32_t i = first_free_block; i < MEM_MNGR_SIZE_OF_MEMORY_BITMAP; i++)
   {
     if (test_block(i) == MEM_MNGR_FREE_SLOT)
     {
@@ -180,6 +183,7 @@ uint32_t* kmalloc(uint32_t length)
         //did we get through?
         if (j == mem_blocks-1)
         {
+          
           free_chunk_start = i;
           free_chunk_end = i+j;
           for (uint32_t allocated_blocks = free_chunk_start; allocated_blocks < (free_chunk_end+1); allocated_blocks++)
@@ -187,6 +191,8 @@ uint32_t* kmalloc(uint32_t length)
             mark_block(MEM_MNGR_USED_SLOT, allocated_blocks);
           }
           //printf("%d\n", free_chunk_start * 4096);
+          
+          first_free_block = free_chunk_end;
           return (uint32_t*)(free_chunk_start * 4096);
         }
       }
@@ -203,7 +209,7 @@ uint32_t kfree(uint32_t* base, uint32_t length)
     mem_blocks += 1;
     
   if ((uint32_t)base % 4096 != 0) { return K_ERROR_M; }
-  
+  first_free_block = ((uint32_t)base / 4096);
   for (uint32_t i = 0; i < (length/4096); i++)
   {
     mark_block(MEM_MNGR_FREE_SLOT, ((uint32_t)base / 4096) + i);
