@@ -1,10 +1,10 @@
 #ifndef CPU_H
 #define CPU_H
 
-#include "idt.h"
-#include "gdt.h"
-#include "interrupt.h"
-#include "pic.h"
-#include "io.h"
+#include <cpu/idt.h>
+#include <cpu/gdt.h>
+#include <cpu/interrupt.h>
+#include <cpu/pic.h>
+#include <cpu/io.h>
 
 #endif
