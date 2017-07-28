@@ -36,12 +36,7 @@ void kernel_main(struct multiboot_header* mboot_header, uint32_t multiboot_magic
 
 	load_ramdisk(multiboot_get_address());
 	
-	//pm_new_thread();
 	
-	//console_reset();
-	//test_list();
-	
-	/*
 	uint32_t kernel_location = get_kernel_location();
   uint32_t kernel_size = get_kernel_size();
   uint32_t kernel_end = get_kernel_end();
@@ -49,23 +44,21 @@ void kernel_main(struct multiboot_header* mboot_header, uint32_t multiboot_magic
 	printf("kernel_location : 0x%x,   %d bytes,    %d KB\n", kernel_location, kernel_location, kernel_location/1024);
 	printf("kernel_size     : 0x%x,   %d bytes,    %d KB\n", kernel_size, kernel_size, kernel_size/1024);
 	printf("kernel_end      : 0x%x,   %d bytes,    %d KB\n", kernel_end, kernel_end, kernel_end/1024);
-	*/
-
+	
 	//fs_format(1, FS_FAT16);
-
-	pm_new_thread((uint32_t*)thread_2, 1024);
+	/*pm_new_thread((uint32_t*)thread_2, 1024);
 	pm_new_thread((uint32_t*)thread_3, 1024);
 	pm_new_thread((uint32_t*)thread_4, 1024);
-
+  */
 	while(true)
 	{
-		printf("year: %d\n", (uint32_t)rtc_get_year());
+		/*printf("year: %d\n", (uint32_t)rtc_get_year());
 		printf("month: %d\n", (uint32_t)rtc_get_month());
 		printf("day: %d\n", (uint32_t)rtc_get_day());
 		printf("weekday: %d\n", (uint32_t)rtc_get_weekday());
 		printf("hour: %d\n", (uint32_t)rtc_get_hour());
 		printf("minute: %d\n", (uint32_t)rtc_get_minute());
-		printf("second: %d\n", (uint32_t)rtc_get_second());
+		printf("second: %d\n", (uint32_t)rtc_get_second());*/
 	}
 }
 

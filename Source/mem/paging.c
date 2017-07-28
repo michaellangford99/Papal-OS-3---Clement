@@ -42,6 +42,25 @@ int init_paging() {
     }
   }
   
+  uint32_t kernel_size = get_kernel_size();
+  
+  uint32_t kernel_pages = kernel_size / PAGE_SIZE;
+  if ((kernel_size % PAGE_SIZE) > 0)
+    kernel_pages++;
+    
+  uint32_t kernel_page_tables = kernel_pages / 1024;
+  if ((kernel_pages % PAGE_SIZE) > 0)
+    kernel_page_tables++;
+    
+  printf("pages of memory in kernel: %d\n", kernel_pages);
+  printf("page tables of memory containing kernel: %d\n", kernel_page_tables);
+  
+  uint32_t kernel_first_page_table = (get_kernel_location() / 4096)/1024;
+  uint32_t kernel_first_page = (get_kernel_location() / 4096) % 1024;
+  
+  printf("kernel_first_page_table: %d\n", kernel_first_page_table);
+  printf("kernel_first_page: %d\n", kernel_first_page);
+  
   //put all 1024 page tables into the page directory
   // attributes: supervisor level, read/write, present
   for (i = 0; i < 1024; i++)
@@ -82,13 +101,19 @@ uint32_t encode_page_directory_entry(uint32_t* page_table_address,
     clear_bit(2, (uint8_t*)&page_dir_entry);
   if (privelege == PAGE_DIR_ENTRY_USER)
     set_bit(2, (uint8_t*)&page_dir_entry);
-  
-  
-  
-  
-  
-  
-  
-  
-  
+    
+  return 0;
 }
+
+
+/*    index into page dir:         page entry in that page table*/
+int get_physical_address(int page_table, int page)
+{
+  return ((1024*page_table + page) * 0x1000);
+}
+/*
+//find the page umber that represents this physical address
+int get_page_number(uint32_t address)
+{
+  return 
+}*/

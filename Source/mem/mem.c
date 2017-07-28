@@ -179,6 +179,7 @@ uint32_t* kmalloc(uint32_t length)
       //if we find a free block, keep going until we find the proper number...
       for (uint32_t j = 0; j < mem_blocks; j++)
       {
+        
         if (test_block(i + j) != MEM_MNGR_FREE_SLOT) { break; }
         //did we get through?
         if (j == mem_blocks-1)

@@ -36,7 +36,7 @@ uint32_t* heap_alloc(uint32_t length)
         bool success = false;
         uint32_t return_value = heap_allocate_from_node(node, length, &success);
         if (success == true)
-          return return_value;
+          return (uint32_t*)return_value;
       }      
     }
     node = node->next;
@@ -48,9 +48,10 @@ uint32_t* heap_alloc(uint32_t length)
   return NULL;
 }
 
-int heap_allocate_from_node(heap_node_t* node, int length)
+uint32_t heap_allocate_from_node(heap_node_t* node, int length, bool* success)
 {
-  
+  *success = true;
+  return 0;
 }
 
 int heap_free(uint32_t* addr, uint32_t length)

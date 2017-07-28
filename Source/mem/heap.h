@@ -18,7 +18,7 @@ typedef struct heap_node {
 
 int heap_init();
 uint32_t* heap_alloc(uint32_t length);
-int heap_allocate_from_node(heap_node_t* node, int length);
+uint32_t heap_allocate_from_node(heap_node_t* node, int length, bool* success);
 int heap_free(uint32_t* addr, uint32_t length);
 
 #endif

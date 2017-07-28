@@ -154,6 +154,7 @@ int pm_new_thread(uint32_t* entry_point, uint32_t stack_size)
 
 void proc_save(struct x86_registers* proc_regs)
 {
+  //this should be a memcpy
   thread_t* thread = (thread_t*)threads->data;
   thread->thread_regs.gs = proc_regs->gs;
   thread->thread_regs.fs = proc_regs->fs;

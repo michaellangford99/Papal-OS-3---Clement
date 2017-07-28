@@ -42,7 +42,7 @@ for cfile in `ls *.c`
 do
 	i686-elf-gcc -c  $cfile -o "../Bin/$cfile.o" $CFLAGS
 	tput setaf $Ccolor
-	echo $cfile
+	echo "$cfile"
 	tput sgr0
 done
 
@@ -54,7 +54,7 @@ do
 	do
 		i686-elf-gcc -c  $cfile -o "../../Bin/$cfile.o" $CFLAGS
 		tput setaf $Ccolor
-		echo $cfile
+		echo "$dir/$cfile"
 		tput sgr0
 	done
 	cd ..
