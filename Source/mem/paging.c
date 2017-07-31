@@ -11,14 +11,14 @@ int init_paging() {
   /*
   This basic paging code just identity maps the entire 4GB address space.
   */
-  
+  printf("init_paging\n");
   //allocate 4KB for page directory
   page_directory = kmalloc(1024*4);
   
   memset((char*)&page_directory[0], 0, 1024 * 4);
   page_tables = (page_table_t*)kmalloc(1024 * sizeof(page_table_t));
   
-  printf("page_directory addr: 0x%x / %d / %d KB\n", (uint32_t)&page_directory[0], (uint32_t)&page_directory[0], ((uint32_t)&page_directory[0])/1024);
+  printf("....page_directory addr: 0x%x / %d / %d KB\n", (uint32_t)&page_directory[0], (uint32_t)&page_directory[0], ((uint32_t)&page_directory[0])/1024);
   
   //first, set all entries in page directory to NP
   unsigned int i;
@@ -52,14 +52,14 @@ int init_paging() {
   if ((kernel_pages % PAGE_SIZE) > 0)
     kernel_page_tables++;
     
-  printf("pages of memory in kernel: %d\n", kernel_pages);
-  printf("page tables of memory containing kernel: %d\n", kernel_page_tables);
+  printf("....pages of memory in kernel: %d\n", kernel_pages);
+  printf("....page tables of memory containing kernel: %d\n", kernel_page_tables);
   
   uint32_t kernel_first_page_table = (get_kernel_location() / 4096)/1024;
   uint32_t kernel_first_page = (get_kernel_location() / 4096) % 1024;
   
-  printf("kernel_first_page_table: %d\n", kernel_first_page_table);
-  printf("kernel_first_page: %d\n", kernel_first_page);
+  printf("....kernel_first_page_table: %d\n", kernel_first_page_table);
+  printf("....kernel_first_page: %d\n", kernel_first_page);
   
   //put all 1024 page tables into the page directory
   // attributes: supervisor level, read/write, present
@@ -70,8 +70,6 @@ int init_paging() {
   
   loadPageDirectory(&(page_directory[0]));
   enablePaging();
-  
-  printf("paging: ready\n");
   return K_SUCCESS;
 }
 

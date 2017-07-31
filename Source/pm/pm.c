@@ -17,15 +17,16 @@ uint32_t proc_table_lock=LOCK_FREE;
 
 int pm_init()
 {
+  printf("pm_init\n");
   //unlock(&proc_table_lock);
   //allocate memory for interrupt stack
   int_stack.stack_bottom = (uint32_t)kmalloc(PM_INTERRUPT_STACK_SIZE);
   int_stack.stack_top = int_stack.stack_bottom + PM_INTERRUPT_STACK_SIZE;
   int_stack.stack_esp = int_stack.stack_top;
   
-  printf("interrupt stack top: %d\n", int_stack.stack_top);
-  printf("interrupt stack bottom: %d\n", int_stack.stack_bottom);
-  printf("interrupt stack esp: %d\n", int_stack.stack_esp);
+  printf("....interrupt stack top: %d\n", int_stack.stack_top);
+  printf("....interrupt stack bottom: %d\n", int_stack.stack_bottom);
+  printf("....interrupt stack esp: %d\n", int_stack.stack_esp);
   
   //set up thread list, making first node the current process
   threads = (node_t*)kmalloc(sizeof(node_t));

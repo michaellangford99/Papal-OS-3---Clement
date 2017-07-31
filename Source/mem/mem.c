@@ -25,7 +25,7 @@ int memory_init(struct multiboot_header* mboot_header)
 {
   
   //Step 1 - clean up memory slots - remove kernel from list of free mamory, align on 4K boundaries, remove memory map from list of free memory...
-  
+  printf("memory_init:\n");
   memory_slots = mboot_header->mmap_length / sizeof(mboot_memmap_t);
   
   kernel_location = (uint32_t)&__start;
@@ -36,9 +36,9 @@ int memory_init(struct multiboot_header* mboot_header)
   mem_map_size  = (uint32_t)mboot_header->mmap_length;
   mem_map_end = (uint32_t)mboot_header->mmap_addr + (uint32_t)mboot_header->mmap_length;
   
-  printf("kernel location %d / %dKB\n", kernel_location, kernel_location/1024);
-  printf(".......size     %d / %dKB\n", kernel_size, kernel_size/1024);
-  printf(".......end      %d / %dKB\n", kernel_end, kernel_end/1024);  
+  printf("....kernel location %d / %dKB\n", kernel_location, kernel_location/1024);
+  printf("...........size     %d / %dKB\n", kernel_size, kernel_size/1024);
+  printf("...........end      %d / %dKB\n", kernel_end, kernel_end/1024);  
   
   mboot_memmap_t mmap_entries[memory_slots];
   memcpy((char*)&mmap_entries, (char*)mboot_header->mmap_addr, mboot_header->mmap_length);
@@ -53,13 +53,13 @@ int memory_init(struct multiboot_header* mboot_header)
       //kernel_size += mod_info->end - kernel_end; //possible bug here
       kernel_end = mod_info->end;
       kernel_size = kernel_end - kernel_location;
-      printf("extended 'kernel_end' to %d on mod%d\n", mod_info->end, mod);
+      printf("....extended 'kernel_end' to %d on mod%d\n", mod_info->end, mod);
     }
   }
   
-  printf("kernel location     %d / %dKB\n", kernel_location, kernel_location/1024);
-  printf("kernel+modules size %d / %dKB\n", kernel_size, kernel_size/1024);
-  printf("kernel+modules end  %d / %dKB\n", kernel_end, kernel_end/1024);  
+  printf("....kernel location     %d / %dKB\n", kernel_location, kernel_location/1024);
+  printf("....kernel+modules size %d / %dKB\n", kernel_size, kernel_size/1024);
+  printf("....kernel+modules end  %d / %dKB\n", kernel_end, kernel_end/1024);  
   
   
   for (uint32_t i = 0; i < memory_slots; i++)
@@ -76,7 +76,7 @@ int memory_init(struct multiboot_header* mboot_header)
           //wastes some memory here if the two overlap
           mmap_entries[i].base_addr += (uint64_t)kernel_size;
           mmap_entries[i].length -= (uint64_t)kernel_size;
-          printf("::::shrunk slot %d %d / %dKB\n", i, (uint32_t)kernel_size, (uint32_t)kernel_size / MEM_MNGR_SLOT_SIZE);
+          printf("....::::shrunk slot %d %d / %dKB\n", i, (uint32_t)kernel_size, (uint32_t)kernel_size / MEM_MNGR_SLOT_SIZE);
         }
         
         //exclude memory map
@@ -86,7 +86,7 @@ int memory_init(struct multiboot_header* mboot_header)
           //same here
           mmap_entries[i].base_addr += (uint64_t)mem_map_size;
           mmap_entries[i].length -= (uint64_t)mem_map_size;
-          printf("::::shrunk slot %d %d / %dKB\n", i, (uint32_t)mem_map_size, (uint32_t)mem_map_size / MEM_MNGR_SLOT_SIZE);
+          printf("....::::shrunk slot %d %d / %dKB\n", i, (uint32_t)mem_map_size, (uint32_t)mem_map_size / MEM_MNGR_SLOT_SIZE);
         }
         
         //align slot on 4K boundary
@@ -102,27 +102,27 @@ int memory_init(struct multiboot_header* mboot_header)
       }
       else{
         mmap_entries[i].type = MULTIBOOT_MMAP_RESERVED;
-        printf("----forced memory slot %d into reserved type, as its base address is below KERNEL_START----\n", i);
+        printf("....----forced memory slot %d into reserved type, as its base address is below KERNEL_START----\n", i);
       }
     }
   }
   
   for (uint32_t i = 0; i < memory_slots; i++)
   {
-    printf("Memory Map Entry - %d:\n", i);
-    printf("  base_addr: %d, %d KB\n", (uint32_t)mmap_entries[i].base_addr, (uint32_t)mmap_entries[i].base_addr/1024);
-    printf("  length   : %d, %d KB\n", (uint32_t)mmap_entries[i].length   , (uint32_t)mmap_entries[i].length/1024);
-    printf("  type     : %d\n", (uint32_t)mmap_entries[i].type);
+    printf("....Memory Map Entry - %d:\n", i);
+    printf("....  base_addr: %x, %d KB\n", (uint32_t)mmap_entries[i].base_addr, (uint32_t)mmap_entries[i].base_addr/1024);
+    printf("....  length   : %x, %d KB\n", (uint32_t)mmap_entries[i].length   , (uint32_t)mmap_entries[i].length/1024);
+    printf("....  type     : %d\n", (uint32_t)mmap_entries[i].type);
     printf("\n");
   }
   
-  printf("total free memory: %d, %d KB, %d MB\n", total_memory_size, total_memory_size/1024, total_memory_size/(1024*1024));
+  printf("....total free memory: %d, %d KB, %d MB\n", total_memory_size, total_memory_size/1024, total_memory_size/(1024*1024));
   
   //Now we have to mark every slot of memory as used, then go throught every free slot, and mark it as free. This way we won't miss any.
   
   //mark all as used
   
-  printf("size of memory bitmap: %d\n", MEM_MNGR_SIZE_OF_MEMORY_BITMAP);
+  printf("....size of memory bitmap: %d\n", MEM_MNGR_SIZE_OF_MEMORY_BITMAP);
   memset((char*)(&memory_bitmap), 255, MEM_MNGR_SIZE_OF_MEMORY_BITMAP); //255 >> binary == %11111111 - all used
   
   
@@ -132,9 +132,9 @@ int memory_init(struct multiboot_header* mboot_header)
     if ((uint32_t)mmap_entries[i].type == MULTIBOOT_MMAP_FREE_MEMORY)
     {
       uint32_t starting_chunk = (uint32_t)(mmap_entries[i].base_addr / (4096));
-      printf("starting 4K page of memory slot %d is : %d\n", i, starting_chunk);
+      printf("....starting 4K page of memory slot %d is : %d\n", i, starting_chunk);
       uint32_t ending_chunk = starting_chunk + (uint32_t)(mmap_entries[i].length / (4096));
-      printf("ending 4K page of memory slot %d is : %d\n", i, ending_chunk);
+      printf("....ending 4K page of memory slot %d is : %d\n", i, ending_chunk);
       
       mark_block(0, starting_chunk);
       mark_block(0, ending_chunk);

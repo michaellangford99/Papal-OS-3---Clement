@@ -11,11 +11,11 @@ heap_node_t* heap_list;
 
 int heap_init()
 {
-  printf("size of heap node is %d bytes\n", sizeof(heap_node_t));
-  printf("dta+bitmap: %d", HEAP_CHUNK_HEADER_SIZE+HEAP_CHUNK_BITMAP_SIZE+HEAP_CHUNK_DATA_SIZE);
+  printf("heap_init\n");
+  printf("....size of heap node is %d bytes\n", sizeof(heap_node_t));
+  printf("....data+bitmap: %d\n", HEAP_CHUNK_HEADER_SIZE+HEAP_CHUNK_BITMAP_SIZE+HEAP_CHUNK_DATA_SIZE);
   heap_list = (heap_node_t*)kmalloc(sizeof(heap_node_t));
   heap_list->next = NULL;
-  
   return 1;
 }
 
