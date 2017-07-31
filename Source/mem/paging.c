@@ -63,17 +63,25 @@ int init_paging() {
   
   //put all 1024 page tables into the page directory
   // attributes: supervisor level, read/write, present
-  for (i = 0; i < 1024; i++)
+  for (i = 0; i < 1023; i++)
   {
     page_directory[i] = ((unsigned int)&page_tables[i]) | 3;
   }
   
+  //map last page directory to itself
+  page_directory[1023] = ((unsigned int)&page_directory[0]) | 3;
+  
   loadPageDirectory(&(page_directory[0]));
   enablePaging();
+  
+  printf("....XXXXXXXXXXXX-TEST-XXXXXXXXX\n");
+  
+  printf("....physical address that %x is mapped to: %x\n", 0xFFFFF000, (uint32_t)get_physaddr((uint32_t*)0xFFFFF000));
+  
   return K_SUCCESS;
 }
 
-uint32_t encode_page_directory_entry(uint32_t* page_table_address, 
+/*uint32_t encode_page_directory_entry(uint32_t* page_table_address, 
                                 uint8_t page_size, 
                                 uint8_t write_through, 
                                 uint8_t privelege, 
@@ -101,6 +109,43 @@ uint32_t encode_page_directory_entry(uint32_t* page_table_address,
     set_bit(2, (uint8_t*)&page_dir_entry);
     
   return 0;
+}*/
+
+
+uint32_t * get_physaddr(uint32_t * virtualaddr)
+{
+    uint32_t pdindex = (uint32_t)virtualaddr >> 22;
+    uint32_t ptindex = (uint32_t)virtualaddr >> 12 & 0x03FF;
+ 
+    uint32_t * pd = (uint32_t *)0xFFFFF000;
+    // Here you need to check whether the PD entry is present.
+ 
+    uint32_t * pt = ((uint32_t *)0xFFC00000) + (0x400 * pdindex);
+    // Here you need to check whether the PT entry is present.
+ 
+    return (uint32_t *)((pt[ptindex] & ~0xFFF) + ((uint32_t)virtualaddr & 0xFFF));
+}
+
+void map_page(uint32_t * physaddr, uint32_t * virtualaddr, unsigned int flags)
+{
+    // Make sure that both addresses are page-aligned.
+ 
+    uint32_t pdindex = (uint32_t)virtualaddr >> 22;
+    uint32_t ptindex = (uint32_t)virtualaddr >> 12 & 0x03FF;
+ 
+    uint32_t * pd = (uint32_t *)0xFFFFF000;
+    // Here you need to check whether the PD entry is present.
+    // When it is not present, you need to create a new empty PT and
+    // adjust the PDE accordingly.
+ 
+    uint32_t * pt = ((uint32_t *)0xFFC00000) + (0x400 * pdindex);
+    // Here you need to check whether the PT entry is present.
+    // When it is, then there is already a mapping present. What do you do now?
+ 
+    pt[ptindex] = ((uint32_t)physaddr) | (flags & 0xFFF) | 0x01; // Present
+ 
+    // Now you need to flush the entry in the TLB
+    // or you might not notice the change.
 }
 
 

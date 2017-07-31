@@ -28,8 +28,8 @@ void kernel_main(struct multiboot_header* mboot_header, uint32_t multiboot_magic
 	clock_init();
 	keyboard_init();
 
-	ata_init();
-	fs_init();
+	//ata_init();
+	//fs_init();
 
 	//data dump
 	graphics_init(multiboot_get_vbe_address());

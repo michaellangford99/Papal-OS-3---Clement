@@ -28,4 +28,7 @@ typedef struct {
 int init_paging();
 int get_physical_address(int page_table, int page);
 
+uint32_t * get_physaddr(uint32_t * virtualaddr);
+void map_page(uint32_t * physaddr, uint32_t * virtualaddr, unsigned int flags);
+
 #endif
