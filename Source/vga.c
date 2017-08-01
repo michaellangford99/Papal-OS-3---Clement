@@ -171,7 +171,6 @@ void startup_graphics_init(vbe_info_t* vbe_info) {
 }
 
 void graphics_init(vbe_info_t* vbe_info) {
-  console_setcolors(create_24bit_color(0,255,0), create_24bit_color(0,0,0));
   
   fbuffer = (pixel*)kmalloc(video_width*video_height*pitch);
   graphics_buffer = (pixel*) memory_location;

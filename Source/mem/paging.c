@@ -6,6 +6,7 @@ page_table_t* page_tables;//[1024] __attribute__((aligned(4096)));
 //link to assembly routines
 extern void loadPageDirectory(uint32_t*);
 extern void enablePaging();
+extern void invalidate_page(uint32_t*);
 
 int init_paging() {
   /*
@@ -144,19 +145,5 @@ void map_page(uint32_t * physaddr, uint32_t * virtualaddr, unsigned int flags)
  
     pt[ptindex] = ((uint32_t)physaddr) | (flags & 0xFFF) | 0x01; // Present
  
-    // Now you need to flush the entry in the TLB
-    // or you might not notice the change.
+    invalidate_page(physaddr);
 }
-
-
-/*    index into page dir:         page entry in that page table*/
-int get_physical_address(int page_table, int page)
-{
-  return ((1024*page_table + page) * 0x1000);
-}
-/*
-//find the page umber that represents this physical address
-int get_page_number(uint32_t address)
-{
-  return 
-}*/

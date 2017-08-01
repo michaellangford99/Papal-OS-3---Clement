@@ -18,3 +18,13 @@ mov %eax, %cr0
 mov %ebp, %esp
 pop %ebp
 ret
+
+.globl invalidate_page
+invalidate_page:
+push %ebp
+mov %esp, %ebp
+mov 8(%esp), %eax
+invlpg (%eax)
+mov %ebp, %esp
+pop %ebp
+ret
