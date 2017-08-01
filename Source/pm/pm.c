@@ -13,7 +13,7 @@ stack_t int_stack;
 extern uint32_t stack_bottom;
 extern uint32_t stack_top;
 
-uint32_t proc_table_lock=LOCK_FREE;
+//lock_t proc_table_lock=LOCK_FREE;
 
 int pm_init()
 {
@@ -24,9 +24,9 @@ int pm_init()
   int_stack.stack_top = int_stack.stack_bottom + PM_INTERRUPT_STACK_SIZE;
   int_stack.stack_esp = int_stack.stack_top;
   
-  printf("....interrupt stack top: %d\n", int_stack.stack_top);
-  printf("....interrupt stack bottom: %d\n", int_stack.stack_bottom);
-  printf("....interrupt stack esp: %d\n", int_stack.stack_esp);
+  printf("....interrupt stack top   : %x\n", int_stack.stack_top);
+  printf("....interrupt stack bottom: %x\n", int_stack.stack_bottom);
+  printf("....interrupt stack esp   : %x\n", int_stack.stack_esp);
   
   //set up thread list, making first node the current process
   threads = (node_t*)kmalloc(sizeof(node_t));
@@ -43,17 +43,14 @@ int pm_init()
   thread->thread_regs.esp = (uint32_t)&stack_top;
   thread->thread_regs.ebp = (uint32_t)&stack_bottom;
   
+  //the registers of process 0 will be saved to the struct upon the next clock interrupt
     
   return 0;
 }
 
 int pm_new_thread(uint32_t* entry_point, uint32_t stack_size)
 {
-  /*while(true)
-  {
-    if (lock(&proc_table_lock)==1)
-      break;
-  }*/
+  //lock(&proc_table_lock);
   interrupt_block();
   //add new node to proc_list, 
   int index = list_add_node(threads, 0);
@@ -148,7 +145,7 @@ int pm_new_thread(uint32_t* entry_point, uint32_t stack_size)
   printf("eflags:      0x%x\n", thread->thread_regs.eflags);
   printf("ss:          0x%x\n", thread->thread_regs.ss);
   */
-  /*unlock(&proc_table_lock);*/
+  //unlock(&proc_table_lock);
   interrupt_unblock();
   return thread->thread_id;
 }
