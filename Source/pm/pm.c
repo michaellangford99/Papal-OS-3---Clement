@@ -152,9 +152,8 @@ int pm_new_thread(uint32_t* entry_point, uint32_t stack_size)
 
 void proc_save(struct x86_registers* proc_regs)
 {
-  //this should be a memcpy
   thread_t* thread = (thread_t*)threads->data;
-  thread->thread_regs.gs = proc_regs->gs;
+  /*thread->thread_regs.gs = proc_regs->gs;
   thread->thread_regs.fs = proc_regs->fs;
   thread->thread_regs.es = proc_regs->es;
   thread->thread_regs.ds = proc_regs->ds;
@@ -172,7 +171,9 @@ void proc_save(struct x86_registers* proc_regs)
   thread->thread_regs.cs = proc_regs->cs;
   thread->thread_regs.eflags = proc_regs->eflags;
   thread->thread_regs.useresp = proc_regs->useresp;
-  thread->thread_regs.ss = proc_regs->ss;
+  thread->thread_regs.ss = proc_regs->ss;*/
+  memcpy((char*)&thread->thread_regs, (char*)proc_regs, sizeof(struct x86_registers));
+  
 }
 
 struct x86_registers* proc_schedule(struct x86_registers* proc_regs)
