@@ -3,10 +3,10 @@
 uint32_t thread_count = 0;
 node_t* threads;
 
+//the ebp and esp from interrupted process
 uint32_t saved_esp;
 uint32_t saved_ebp;
 
-//the ebp and esp from interrupted process
 stack_t int_stack;
 
 //externl references to addresses of proc 0 stack
@@ -45,6 +45,14 @@ int pm_init()
   
   //the registers of process 0 will be saved to the struct upon the next clock interrupt
     
+  //set up user mode
+  
+  struct x86_tss* tss = (struct x86_tss*)kmalloc(sizeof(struct x86_tss));
+  
+  memset((char*)tss, 0, sizeof(struct x86_tss));
+    
+  load_TSS((uint32_t*)tss, sizeof(struct x86_tss));
+  
   return 0;
 }
 
@@ -173,7 +181,6 @@ void proc_save(struct x86_registers* proc_regs)
   thread->thread_regs.useresp = proc_regs->useresp;
   thread->thread_regs.ss = proc_regs->ss;*/
   memcpy((char*)&thread->thread_regs, (char*)proc_regs, sizeof(struct x86_registers));
-  
 }
 
 struct x86_registers* proc_schedule(struct x86_registers* proc_regs)
@@ -190,7 +197,7 @@ struct x86_registers* proc_schedule(struct x86_registers* proc_regs)
     }
     /*unlock(&proc_table_lock);
   }*/
-  
+    
   //get registers of process in list position 0
   thread_t* thread = (thread_t*)threads->data;
   //printf("thread_id: %d\n", thread->thread_id);
