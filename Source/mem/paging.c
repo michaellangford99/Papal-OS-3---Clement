@@ -4,7 +4,6 @@ uint32_t* page_directory;//[1024] __attribute__((aligned(4096)));
 page_table_t* page_tables;//[1024] __attribute__((aligned(4096)));
 
 //link to assembly routines
-extern void loadPageDirectory(uint32_t*);
 extern void enablePaging();
 extern void invalidate_page(uint32_t*);
 

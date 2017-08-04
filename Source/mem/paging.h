@@ -25,6 +25,10 @@ typedef struct {
   uint32_t frame;     // Frame address (shifted right 12 bits)
 } page_table_entry_descriptor_t;
 
+extern void loadPageDirectory(uint32_t*);//this one is in the header because other 
+                                         //files, aka pm.c will need to change the 
+                                         //page directory for each process
+
 int init_paging();
 int get_physical_address(int page_table, int page);
 
