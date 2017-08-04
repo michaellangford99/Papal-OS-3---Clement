@@ -2,7 +2,7 @@
 #define GDT_H
 
 //constants for GDT
-#define SEGMENT_DESCRIPTORS    5
+#define SEGMENT_DESCRIPTORS    6
 #define SECTOR_CODE_DPL_0      0x9A
 #define SECTOR_DATA_DPL_0      0x92
 #define SECTOR_CODE_DPL_3      0xFA // not yet impl.
@@ -58,6 +58,7 @@ struct {
 } __attribute__((packed)) TSS_descriptor;
 
 void gdt_init();
+void load_TSS(uint32_t* TSS, uint32_t TSS_size);
 void encode_GDT_entry(uint8_t *target, struct GDT_sector_descriptor source);
 extern void setGDT(uint32_t base, uint16_t size);
 extern void reloadSegments();
