@@ -17,14 +17,6 @@ typedef uint16_t flags;
 
 typedef uint16_t idt_entry;
 
-struct x86_registers
-{
-  uint32_t gs, fs, es, ds;
-  uint32_t edi, esi, ebp, esp, ebx, edx, ecx, eax;
-  uint32_t int_no, err_code;
-  uint32_t eip, cs, eflags, useresp, ss;
-};
-
 void idt_init();
 void idt_zero();
 void idt_set_gate(char interrupt, offset int_offset, flags int_flags, segment int_segment);
