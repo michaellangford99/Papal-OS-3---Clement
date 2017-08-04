@@ -50,4 +50,33 @@ struct x86_tss {
 	uint16_t	iomap;
 };
 
+struct x86_eflags {
+	unsigned carry:1;
+	unsigned reserved0:1;
+	unsigned parity:1;
+	unsigned reserved1:1;
+
+	unsigned auxcarry:1;
+	unsigned reserved2:1;
+	unsigned zero:1;
+	unsigned sign:1;
+
+	unsigned trap:1;
+	unsigned interrupt:1;
+	unsigned direction:1;
+	unsigned overflow:1;
+
+	unsigned iopl:2;
+	unsigned nested:1;
+	unsigned reserved3:1;
+
+	unsigned resume:1;
+	unsigned v86:1;
+	unsigned align:1;
+	unsigned vinterrupt:1;
+
+	unsigned vpending:1;
+	unsigned id:1;
+};
+
 #endif
