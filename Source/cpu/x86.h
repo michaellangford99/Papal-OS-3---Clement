@@ -48,7 +48,7 @@ struct x86_tss {
 	uint16_t	reserved9;
 	uint16_t	t;
 	uint16_t	iomap;
-};
+}  __attribute__((packed));
 
 struct x86_eflags {
 	unsigned carry:1;
