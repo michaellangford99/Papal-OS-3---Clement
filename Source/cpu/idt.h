@@ -3,9 +3,9 @@
 
 #define idt_entries_length    (256)
 #define idt_array_length      (idt_entries_length * 4)
-#define isr_flags             0x8E00
+#define isr_flags             0xEE00//
 #define isr_segment           0x0008
-#define irq_flags             0x8E00
+#define irq_flags             0xEE00//
 #define irq_segment           0x0008
 
 //set to 1 to see output of 'idt_set_gate'
@@ -19,7 +19,7 @@ typedef uint16_t idt_entry;
 
 void idt_init();
 void idt_zero();
-void idt_set_gate(char interrupt, offset int_offset, flags int_flags, segment int_segment);
+void idt_set_gate(uint8_t interrupt, offset int_offset, flags int_flags, segment int_segment);
 void isr_init();
 uint32_t isr_handler(struct x86_registers *regs);
 void irq_init();

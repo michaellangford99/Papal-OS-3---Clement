@@ -6,11 +6,14 @@
 #define PM_PROC_0_ID             0
 #define PM_THREAD_TIME_QUANTUM   10
 #define PM_ESP_OFFSET            (-12*4)
+#define PM_PL0                   0
+#define PM_PL3                   3
 
 typedef struct {
     uint32_t thread_id;
     struct x86_registers thread_regs;
     uint32_t quantum;
+    uint32_t* int_stack_esp
 } thread_t;
 
 typedef struct {
@@ -20,8 +23,9 @@ typedef struct {
 }  __attribute__((packed))  stack_t;
 
 int pm_init();
+void save_ring_0_esp(uint32_t ring0_esp);
 void proc_save(struct x86_registers* proc_regs);
-int pm_new_thread(uint32_t* entry_point, uint32_t stack_size);
+int pm_new_thread(uint32_t* entry_point, uint32_t stack_size, uint32_t privelege);
 struct x86_registers* proc_schedule(struct x86_registers* proc_regs);
 
 #endif

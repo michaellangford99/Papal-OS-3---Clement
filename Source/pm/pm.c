@@ -9,9 +9,11 @@ uint32_t saved_ebp;
 
 stack_t int_stack;
 
-//externl references to addresses of proc 0 stack
+//external references to addresses of proc 0 stack
 extern uint32_t stack_bottom;
 extern uint32_t stack_top;
+
+struct x86_tss tss;
 
 //lock_t proc_table_lock=LOCK_FREE;
 
@@ -23,85 +25,111 @@ int pm_init()
   int_stack.stack_bottom = (uint32_t)kmalloc(PM_INTERRUPT_STACK_SIZE);
   int_stack.stack_top = int_stack.stack_bottom + PM_INTERRUPT_STACK_SIZE;
   int_stack.stack_esp = int_stack.stack_top;
-  
+
   printf("....interrupt stack top   : %x\n", int_stack.stack_top);
   printf("....interrupt stack bottom: %x\n", int_stack.stack_bottom);
   printf("....interrupt stack esp   : %x\n", int_stack.stack_esp);
-  
+
   //set up thread list, making first node the current process
   threads = (node_t*)kmalloc(sizeof(node_t));
-  
+
   threads->val = 0;        //unused in pm.c
   threads->next = NULL;
   threads->child = NULL;   //unused in pm.c
   threads->data = (uint32_t*)kmalloc(sizeof(thread_t));    //pointer to thread descriptor struct
   thread_t* thread = (thread_t*)threads->data;
-  
+
   thread->thread_id = thread_count;
   thread->quantum = PM_THREAD_TIME_QUANTUM;
-  
+
   thread->thread_regs.esp = (uint32_t)&stack_top;
   thread->thread_regs.ebp = (uint32_t)&stack_bottom;
-  
+
   //the registers of process 0 will be saved to the struct upon the next clock interrupt
-    
+
   //set up user mode
-  
-  struct x86_tss* tss = (struct x86_tss*)kmalloc(sizeof(struct x86_tss));
-  
-  memset((char*)tss, 0, sizeof(struct x86_tss));
-    
-  load_TSS((uint32_t*)tss, sizeof(struct x86_tss));
-  
+
+  //tss = (struct x86_tss*)kmalloc(sizeof(struct x86_tss));
+
+  printf("....TSS Address: %x\n", (uint32_t)&tss);
+
+  memset((char*)&tss, 0, sizeof(struct x86_tss));
+
+  tss.esp0 = int_stack.stack_esp;
+  tss.ss0 = 0x00000010;
+
+  load_TSS((uint32_t*)&tss, sizeof(struct x86_tss));
+
   return 0;
 }
 
-int pm_new_thread(uint32_t* entry_point, uint32_t stack_size)
+void save_ring_0_esp(uint32_t ring0_esp)
+{
+  //printf("TSS: esp0: 0x%x\n", ring0_esp);
+  tss.esp0 = ring0_esp;
+}
+
+int pm_new_thread(uint32_t* entry_point, uint32_t stack_size, uint32_t privelege)
 {
   //lock(&proc_table_lock);
   interrupt_block();
-  //add new node to proc_list, 
+  //add new node to proc_list,
   int index = list_add_node(threads, 0);
   node_t* new_thread_node = list_access_node(threads, index);
-  
+
   new_thread_node->data = (uint32_t*)kmalloc(sizeof(thread_t));    //pointer to thread descriptor struct
   thread_t* thread = (thread_t*)new_thread_node->data;
-  
+
   thread_count++;
-  
+
   thread->thread_id = thread_count;
-  
+
   thread->quantum = PM_THREAD_TIME_QUANTUM;
-  
-  //set segments
-  thread->thread_regs.gs = 0x00000010;
-  thread->thread_regs.fs = 0x00000010;
-  thread->thread_regs.es = 0x00000010;
-  thread->thread_regs.ds = 0x00000010;
-  
+
   //zero source & dest pointers
   thread->thread_regs.edi = 0;
   thread->thread_regs.esi = 0;
-  
+
   //allocate stack
   thread->thread_regs.ebp = (uint32_t)kmalloc(stack_size);
   thread->thread_regs.esp = thread->thread_regs.ebp + stack_size - PM_ESP_OFFSET;
-  thread->thread_regs.useresp = 0;
-    
+  thread->thread_regs.useresp = thread->thread_regs.esp;
+
   //zero general purpose registers
   thread->thread_regs.ebx = 0;
   thread->thread_regs.edx = 0;
   thread->thread_regs.ecx = 0;
   thread->thread_regs.eax = 0;
-  
+
   //set cs:eip (important!!)
   thread->thread_regs.eip = (uint32_t)entry_point;
-  thread->thread_regs.cs = 0x00000008;
-  thread->thread_regs.eflags = 0x202;//?
-  thread->thread_regs.ss = 0x00000008;
-  
+  //privelege level
+  if (privelege == PM_PL0)
+  {
+    thread->thread_regs.cs = 0x00000008;
+    thread->thread_regs.ss = 0x00000010;
+    //set segments
+    thread->thread_regs.gs = 0x00000010;
+    thread->thread_regs.fs = 0x00000010;
+    thread->thread_regs.es = 0x00000010;
+    thread->thread_regs.ds = 0x00000010;
+  }
+  if (privelege == PM_PL3)
+  {
+    thread->thread_regs.cs = 0x0000001B;
+    thread->thread_regs.ss = 0x00000023;
+    //set segments
+    thread->thread_regs.gs = 0x00000023;
+    thread->thread_regs.fs = 0x00000023;
+    thread->thread_regs.es = 0x00000023;
+    thread->thread_regs.ds = 0x00000023;
+
+    thread->int_stack_esp = kmalloc(1024);
+  }
+  thread->thread_regs.eflags = 0x202;//?fv2
+
   //now that struct has correct registers, these must be copied onto the new stack
-  uint32_t* thread_esp = (uint32_t*)(thread->thread_regs.esp - sizeof(struct x86_registers) + 28);
+  uint32_t* thread_esp = (uint32_t*)(thread->thread_regs.esp - sizeof(struct x86_registers) + 28);//28 is offset of esp from struct start * 4
   memcpy((char*)thread_esp, (char*)(&(thread->thread_regs)), sizeof(struct x86_registers));
   /*
   thread_esp[0] = thread->thread_regs.ss;
@@ -124,35 +152,35 @@ int pm_new_thread(uint32_t* entry_point, uint32_t stack_size)
   thread_esp[17] = thread->thread_regs.fs;
   thread_esp[18] = thread->thread_regs.gs;
   */
-  /*
+  //*
   printf("dumping registers of new proc: %d\n", thread_count);
-  
+
   printf("gs:          0x%x\n", thread->thread_regs.gs);
   printf("fs:          0x%x\n", thread->thread_regs.fs);
   printf("es:          0x%x\n", thread->thread_regs.es);
   printf("ds:          0x%x\n", thread->thread_regs.ds);
-  
+
   //zero source & dest pointers
   printf("edi:         0x%x\n", thread->thread_regs.edi);
   printf("esi:         0x%x\n", thread->thread_regs.esi);
-  
+
   //allocate stack
   printf("ebp:         0x%x\n", thread->thread_regs.ebp);
   printf("esp:         0x%x\n", thread->thread_regs.esp);
   printf("useresp:     0x%x\n", thread->thread_regs.useresp);
-    
+
   //zero general purpose registers
   printf("ebx:         0x%x\n", thread->thread_regs.ebx);
   printf("edx:         0x%x\n", thread->thread_regs.edx);
   printf("ecx:         0x%x\n", thread->thread_regs.ecx);
   printf("eax:         0x%x\n", thread->thread_regs.eax);
-  
+
   //set cs:eip (important!!)
   printf("eip:         0x%x\n", thread->thread_regs.eip);
   printf("cs:          0x%x\n", thread->thread_regs.cs);
   printf("eflags:      0x%x\n", thread->thread_regs.eflags);
   printf("ss:          0x%x\n", thread->thread_regs.ss);
-  */
+  //*/
   //unlock(&proc_table_lock);
   interrupt_unblock();
   return thread->thread_id;
@@ -161,6 +189,9 @@ int pm_new_thread(uint32_t* entry_point, uint32_t stack_size)
 void proc_save(struct x86_registers* proc_regs)
 {
   thread_t* thread = (thread_t*)threads->data;
+
+  //tss.esp0 = int_stack.stack_esp;
+  //tss.ss0 = 0x00000010;
   /*thread->thread_regs.gs = proc_regs->gs;
   thread->thread_regs.fs = proc_regs->fs;
   thread->thread_regs.es = proc_regs->es;
@@ -181,13 +212,19 @@ void proc_save(struct x86_registers* proc_regs)
   thread->thread_regs.useresp = proc_regs->useresp;
   thread->thread_regs.ss = proc_regs->ss;*/
   memcpy((char*)&thread->thread_regs, (char*)proc_regs, sizeof(struct x86_registers));
+
+  //if dpl0
+  if ((proc_regs->cs & 0xFF) == 0x1B)
+  {
+    save_ring_0_esp((uint32_t)thread->int_stack_esp);
+  }
 }
 
 struct x86_registers* proc_schedule(struct x86_registers* proc_regs)
 {
   if (((thread_t*)threads->data)->quantum>0)
     ((thread_t*)threads->data)->quantum--;
-  
+
   /*if (lock(&proc_table_lock))
   {*/
     if (((thread_t*)threads->data)->quantum <= 0)
@@ -197,9 +234,16 @@ struct x86_registers* proc_schedule(struct x86_registers* proc_regs)
     }
     /*unlock(&proc_table_lock);
   }*/
-    
+
   //get registers of process in list position 0
   thread_t* thread = (thread_t*)threads->data;
   //printf("thread_id: %d\n", thread->thread_id);
+
+  //if dpl0
+  if ((thread->thread_regs.cs & 0xFF) == 0x1B)
+  {
+    save_ring_0_esp((uint32_t)thread->int_stack_esp);
+  }
+
   return (struct x86_registers*)(thread->thread_regs.esp + PM_ESP_OFFSET);
 }

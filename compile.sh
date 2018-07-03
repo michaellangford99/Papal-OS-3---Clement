@@ -76,7 +76,7 @@ cp Grub/grub.cfg Grub/boot/grub/grub.cfg
 
 #create .iso
 tput setaf $GRUBcolor
-grub-mkrescue -o Build/clement.iso Grub
+grub-mkrescue -o Build/clement.iso Grub -d /usr/lib/grub/i386-pc
 
 #we're done!
 echo "--Build Clement OS--" >> $LOGFILE

@@ -7,7 +7,7 @@
 #define SECTOR_DATA_DPL_0      0x92
 #define SECTOR_CODE_DPL_3      0xFA
 #define SECTOR_DATA_DPL_3      0xF2
-#define SECTOR_TSS_DPL_0       0x89
+#define SECTOR_TSS_DPL_3       0xE9
 
 struct GDT_sector_descriptor
 {
@@ -16,7 +16,7 @@ struct GDT_sector_descriptor
 	uint8_t type;
 };
 
-struct {
+/*struct {
 	int16_t	prev;
 	int16_t	reserved;
 	int32_t	esp0;
@@ -55,11 +55,12 @@ struct {
 	int16_t	reserved9;
 	int16_t	t;
 	int16_t	iomap;
-} __attribute__((packed)) TSS_descriptor;
+} __attribute__((packed)) TSS_descriptor;*/
 
 void gdt_init();
 void load_TSS(uint32_t* TSS, uint32_t TSS_size);
 void encode_GDT_entry(uint8_t *target, struct GDT_sector_descriptor source);
 extern void setGDT(uint32_t base, uint16_t size);
 extern void reloadSegments();
+extern void setTSS();
 #endif

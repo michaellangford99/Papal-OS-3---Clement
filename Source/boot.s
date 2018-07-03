@@ -57,8 +57,9 @@ _start:
 	# than real symbol and jump to there endlessly.
 	cli
 	hlt
-.Lhang:
-	jmp .Lhang
+.global Lhang
+Lhang:
+	jmp Lhang
 
 # Set the size of the _start symbol to the current location '.' minus its start.
 # This is useful when debugging or when you implement call tracing.

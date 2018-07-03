@@ -91,7 +91,7 @@ void idt_zero()
 		idt_entries[i] = 0;
 }
 
-void idt_set_gate(char interrupt, offset int_offset, flags int_flags, segment int_segment)
+void idt_set_gate(uint8_t interrupt, offset int_offset, flags int_flags, segment int_segment)
 {
 	// idt_entries[interrupt * 4] is start of entry
 	// 1st 16 bits (uint16_t) is the first 16 bits of int_offset
@@ -149,6 +149,7 @@ extern void _isr28();
 extern void _isr29();
 extern void _isr30();
 extern void _isr31();
+extern void _isr0x80();
 
 void isr_init()
 {
@@ -185,21 +186,19 @@ void isr_init()
 	idt_set_gate(29, (uint32_t)_isr29, isr_flags, isr_segment);
 	idt_set_gate(30, (uint32_t)_isr30, isr_flags, isr_segment);
 	idt_set_gate(31, (uint32_t)_isr31, isr_flags, isr_segment);
+	idt_set_gate(0x80, (uint32_t)_isr0x80, isr_flags, isr_segment);
 }
-
+uint32_t test;
 uint32_t isr_handler(struct x86_registers *regs)
 {
-	//interrupt_block();
-	
-	proc_save(regs);
-	
-	if (regs->int_no < 32)
+	interrupt_block();
+	if ((uint32_t)regs->int_no < 32)
 	{
 		printf("unhandled ");
-		printf(error_codes[regs->int_no]);
-		printf(" (%d), with code %d\nSystem execution halted indefinitely", regs->int_no, regs->err_code);
-		
-		
+		printf(error_codes[(uint8_t)regs->int_no]);
+		printf(" (0x%x), with code 0x%x\nSystem execution halted indefinitely\n", regs->int_no, regs->err_code);
+
+		printf("esp rcvd: 0x%x                      \n", (uint32_t)regs);
 		printf("gs        0x%x                      \n", regs->gs);
 		printf("fs        0x%x                      \n", regs->fs);
 		printf("es        0x%x                      \n", regs->es);
@@ -214,20 +213,29 @@ uint32_t isr_handler(struct x86_registers *regs)
 		printf("ecx       0x%x                      \n", regs->ecx);
 		printf("eax       0x%x                      \n", regs->eax);
 
-		printf("int_no    %d                        \n", regs->int_no);
-		printf("err_code  %d                        \n", regs->err_code);
+		printf("int_no    0x%x                      \n", regs->int_no);
+		printf("err_code  0x%x                      \n", regs->err_code);
 
 		printf("eip       0x%x                      \n", regs->eip);
 		printf("cs        0x%x                      \n", regs->cs);
 		printf("eflags    0x%x                      \n", regs->eflags);
 		printf("useresp   0x%x                      \n", regs->useresp);
 		printf("ss        0x%x                      \n", regs->ss);
-		
-		for (;;);
+		graphics_update_fb();
+		while(true)
+		{
+			test++;
+			graphics_update_fb();
+		}
 	}
-	
-	//don't reschedule...
-	
+
+	//graphics_update_fb();
+	//interrupt_block();
+
+	proc_save(regs);
+
+	printf("call recieved\n");
+
 	return (uint32_t)regs;
 }
 
@@ -302,9 +310,9 @@ extern uint32_t stack_top;
 uint32_t irq_handler(struct x86_registers *regs)
 {
 	//interrupt_block();
-	
+
 	proc_save(regs);
-	
+
 	void (*handler)(struct x86_registers *regs);
 
 	handler = irq_handlers[regs->int_no - 32];
@@ -312,11 +320,11 @@ uint32_t irq_handler(struct x86_registers *regs)
 		handler(regs);
 
 	irq_send_EOI_8259(regs->int_no);
-		
+
 	//only reschedule on clock ticks
 	if (regs->int_no == INTERRUPT_SYSTEM_TIMER)
 		regs = proc_schedule(regs);
-		
+
 	/*
 	printf("regs      0x%x                      \n", (uint32_t)regs);
 	printf("gs        0x%x                      \n", regs->gs);

@@ -38,7 +38,7 @@ void gdt_init()
 	GDT_sect_desc[2].base =0;
 	GDT_sect_desc[2].limit=0xffffffff;
 	GDT_sect_desc[2].type =SECTOR_DATA_DPL_0;
-	
+
 	GDT_sect_desc[3].base =0;
 	GDT_sect_desc[3].limit=0xffffffff;
 	GDT_sect_desc[3].type =SECTOR_CODE_DPL_3;
@@ -46,10 +46,10 @@ void gdt_init()
 	GDT_sect_desc[4].base =0;
 	GDT_sect_desc[4].limit=0xffffffff;
 	GDT_sect_desc[4].type =SECTOR_DATA_DPL_3;
-	
+
 	GDT_sect_desc[5].base =0;
 	GDT_sect_desc[5].limit=0;
-	GDT_sect_desc[5].type =SECTOR_TSS_DPL_0;
+	GDT_sect_desc[5].type =SECTOR_TSS_DPL_3;
 
 	//zero our GDT descriptors (the actual descriptors, not the structs describing them)...
 	for (int i = 0; i < SEGMENT_DESCRIPTORS * 8; i++) {
@@ -63,30 +63,32 @@ void gdt_init()
 	encode_GDT_entry(&GDT_table_entries[3 *8], GDT_sect_desc[3]);
 	encode_GDT_entry(&GDT_table_entries[4 *8], GDT_sect_desc[4]);
 	encode_GDT_entry(&GDT_table_entries[5 *8], GDT_sect_desc[5]);
-	
+
 	//tell CPU where our table is stored (in assembly... )
 	setGDT((uint32_t) &GDT_table_entries, sizeof(GDT_table_entries)-1);
 	//load segment descr. into actual segments (in assembly...)
 	reloadSegments();
-	
+
 	printf("gdt: ready\n");
 }
 
 void load_TSS(uint32_t* TSS, uint32_t TSS_size)
 {
-	
+
 	GDT_sect_desc[5].base = (uint32_t)TSS;
 	GDT_sect_desc[5].limit=TSS_size;
-	GDT_sect_desc[5].type =SECTOR_TSS_DPL_0;
+	GDT_sect_desc[5].type =SECTOR_TSS_DPL_3;
 	
 	GDT_table_entries[5]=0;
-	
+
 	encode_GDT_entry(&GDT_table_entries[5 *8], GDT_sect_desc[5]);
-	
+
 	//tell CPU where our table is stored (in assembly... )
 	setGDT((uint32_t) &GDT_table_entries, sizeof(GDT_table_entries)-1);
 	//load segment descr. into actual segments (in assembly...)
 	reloadSegments();
+
+	setTSS();
 }
 
 void encode_GDT_entry(uint8_t *target, struct GDT_sector_descriptor source)

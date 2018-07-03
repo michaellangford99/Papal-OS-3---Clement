@@ -51,7 +51,7 @@ void keyboard_interrupt(struct x86_registers *regs)
 		printf("fs        %d\n", regs->fs);
 		printf("es        %d\n", regs->es);
 		printf("ds        %d\n", regs->ds);
-		
+
 		printf("edi       %d\n", regs->edi);
 		printf("esi       %d\n", regs->esi);
 		printf("ebp       %d\n", regs->ebp);
@@ -60,10 +60,10 @@ void keyboard_interrupt(struct x86_registers *regs)
 		printf("edx       %d\n", regs->edx);
 		printf("ecx       %d\n", regs->ecx);
 		printf("eax       %d\n", regs->eax);
-		
+
 		printf("int_no    %d\n", regs->int_no);
 		printf("err_code  %d\n", regs->err_code);
-		
+
 		printf("eip       %d\n", regs->eip);
 		printf("cs        %d\n", regs->cs);
 		printf("eflags    %d\n", regs->eflags);

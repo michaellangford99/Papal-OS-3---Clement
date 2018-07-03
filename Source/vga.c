@@ -61,7 +61,7 @@ void graphics_fillrect(size_t x, size_t y, size_t width, size_t height, _24bit_c
 void graphics_rect(size_t x, size_t y, size_t width, size_t height, _24bit_color color) {
 	graphics_drawline(x, y, x + width, y, color);
   graphics_drawline(x, y + height, x + width, y + height, color);
-  
+
   graphics_drawline(x, y, x, y + height, color);
   graphics_drawline(x + width, y, x + width, y + height, color);
 }
@@ -130,10 +130,10 @@ void graphics_test() {
   {
     for (uint32_t j = 0; j < video_height; j += (video_height/256))
     {
-      graphics_fillrect(i, 
-                        j, 
-                        (video_width/256), 
-                        (video_height/256), 
+      graphics_fillrect(i,
+                        j,
+                        (video_width/256),
+                        (video_height/256),
                         create_24bit_color(i / (video_width/256), 0, j / (video_height/256))
                        );
     }
@@ -160,18 +160,18 @@ void startup_graphics_init(vbe_info_t* vbe_info) {
   memory_location = vbe_info->physbase;
   video_width = vbe_info->Xres;
   video_height = vbe_info->Yres;
-  
+
   pitch = vbe_info->bpp/8;
-  
+
   fbuffer = (pixel*)memory_location;
-  
+
 	graphics_buffer = (pixel*)memory_location;
-  
+
 	graphics_clear(create_24bit_color(0,0,0));
 }
 
 void graphics_init(vbe_info_t* vbe_info) {
-  
+
   fbuffer = (pixel*)kmalloc(video_width*video_height*pitch);
   graphics_buffer = (pixel*) memory_location;
   graphics_clear(create_24bit_color(0,0,0));

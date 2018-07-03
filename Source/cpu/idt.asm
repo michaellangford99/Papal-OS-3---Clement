@@ -41,8 +41,12 @@ global  _isr28
 global  _isr29
 global  _isr30
 global  _isr31
+global  _isr0x80
 
 extern isr_handler
+
+extern save_ring_0_esp
+extern tss
 
 ;===========================================isr handlers======================================================================
 
@@ -146,8 +150,7 @@ _isr13:
 
 _isr14:
 
-
-  push byte 14
+  push 14
 
   jmp _isr_stub
 
@@ -270,6 +273,14 @@ _isr31:
 
   jmp _isr_stub
 
+
+_isr0x80:
+
+    push byte 0 
+    push 0x80
+
+    jmp _isr_stub
+
 ;===========================================_isr_stub======================================================================
 _isr_stub:
 
@@ -290,39 +301,42 @@ _isr_stub:
   mov gs, ax
 
   mov eax, esp
-  
+
   ; ====switch stacks:
-    
+
   ; load interrupt stack
   mov esp, [int_stack]
   mov ebp, [int_stack+4]
 
   ;push process stack
   push eax
-  
+
   mov eax, isr_handler
   call eax
 
   ;handler places stack value in eax as return value
 
   pop ebx ;pop eax off the stack into an arbitrary register
-  
+
   ; save interrupt stack
   mov [int_stack], esp
   mov [int_stack+4], ebp
 
+
+  ;mov [tss+4], esp
+
   ;reload process stack
   mov esp, eax ;move stack value back into esp
-  
+
   pop gs
   pop fs
   pop es
   pop ds
   popa
   add esp, 8 ; jump past interrupt number and code
-  
+
   sti
-  
+
   iret
 
 
@@ -487,37 +501,40 @@ _irq_stub:
   mov gs, ax
 
   mov eax, esp
-  
+
   ; ====switch stacks:
-    
+
   ; load interrupt stack
   mov esp, [int_stack]
   mov ebp, [int_stack+4]
 
   ;push process stack
   push eax
-  
+
   mov eax, irq_handler
   call eax
 
   ;handler places stack value in eax as return value
 
   pop ebx ;pop eax off the stack into an arbitrary register
-  
+
   ; save interrupt stack
   mov [int_stack], esp
   mov [int_stack+4], ebp
 
+
+  ;mov [tss+4], esp
+
   ;reload process stack
   mov esp, eax ;move stack value back into esp
-  
+
   pop gs
   pop fs
   pop es
   pop ds
   popa
   add esp, 8 ; jump past interrupt number and code
-  
+
   sti
-  
+
   iret
