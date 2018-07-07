@@ -1,6 +1,6 @@
 #include <system.h>
 
-uint32_t* page_directory;//[1024] __attribute__((aligned(4096)));
+page_directory_entry_t* page_directory_entries;//[1024] __attribute__((aligned(4096)));
 page_table_t* page_tables;//[1024] __attribute__((aligned(4096)));
 
 //link to assembly routines
@@ -8,17 +8,13 @@ extern void enablePaging();
 extern void invalidate_page(uint32_t*);
 
 int init_paging() {
-  /*
-  This basic paging code just identity maps the entire 4GB address space.
-  */
   printf("init_paging\n");
   //allocate 4KB for page directory
-  page_directory = kmalloc(1024*4);
 
-  memset((char*)&page_directory[0], 0, 1024 * 4);
+  page_directory_entries = (page_directory_entry_t*)kmalloc(1024*4);
   page_tables = (page_table_t*)kmalloc(1024 * sizeof(page_table_t));
 
-  printf("....page_directory addr: 0x%x / %d / %d KB\n", (uint32_t)&page_directory[0], (uint32_t)&page_directory[0], ((uint32_t)&page_directory[0])/1024);
+  printf("....page_directory_entries addr: 0x%x / %d / %d KB\n", (uint32_t)&page_directory_entries[0], (uint32_t)&page_directory_entries[0], ((uint32_t)&page_directory_entries[0])/1024);
 
   //first, set all entries in page directory to NP
   unsigned int i;
@@ -28,7 +24,11 @@ int init_paging() {
       //   Supervisor: Only kernel-mode can access them
       //   Write Enabled: It can be both read from and written to
       //   Not Present: The page table is not present
-      page_directory[i] = 0b000000110;
+      page_directory_entries[i].value = 0;
+      page_directory_entries[i].page_dir_entry_bits.user = PDE_PTE_SUPERVISOR;
+      page_directory_entries[i].page_dir_entry_bits.present = PDE_PTE_NOT_PRESENT;
+      page_directory_entries[i].page_dir_entry_bits.rw = PDE_PTE_RW;
+
   }
 
   //Fill all 1024 entries in all 1024 page tables
@@ -38,7 +38,11 @@ int init_paging() {
     {
         // As the address is page aligned, it will always leave 12 bits zeroed.
         // Those bits are used by the attributes ;)
-        page_tables[pt].page_table[i] = ((1024*pt + i) * 0x1000) | 0b1111; // attributes: user level, read/write, present.
+        page_tables[pt].pages[i].value = ((1024*pt + i) * 0x1000);
+        page_tables[pt].pages[i].page_table_entry_bits.user = PDE_PTE_SUPERVISOR;
+        page_tables[pt].pages[i].page_table_entry_bits.present = PDE_PTE_PRESENT;
+        page_tables[pt].pages[i].page_table_entry_bits.rw = PDE_PTE_RW;
+
     }
   }
 
@@ -52,12 +56,11 @@ int init_paging() {
   if ((kernel_pages % PAGE_SIZE) > 0)
     kernel_page_tables++;
 
-  printf("....pages of memory in kernel: %d\n", kernel_pages);
-  printf("....page tables of memory containing kernel: %d\n", kernel_page_tables);
-
   uint32_t kernel_first_page_table = (get_kernel_location() / 4096)/1024;
   uint32_t kernel_first_page = (get_kernel_location() / 4096) % 1024;
 
+  printf("....pages of memory in kernel: %d\n", kernel_pages);
+  printf("....page tables of memory containing kernel: %d\n", kernel_page_tables);
   printf("....kernel_first_page_table: %d\n", kernel_first_page_table);
   printf("....kernel_first_page: %d\n", kernel_first_page);
 
@@ -65,84 +68,161 @@ int init_paging() {
   // attributes: supervisor level, read/write, present
   for (i = 0; i < 1023; i++)
   {
-    page_directory[i] = ((unsigned int)&page_tables[i]) | 0b111;
+    page_directory_entries[i].value = ((unsigned int)&page_tables[i]) & 0xFFFFF000;
+    page_directory_entries[i].page_dir_entry_bits.user = PDE_PTE_SUPERVISOR;
+    page_directory_entries[i].page_dir_entry_bits.present = PDE_PTE_PRESENT;
+    page_directory_entries[i].page_dir_entry_bits.rw = PDE_PTE_RW;
   }
 
   //map last page directory to itself
-  page_directory[1023] = ((unsigned int)&page_directory[0]) | 0b111;
+  page_directory_entries[1023].value = ((unsigned int)&page_directory_entries[0]) & 0xFFFFF000;
+  page_directory_entries[1023].page_dir_entry_bits.user = PDE_PTE_SUPERVISOR;
+  page_directory_entries[1023].page_dir_entry_bits.present = PDE_PTE_PRESENT;
+  page_directory_entries[1023].page_dir_entry_bits.rw = PDE_PTE_RW;
 
-  loadPageDirectory(&(page_directory[0]));
+  loadPageDirectory((uint32_t*)&(page_directory_entries[0]));
   enablePaging();
-
-  printf("....XXXXXXXXXXXX-TEST-XXXXXXXXX\n");
 
   printf("....physical address that %x is mapped to: %x\n", 0xFFFFF000, (uint32_t)get_physaddr((uint32_t*)0xFFFFF000));
 
   return K_SUCCESS;
 }
 
-/*uint32_t encode_page_directory_entry(uint32_t* page_table_address,
-                                uint8_t page_size,
-                                uint8_t write_through,
-                                uint8_t privelege,
-                                uint8_t rw,
-                                uint8_t present)
-{
-  uint32_t page_dir_entry = (uint32_t)page_table_address;
-
-  //set present bit
-  if (present == PAGE_DIR_ENTRY_PRESENT)
-    set_bit(0, (uint8_t*)&page_dir_entry);
-  if (present == PAGE_DIR_ENTRY_NOT_PRESENT)
-    clear_bit(0, (uint8_t*)&page_dir_entry);
-
-  //set rw flag
-  if (rw == PAGE_DIR_ENTRY_RW)
-    set_bit(1, (uint8_t*)&page_dir_entry);
-  if (rw == PAGE_DIR_ENTRY_READ_ONLY)
-    clear_bit(1, (uint8_t*)&page_dir_entry);
-
-  //set the supervisor bit
-  if (privelege == PAGE_DIR_ENTRY_SUPERVISOR)
-    clear_bit(2, (uint8_t*)&page_dir_entry);
-  if (privelege == PAGE_DIR_ENTRY_USER)
-    set_bit(2, (uint8_t*)&page_dir_entry);
-
-  return 0;
-}*/
-
-
-uint32_t * get_physaddr(uint32_t * virtualaddr)
-{
+uint32_t * get_physaddr(uint32_t * virtualaddr) {
     uint32_t pdindex = (uint32_t)virtualaddr >> 22;
     uint32_t ptindex = (uint32_t)virtualaddr >> 12 & 0x03FF;
 
-    uint32_t * pd = (uint32_t *)0xFFFFF000;
-    // Here you need to check whether the PD entry is present.
+    page_directory_entry_t * pd = (page_directory_entry_t *)0xFFFFF000;
+    page_table_entry_t * pt = ((page_table_entry_t *)0xFFC00000) + (0x400 * pdindex);
 
-    uint32_t * pt = ((uint32_t *)0xFFC00000) + (0x400 * pdindex);
-    // Here you need to check whether the PT entry is present.
+    //check that both the page table / page directory entry,
+    //and the page / page table entry are present.
 
-    return (uint32_t *)((pt[ptindex] & ~0xFFF) + ((uint32_t)virtualaddr & 0xFFF));
+    if (pd[pdindex].page_dir_entry_bits.present != PDE_PTE_PRESENT)
+      return NULL;
+    if (pt[ptindex].page_table_entry_bits.present != PDE_PTE_PRESENT)
+      return NULL;
+
+    return (uint32_t *)((pt[ptindex].value & ~0xFFF) + ((uint32_t)virtualaddr & 0xFFF));
 }
-
-void map_page(uint32_t * physaddr, uint32_t * virtualaddr, unsigned int flags)
-{
+void map_page(uint32_t * physaddr, uint32_t * virtualaddr, uint8_t privilege_level, uint8_t rw, uint8_t force) {
     // Make sure that both addresses are page-aligned.
 
     uint32_t pdindex = (uint32_t)virtualaddr >> 22;
     uint32_t ptindex = (uint32_t)virtualaddr >> 12 & 0x03FF;
 
-    uint32_t * pd = (uint32_t *)0xFFFFF000;
-    // Here you need to check whether the PD entry is present.
-    // When it is not present, you need to create a new empty PT and
+    page_directory_entry_t * pd = (page_directory_entry_t *)0xFFFFF000;
+
+    // check whether the PD entry is present.
+    // When it is not present, create a new empty PT and
     // adjust the PDE accordingly.
+    if (pd[pdindex].page_dir_entry_bits.present != PDE_PTE_PRESENT)
+    {
+      page_table_t* new_page_table = (page_table_t*)kmalloc(sizeof(page_table_t));
 
-    uint32_t * pt = ((uint32_t *)0xFFC00000) + (0x400 * pdindex);
+      pd[pdindex].value = ((unsigned int)new_page_table) & 0xFFFFF000;
+
+      pd[pdindex].page_dir_entry_bits.user = (privilege_level == DPL_0) ? PDE_PTE_SUPERVISOR : PDE_PTE_USER;
+      pd[pdindex].page_dir_entry_bits.present = PDE_PTE_PRESENT;
+      pd[pdindex].page_dir_entry_bits.rw = rw;
+    }
+
+    page_table_entry_t * pt = ((page_table_entry_t *)0xFFC00000) + (0x400 * pdindex);
+
     // Here you need to check whether the PT entry is present.
-    // When it is, then there is already a mapping present. What do you do now?
+    // When it is, then there is already a mapping present.
+    // if force is off, and the page is already mapped, return
+    if ((pt[ptindex].page_table_entry_bits.present == PDE_PTE_PRESENT) && (force == 0))
+    {
+      return;
+    }
 
-    pt[ptindex] = ((uint32_t)physaddr) | (flags & 0xFFF) | 0x01; // Present
+    pt[ptindex].value = ((uint32_t)physaddr) & 0xFFFFF000;
+    pt[ptindex].page_table_entry_bits.user = (privilege_level == DPL_0) ? PDE_PTE_SUPERVISOR : PDE_PTE_USER;
+    pt[ptindex].page_table_entry_bits.present = PDE_PTE_PRESENT;
+    pt[ptindex].page_table_entry_bits.rw = rw;
 
     invalidate_page(physaddr);
+}
+void set_memory_range_dpl(uint32_t virt_address, uint32_t length, uint8_t privilege_level) {
+    uint32_t aligned_address = virt_address & 0xFFFFF000;
+
+    length += (virt_address - aligned_address);
+
+    uint32_t page_count = (length/PAGE_SIZE) + ((length%PAGE_SIZE) != 0);
+
+    for (uint32_t i = 0; i < page_count; i++)
+    {
+      set_page_dpl(virt_address + i*PAGE_SIZE, privilege_level);
+    }
+}
+void set_page_dpl(uint32_t virt_address, uint8_t privilege_level) {
+  virt_address = virt_address & 0xFFFFF000;
+  uint32_t pdindex = (uint32_t)virt_address >> 22;
+  uint32_t ptindex = (uint32_t)virt_address >> 12 & 0x03FF;
+
+  page_directory_entry_t * pd = (page_directory_entry_t *)0xFFFFF000;
+  page_table_entry_t * pt = ((page_table_entry_t *)0xFFC00000) + (0x400 * pdindex);
+
+  //check that both the page table / page directory entry,
+  //and the page / page table entry are present.
+
+  if (pd[pdindex].page_dir_entry_bits.present != PDE_PTE_PRESENT)
+    return;
+  if (pt[ptindex].page_table_entry_bits.present != PDE_PTE_PRESENT)
+    return;
+
+  pt[ptindex].page_table_entry_bits.user = (privilege_level == DPL_0) ? PDE_PTE_SUPERVISOR : PDE_PTE_USER;
+  //only set the page directory's dpl if it requires higher privilege than the page in it
+  if ((privilege_level != DPL_0) && (pd[pdindex].page_dir_entry_bits.user == PDE_PTE_SUPERVISOR))
+    pd[pdindex].page_dir_entry_bits.user = PDE_PTE_USER;
+
+  invalidate_page((uint32_t*)(page_tables[pdindex].pages[ptindex].value & 0xFFFFF000));
+}
+void set_page_table_dpl(uint32_t virt_address, uint8_t privilege_level) {
+  virt_address = virt_address & 0xFFFFF000;
+  uint32_t pdindex = (uint32_t)virt_address >> 22;
+  uint32_t ptindex = (uint32_t)virt_address >> 12 & 0x03FF;
+
+  page_directory_entry_t * pd = (page_directory_entry_t *)0xFFFFF000;
+
+  //if page dir isn't present, return
+  if (pd[pdindex].page_dir_entry_bits.present != PDE_PTE_PRESENT)
+    return;
+
+  //write privilege level
+  pd[pdindex].page_dir_entry_bits.user = (privilege_level == DPL_0) ? PDE_PTE_SUPERVISOR : PDE_PTE_USER;//.value = (page_directory_entries[pdindex].value & (0xFFFFFFFB)) | ((privilege_level == DPL_3) << 2);
+}
+void set_page_table_present(uint32_t virt_address, uint8_t present) {
+  virt_address = virt_address & 0xFFFFF000;
+  uint32_t pdindex = (uint32_t)virt_address >> 22;
+  uint32_t ptindex = (uint32_t)virt_address >> 12 & 0x03FF;
+
+  page_directory_entry_t * pd = (page_directory_entry_t *)0xFFFFF000;
+
+  //if page dir isn't present, return
+  if (pd[pdindex].page_dir_entry_bits.present != PDE_PTE_PRESENT)
+    return;
+
+  //mask out the user/supervisor mode bit and combine with privilege_level
+  pd[pdindex].page_dir_entry_bits.present = present;
+}
+void set_page_present(uint32_t virt_address, uint8_t present) {
+  virt_address = virt_address & 0xFFFFF000;
+  uint32_t pdindex = (uint32_t)virt_address >> 22;
+  uint32_t ptindex = (uint32_t)virt_address >> 12 & 0x03FF;
+
+  page_directory_entry_t * pd = (page_directory_entry_t *)0xFFFFF000;
+  page_table_entry_t * pt = ((page_table_entry_t *)0xFFC00000) + (0x400 * pdindex);
+
+  //check that both the page table / page directory entry,
+  //and the page / page table entry are present.
+
+  if (pd[pdindex].page_dir_entry_bits.present != PDE_PTE_PRESENT)
+    return;
+  if (pt[ptindex].page_table_entry_bits.present != PDE_PTE_PRESENT)
+    return;
+
+  //mask out the user/supervisor mode bit and combine with privilege_level
+  pt[ptindex].page_table_entry_bits.present = present;
 }

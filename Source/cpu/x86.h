@@ -1,6 +1,9 @@
 #ifndef X86_H
 #define X86_H
 
+#define DPL_0 0
+#define DPL_3 3
+
 struct x86_registers
 {
   uint32_t gs, fs, es, ds;
