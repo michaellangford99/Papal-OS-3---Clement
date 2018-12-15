@@ -40,8 +40,7 @@ void kernel_main(struct multiboot_header* mboot_header, uint32_t multiboot_magic
 	graphics_init(multiboot_get_vbe_address());
 	//multiboot_dump(multiboot_get_address());
 
-	load_ramdisk(multiboot_get_address());
-
+	//load_ramdisk(multiboot_get_address());
 
 	uint32_t kernel_location = get_kernel_location();
   uint32_t kernel_size = get_kernel_size();
@@ -62,15 +61,38 @@ void kernel_main(struct multiboot_header* mboot_header, uint32_t multiboot_magic
 
 	//run_user_mode();
 
+	//set_page_dpl(0x0, DPL_0);
+	//set_page_dpl(0x1000, DPL_0);
+
+	//set_memory_range_dpl(kernel_location, kernel_size, DPL_3);
+
+	//unmap_page(kernel_location);
+
+	printf("swapping page 0x%x, result: 0x%x\n", kernel_location, swap_page(kernel_location, kernel_location, DPL_0, PDE_PTE_RW));
+	printf("swapping page table 0x%x, result: 0x%x\n", kernel_location, swap_page_table(kernel_location, (uint32_t)kmalloc(sizeof(page_table_t)), DPL_0, PDE_PTE_RW));
+
+	printf("\n");
+
+	uint32_t ptable = (uint32_t)kmalloc(sizeof(page_table_t));
+
+	memset((char*)ptable, 0, sizeof(page_table_t));
+
+	printf("swapping page 0x%x, result: 0x%x\n", 0x3000000, swap_page(0x3000000, 0x3000000, DPL_0, PDE_PTE_RW));
+	printf("swapping page table 0x%x, result: 0x%x\n", 0x3000000, swap_page_table(0x3000000, ptable, DPL_0, PDE_PTE_RW));
+	printf("swapping page 0x%x, result: 0x%x\n", 0x3000000, swap_page(0x3000000, 0x3000000, DPL_0, PDE_PTE_RW));
+
+	//set_page_table_dpl(0, DPL_0);
+	//set_page_table_dpl(0x400000, DPL_0);
+
 	//fs_format(1, FS_FAT16);
-	pm_new_thread((uint32_t*)&user_mode_function, 1024, PM_PL3);
-	pm_new_thread((uint32_t*)&user_mode_function2, 1024, PM_PL3);
+	//pm_new_thread((uint32_t*)&user_mode_function, 1024, PM_PL3);
+	//pm_new_thread((uint32_t*)&user_mode_function2, 1024, PM_PL3);
 	/*pm_new_thread((uint32_t*)thread_3, 1024);
 	pm_new_thread((uint32_t*)thread_4, 1024);
   */
 
 	//dump the process table:
-	
+
 
 	while(true)
 	{
