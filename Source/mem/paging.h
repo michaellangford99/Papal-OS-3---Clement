@@ -62,4 +62,8 @@ void set_page_dpl(uint32_t virt_address, uint8_t privilege_level);
 void set_page_table_dpl(uint32_t virt_address, uint8_t privilege_level);
 void set_page_table_present(uint32_t virt_address, uint8_t present);
 void set_page_present(uint32_t virt_address, uint8_t present);
+void unmap_page(uint32_t virt_address);
+void unmap_page_table(uint32_t virt_address);
+uint32_t swap_page_table(uint32_t virt_address, uint32_t page_table_phys_address, uint8_t privilege_level, uint8_t rw);
+uint32_t swap_page(uint32_t virt_address, uint32_t page_phys_address, uint8_t privilege_level, uint8_t rw);
 #endif

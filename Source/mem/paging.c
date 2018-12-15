@@ -134,6 +134,7 @@ void map_page(uint32_t * physaddr, uint32_t * virtualaddr, uint8_t privilege_lev
     // if force is off, and the page is already mapped, return
     if ((pt[ptindex].page_table_entry_bits.present == PDE_PTE_PRESENT) && (force == 0))
     {
+      printf("attempted to map virtual address 0x%x to 0x%x, which is already mapped to 0x%x!\n", (uint32_t)virtualaddr, (uint32_t)physaddr, (uint32_t)get_physaddr(virtualaddr));
       return;
     }
 
@@ -225,4 +226,117 @@ void set_page_present(uint32_t virt_address, uint8_t present) {
 
   //mask out the user/supervisor mode bit and combine with privilege_level
   pt[ptindex].page_table_entry_bits.present = present;
+}
+void unmap_page(uint32_t virt_address) {
+  //bounds check - let's make sure we're not unmapping something we'll regret later..
+  uint32_t kernel_start = get_kernel_location() & 0xFFFFF000;
+  uint32_t kernel_end = get_kernel_end();
+  if (kernel_end%0x1000 != 0)
+    kernel_end += 0x1000-(kernel_end%0x1000);
+  kernel_end &= 0xFFFFF000;
+
+  if ((virt_address >= kernel_start) && (virt_address <= kernel_end))
+  {
+    printf("attempted to unmap kernel-space page: virtual address  0x%x!\n", (uint32_t)virt_address);
+    return;
+  }
+
+  set_page_present(virt_address, PDE_PTE_NOT_PRESENT);
+}
+void unmap_page_table(uint32_t virt_address) {
+  //bounds check - let's make sure we're not unmapping something we'll regret later..
+  uint32_t kernel_start = get_kernel_location() & 0xFFFFF000;
+  uint32_t kernel_end = get_kernel_end();
+  if (kernel_end%0x1000 != 0)
+    kernel_end += 0x1000-(kernel_end%0x1000);
+  kernel_end &= 0xFFFFF000;
+
+  if ((virt_address >= kernel_start) && (virt_address <= kernel_end))
+  {
+    printf("attempted to unmap kernel-space page table: virtual address 0x%x!\n", (uint32_t)virt_address);
+    return;
+  }
+
+  set_page_table_present(virt_address, PDE_PTE_NOT_PRESENT);
+}
+uint32_t swap_page_table(uint32_t virt_address, uint32_t page_table_phys_address, uint8_t privilege_level, uint8_t rw) {
+  //bounds check - let's make sure we're not swapping something we'll regret later..
+  uint32_t kernel_start = get_kernel_location() & 0xFFFFF000;
+  uint32_t kernel_end = get_kernel_end();
+  if (kernel_end%0x1000 != 0)
+    kernel_end += 0x1000-(kernel_end%0x1000);
+  kernel_end &= 0xFFFFF000;
+
+  virt_address = virt_address & 0xFFFFF000;
+  uint32_t pdindex = (uint32_t)virt_address >> 22;
+  uint32_t ptindex = (uint32_t)virt_address >> 12 & 0x03FF;
+
+  page_directory_entry_t * pd = (page_directory_entry_t *)0xFFFFF000;
+
+  if (pd[pdindex].page_dir_entry_bits.present != PDE_PTE_PRESENT)
+  {
+    printf("attempted to swap out page table that is not present yet: virtual address 0x%x!\n", virt_address);
+    return 0;
+  }
+
+  if ((((pd[pdindex].value & 0xFFFFF000) >= kernel_start) && ((pd[pdindex].value & 0xFFFFF000) <= kernel_end)) ||
+      ((virt_address >= kernel_start) && (virt_address <= kernel_end)))
+  {
+    printf("attempted to swap out kernel-space page table: physical address 0x%x, virtual address 0x%x!\n", (uint32_t)(pd[pdindex].value & 0xFFFFF000), virt_address);
+    return 0;
+  }
+
+  uint32_t original_page_table = pd[pdindex].value;
+
+  pd[pdindex].value = page_table_phys_address & 0xFFFFF000;
+  pd[pdindex].page_dir_entry_bits.present = PDE_PTE_PRESENT;
+  pd[pdindex].page_dir_entry_bits.user = (privilege_level != DPL_0) ? PDE_PTE_USER : PDE_PTE_SUPERVISOR;
+  pd[pdindex].page_dir_entry_bits.rw = rw;
+
+  return original_page_table;
+}
+uint32_t swap_page(uint32_t virt_address, uint32_t page_phys_address, uint8_t privilege_level, uint8_t rw) {
+  //bounds check - let's make sure we're not swapping something we'll regret later..
+  uint32_t kernel_start = get_kernel_location() & 0xFFFFF000;
+  uint32_t kernel_end = get_kernel_end();
+  if (kernel_end%0x1000 != 0)
+    kernel_end += 0x1000-(kernel_end%0x1000);
+  kernel_end &= 0xFFFFF000;
+
+  virt_address = virt_address & 0xFFFFF000;
+  uint32_t pdindex = (uint32_t)virt_address >> 22;
+  uint32_t ptindex = (uint32_t)virt_address >> 12 & 0x03FF;
+
+  page_directory_entry_t * pd = (page_directory_entry_t *)0xFFFFF000;
+  page_table_entry_t * pt = ((page_table_entry_t *)0xFFC00000) + (0x400 * pdindex);
+
+  //check that the pde is present. It's 'oh well' if the pte is not present
+
+  if (pd[pdindex].page_dir_entry_bits.present != PDE_PTE_PRESENT)
+  {
+    printf("attempted to swap out page lacking a page table: virtual address 0x%x!\n", virt_address);
+    return 0;
+  }
+
+  if (pt[ptindex].page_table_entry_bits.present != PDE_PTE_PRESENT)
+  {
+    printf("attempted to swap out page that is not present yet: virtual address 0x%x!\n", virt_address);
+    return 0;
+  }
+
+  if ((((pt[ptindex].value & 0xFFFFF000) >= kernel_start) && ((pt[ptindex].value & 0xFFFFF000) <= kernel_end)) ||
+      ((virt_address >= kernel_start) && (virt_address <= kernel_end)))
+  {
+    printf("attempted to swap out kernel-space page: physical address 0x%x, virtual address 0x%x!\n", (uint32_t)(pt[ptindex].value & 0xFFFFF000), virt_address);
+    return 0;
+  }
+
+  uint32_t original_page = pt[ptindex].value;
+
+  pt[ptindex].value = page_phys_address & 0xFFFFF000;
+  pt[ptindex].page_table_entry_bits.present = PDE_PTE_PRESENT;
+  pt[ptindex].page_table_entry_bits.user = (privilege_level != DPL_0) ? PDE_PTE_USER : PDE_PTE_SUPERVISOR;
+  pt[ptindex].page_table_entry_bits.rw = rw;
+
+  return original_page;
 }
