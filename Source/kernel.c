@@ -36,15 +36,16 @@ void kernel_main(struct multiboot_header* mboot_header, uint32_t multiboot_magic
 	//ata_init();
 	//fs_init();
 
-	//data dump
 	graphics_init(multiboot_get_vbe_address());
+	
+	//data dump
 	//multiboot_dump(multiboot_get_address());
 
-	//load_ramdisk(multiboot_get_address());
+	load_ramdisk(multiboot_get_address());
 
 	uint32_t kernel_location = get_kernel_location();
-  uint32_t kernel_size = get_kernel_size();
-  uint32_t kernel_end = get_kernel_end();
+  	uint32_t kernel_size = get_kernel_size();
+  	uint32_t kernel_end = get_kernel_end();
 
 	printf("kernel_location : 0x%x,   %d bytes,    %d KB\n", kernel_location, kernel_location, kernel_location/1024);
 	printf("kernel_size     : 0x%x,   %d bytes,    %d KB\n", kernel_size, kernel_size, kernel_size/1024);
@@ -57,16 +58,15 @@ void kernel_main(struct multiboot_header* mboot_header, uint32_t multiboot_magic
 	printf("isr:  0x%x\n", &irq_handler);
 	printf("main: 0x%x\n", &kernel_main);
 	printf("proc: 0x%x\n", &proc_save);
-	//graphics_update_fb();
-
+	
 	//run_user_mode();
 
-	//set_page_dpl(0x0, DPL_0);
-	//set_page_dpl(0x1000, DPL_0);
+	set_page_dpl(0x0, DPL_0);
+	set_page_dpl(0x1000, DPL_0);
 
-	//set_memory_range_dpl(kernel_location, kernel_size, DPL_3);
+	set_memory_range_dpl(kernel_location, kernel_size, DPL_3);
 
-	//unmap_page(kernel_location);
+	unmap_page(kernel_location);
 
 	printf("swapping page 0x%x, result: 0x%x\n", kernel_location, swap_page(kernel_location, kernel_location, DPL_0, PDE_PTE_RW));
 	printf("swapping page table 0x%x, result: 0x%x\n", kernel_location, swap_page_table(kernel_location, (uint32_t)kmalloc(sizeof(page_table_t)), DPL_0, PDE_PTE_RW));
@@ -81,15 +81,15 @@ void kernel_main(struct multiboot_header* mboot_header, uint32_t multiboot_magic
 	printf("swapping page table 0x%x, result: 0x%x\n", 0x3000000, swap_page_table(0x3000000, ptable, DPL_0, PDE_PTE_RW));
 	printf("swapping page 0x%x, result: 0x%x\n", 0x3000000, swap_page(0x3000000, 0x3000000, DPL_0, PDE_PTE_RW));
 
-	//set_page_table_dpl(0, DPL_0);
-	//set_page_table_dpl(0x400000, DPL_0);
+	set_page_table_dpl(0, DPL_0);
+	set_page_table_dpl(0x400000, DPL_0);
 
 	//fs_format(1, FS_FAT16);
 	//pm_new_thread((uint32_t*)&user_mode_function, 1024, PM_PL3);
 	//pm_new_thread((uint32_t*)&user_mode_function2, 1024, PM_PL3);
 	/*pm_new_thread((uint32_t*)thread_3, 1024);
 	pm_new_thread((uint32_t*)thread_4, 1024);
-  */
+    */
 
 	//dump the process table:
 
@@ -97,7 +97,7 @@ void kernel_main(struct multiboot_header* mboot_header, uint32_t multiboot_magic
 	while(true)
 	{
 		//printf("2000");
-		graphics_update_fb();
+		//graphics_update_fb();
 		/*printf("year: %d\n", (uint32_t)rtc_get_year());
 		printf("month: %d\n", (uint32_t)rtc_get_month());
 		printf("day: %d\n", (uint32_t)rtc_get_day());

@@ -213,7 +213,7 @@ void proc_save(struct x86_registers* proc_regs)
   thread->thread_regs.ss = proc_regs->ss;*/
   memcpy((char*)&thread->thread_regs, (char*)proc_regs, sizeof(struct x86_registers));
 
-  //if dpl0
+  //if dpl3
   if ((proc_regs->cs & 0xFF) == 0x1B)
   {
     save_ring_0_esp((uint32_t)thread->int_stack_esp);
@@ -239,7 +239,7 @@ struct x86_registers* proc_schedule(struct x86_registers* proc_regs)
   thread_t* thread = (thread_t*)threads->data;
   //printf("thread_id: %d\n", thread->thread_id);
 
-  //if dpl0
+  //if dpl3
   if ((thread->thread_regs.cs & 0xFF) == 0x1B)
   {
     save_ring_0_esp((uint32_t)thread->int_stack_esp);
