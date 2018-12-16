@@ -36,8 +36,8 @@ extern save_ring_0_esp
 global run_user_mode
 run_user_mode:
 
-  push 0xdeadbeef
-  int 1
+  ;push 0xdeadbeef
+  ;int 1
 
   mov eax, esp
   push eax
@@ -68,7 +68,7 @@ run_user_mode:
   push 0x1B
 
   ;push eip
-  push user_mode_function
+  push user_mode_function2
 
   iret
 
@@ -79,5 +79,5 @@ user_mode_function:
 
 global user_mode_function2
 user_mode_function2:
-  int 0x80
+  int 0x1
   jmp user_mode_function2
