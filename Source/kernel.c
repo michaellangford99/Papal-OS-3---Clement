@@ -58,15 +58,15 @@ void kernel_main(struct multiboot_header* mboot_header, uint32_t multiboot_magic
 	printf("isr:  0x%x\n", &irq_handler);
 	printf("main: 0x%x\n", &kernel_main);
 	printf("proc: 0x%x\n", &proc_save);
-	
-	//run_user_mode();
+
+	run_user_mode();
 
 	set_page_dpl(0x0, DPL_0);
 	set_page_dpl(0x1000, DPL_0);
 
 	set_memory_range_dpl(kernel_location, kernel_size, DPL_3);
 
-	unmap_page(kernel_location);
+	/*unmap_page(kernel_location);
 
 	printf("swapping page 0x%x, result: 0x%x\n", kernel_location, swap_page(kernel_location, kernel_location, DPL_0, PDE_PTE_RW));
 	printf("swapping page table 0x%x, result: 0x%x\n", kernel_location, swap_page_table(kernel_location, (uint32_t)kmalloc(sizeof(page_table_t)), DPL_0, PDE_PTE_RW));
