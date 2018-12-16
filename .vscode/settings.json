@@ -1,0 +1,12 @@
+{
+    "files.associations": {
+        "system.h": "c",
+        "stdbool.h": "c",
+        "stdint.h": "c",
+        "stddef.h": "c",
+        "cstdint": "c",
+        "stdarg.h": "c",
+        "types.h": "c",
+        "wordsize.h": "c"
+    }
+}
