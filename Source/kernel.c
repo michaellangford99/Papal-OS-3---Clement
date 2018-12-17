@@ -51,17 +51,20 @@ void kernel_main(struct multiboot_header* mboot_header, uint32_t multiboot_magic
 	printf("kernel_size     : 0x%x,   %d bytes,    %d KB\n", kernel_size, kernel_size, kernel_size/1024);
 	printf("kernel_end      : 0x%x,   %d bytes,    %d KB\n", kernel_end, kernel_end, kernel_end/1024);
 
-	printf("hang: 0x%x\n", &Lhang);
-	printf("user: 0x%x\n", &run_user_mode);
-	printf("ufunc:0x%x\n", &user_mode_function);
-	printf("idt:  0x%x\n", &isr_handler);
-	printf("isr:  0x%x\n", &irq_handler);
-	printf("main: 0x%x\n", &kernel_main);
-	printf("proc: 0x%x\n", &proc_save);
+	printf("hang:  0x%x\n", &Lhang);
+	printf("user:  0x%x\n", &run_user_mode);
+	printf("ufunc: 0x%x\n", &user_mode_function);
+	printf("ufunc2:0x%x\n", &user_mode_function2);
+	printf("idt:   0x%x\n", &isr_handler);
+	printf("isr:   0x%x\n", &irq_handler);
+	printf("main:  0x%x\n", &kernel_main);
+	printf("proc:  0x%x\n", &proc_save);
+
+	set_memory_range_dpl(&user_mode_function2, 1024, DPL_3);
 
 	run_user_mode();
 
-	set_page_dpl(0x0, DPL_0);
+	/*set_page_dpl(0x0, DPL_0);
 	set_page_dpl(0x1000, DPL_0);
 
 	set_memory_range_dpl(kernel_location, kernel_size, DPL_3);

@@ -154,7 +154,8 @@ void set_memory_range_dpl(uint32_t virt_address, uint32_t length, uint8_t privil
 
     for (uint32_t i = 0; i < page_count; i++)
     {
-      set_page_dpl(virt_address + i*PAGE_SIZE, privilege_level);
+      set_page_dpl(aligned_address + i*PAGE_SIZE, privilege_level);
+      //printf("paging.c - set_memory_range_dpl: virt_address=0x%x, page address=0x%x, privilege_level=0x%x\n", aligned_address, aligned_address+i*PAGE_SIZE, privilege_level);
     }
 }
 void set_page_dpl(uint32_t virt_address, uint8_t privilege_level) {
