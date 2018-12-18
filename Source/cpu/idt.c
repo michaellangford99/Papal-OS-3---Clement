@@ -229,13 +229,39 @@ uint32_t isr_handler(struct x86_registers *regs)
 		}
 	}
 
+	//_breakpoint();
+
 	//graphics_update_fb();
 	//interrupt_block();
 
 	proc_save(regs);
 
-	printf("call recieved\n");
+	//printf("call recieved\n");
+	
+	/*printf("esp rcvd: 0x%x                      \n", (uint32_t)regs);
+	printf("gs        0x%x                      \n", regs->gs);
+	printf("fs        0x%x                      \n", regs->fs);
+	printf("es        0x%x                      \n", regs->es);
+	printf("ds        0x%x                      \n", regs->ds);
 
+	printf("edi       0x%x                      \n", regs->edi);
+	printf("esi       0x%x                      \n", regs->esi);
+	printf("ebp       0x%x                      \n", regs->ebp);
+	printf("esp       0x%x                      \n", regs->esp);
+	printf("ebx       0x%x                      \n", regs->ebx);
+	printf("edx       0x%x                      \n", regs->edx);
+	printf("ecx       0x%x                      \n", regs->ecx);
+	printf("eax       0x%x                      \n", regs->eax);
+
+	printf("int_no    0x%x                      \n", regs->int_no);
+	printf("err_code  0x%x                      \n", regs->err_code);
+
+	printf("eip       0x%x                      \n", regs->eip);
+	printf("cs        0x%x                      \n", regs->cs);
+	printf("eflags    0x%x                      \n", regs->eflags);
+	printf("useresp   0x%x                      \n", regs->useresp);
+	printf("ss        0x%x                      \n", regs->ss);
+*/
 	return (uint32_t)regs;
 }
 

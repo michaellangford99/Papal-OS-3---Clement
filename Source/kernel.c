@@ -60,16 +60,21 @@ void kernel_main(struct multiboot_header* mboot_header, uint32_t multiboot_magic
 	printf("main:  0x%x\n", &kernel_main);
 	printf("proc:  0x%x\n", &proc_save);
 
-	set_memory_range_dpl(&user_mode_function2, 1024, DPL_3);
+	set_memory_range_dpl((uint32_t)&user_mode_function2, 1024, DPL_3);
 
-	run_user_mode();
+	pm_new_thread((uint32_t*)&user_mode_function2, 1024, PM_PL3);
+	pm_new_thread((uint32_t*)&user_mode_function2, 1024, PM_PL3);
+	pm_new_thread((uint32_t*)&user_mode_function2, 1024, PM_PL0);
+	pm_new_thread((uint32_t*)&user_mode_function2, 1024, PM_PL0);
+
+	//run_user_mode();
 
 	/*set_page_dpl(0x0, DPL_0);
 	set_page_dpl(0x1000, DPL_0);
 
 	set_memory_range_dpl(kernel_location, kernel_size, DPL_3);
 
-	/*unmap_page(kernel_location);
+	unmap_page(kernel_location);
 
 	printf("swapping page 0x%x, result: 0x%x\n", kernel_location, swap_page(kernel_location, kernel_location, DPL_0, PDE_PTE_RW));
 	printf("swapping page table 0x%x, result: 0x%x\n", kernel_location, swap_page_table(kernel_location, (uint32_t)kmalloc(sizeof(page_table_t)), DPL_0, PDE_PTE_RW));
@@ -89,8 +94,8 @@ void kernel_main(struct multiboot_header* mboot_header, uint32_t multiboot_magic
 
 	//fs_format(1, FS_FAT16);
 	//pm_new_thread((uint32_t*)&user_mode_function, 1024, PM_PL3);
-	//pm_new_thread((uint32_t*)&user_mode_function2, 1024, PM_PL3);
-	/*pm_new_thread((uint32_t*)thread_3, 1024);
+	pm_new_thread((uint32_t*)&user_mode_function2, 1024, PM_PL3);
+	pm_new_thread((uint32_t*)thread_3, 1024);
 	pm_new_thread((uint32_t*)thread_4, 1024);
     */
 

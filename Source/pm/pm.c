@@ -58,6 +58,9 @@ int pm_init()
   tss.esp0 = int_stack.stack_esp;
   tss.ss0 = 0x00000010;
 
+  //tss.esp0 = (uint32_t)kmalloc(1024);
+  //set_memory_range_dpl(tss.esp0, 1023, DPL_0);
+
   load_TSS((uint32_t*)&tss, sizeof(struct x86_tss));
 
   return 0;
@@ -124,7 +127,10 @@ int pm_new_thread(uint32_t* entry_point, uint32_t stack_size, uint32_t privelege
     thread->thread_regs.es = 0x00000023;
     thread->thread_regs.ds = 0x00000023;
 
+    //stack will be clobbered otherwise by attempting to switch to an esp already in use because of TSS stack switch
     thread->int_stack_esp = kmalloc(1024);
+    
+    set_memory_range_dpl(thread->thread_regs.ebp, stack_size, DPL_3);
   }
   thread->thread_regs.eflags = 0x202;//?fv2
 
@@ -182,12 +188,18 @@ int pm_new_thread(uint32_t* entry_point, uint32_t stack_size, uint32_t privelege
   printf("ss:          0x%x\n", thread->thread_regs.ss);
   //*/
   //unlock(&proc_table_lock);
+
+  //_breakpoint();
+
   interrupt_unblock();
   return thread->thread_id;
 }
 
 void proc_save(struct x86_registers* proc_regs)
 {
+
+  //_breakpoint();
+
   thread_t* thread = (thread_t*)threads->data;
 
   //tss.esp0 = int_stack.stack_esp;
