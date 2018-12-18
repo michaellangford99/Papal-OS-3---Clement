@@ -322,7 +322,6 @@ _isr_stub:
   mov [int_stack], esp
   mov [int_stack+4], ebp
 
-
   ;mov [tss+4], esp
 
   ;reload process stack
@@ -522,7 +521,6 @@ _irq_stub:
   mov [int_stack], esp
   mov [int_stack+4], ebp
 
-
   ;mov [tss+4], esp
 
   ;reload process stack
@@ -538,3 +536,8 @@ _irq_stub:
   sti
 
   iret
+
+global _breakpoint
+_breakpoint:
+  int 0x01
+ret

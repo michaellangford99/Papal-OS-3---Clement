@@ -51,5 +51,5 @@ void wait(int seconds);
 void cpuid(int code, uint32_t* a, uint32_t* d);
 uint64_t rdtsc();
 unsigned long read_cr0(void);
-
+extern void _breakpoint(void);
 #endif
