@@ -3,7 +3,6 @@
 extern uint32_t Lhang;
 extern uint32_t user_mode_function;
 extern uint32_t user_mode_function2;
-extern void run_user_mode();
 
 void kernel_main(struct multiboot_header* mboot_header, uint32_t multiboot_magic) {
 
@@ -52,7 +51,6 @@ void kernel_main(struct multiboot_header* mboot_header, uint32_t multiboot_magic
 	printf("kernel_end      : 0x%x,   %d bytes,    %d KB\n", kernel_end, kernel_end, kernel_end/1024);
 
 	printf("hang:  0x%x\n", &Lhang);
-	printf("user:  0x%x\n", &run_user_mode);
 	printf("ufunc: 0x%x\n", &user_mode_function);
 	printf("ufunc2:0x%x\n", &user_mode_function2);
 	printf("idt:   0x%x\n", &isr_handler);
@@ -66,6 +64,119 @@ void kernel_main(struct multiboot_header* mboot_header, uint32_t multiboot_magic
 	pm_new_thread((uint32_t*)&user_mode_function2, 1024, PM_PL3);
 	pm_new_thread((uint32_t*)&user_mode_function2, 1024, PM_PL0);
 	pm_new_thread((uint32_t*)&user_mode_function2, 1024, PM_PL0);
+
+	/*
+	mboot_header = multiboot_get_address();
+
+	mboot_mod_desc_t* mod_info = (mboot_mod_desc_t*)(mboot_header->mods_addr + (1*sizeof(mboot_mod_desc_t)));
+
+	int width = 0;
+	int height = 0;
+
+	uint8_t offset = 0;
+
+	uint8_t* header = (uint8_t*)mod_info->start;
+
+	//get past P6
+	while(true)
+	{
+		if (header[offset] == '\n')
+		{
+			offset++;
+			break;
+		}
+		offset++;
+	}
+
+	printf("offset = %d\n", offset);
+
+	if (header[offset] == '#')
+	{
+		while (true)
+		{
+			offset++;
+			if ((header[offset] == '\r') || (header[offset] == '\t') || (header[offset] == '\n'))
+			{
+				offset++;
+				break;
+			}
+		}
+	}
+
+	//get past first dimension
+	while(true)
+	{
+		if (header[offset] == ' ')
+		{
+			offset++;
+			break;
+		}
+		width = width*10 + (header[offset] - 48);
+		printf("    width = %d, %c\n", width, header[offset]);
+		offset++;
+	}
+
+	printf("offset = %d\n", offset);
+	printf("width = %d\n", width);
+
+	//get past second dimension
+	while(true)
+	{
+		if (header[offset] == '\n')
+		{
+			offset++;
+			break;
+		}		
+		height = height*10 + (header[offset] - 48);	
+		printf("    height = %d, %c\n", height, header[offset]);
+		offset++;
+	}
+
+	printf("offset = %d\n", offset);	
+	printf("height = %d\n", height);
+
+	//get past last dimension
+	while(true)
+	{
+		if (header[offset] == '\n')
+		{
+			offset++;
+			break;
+		}
+		offset++;
+	}
+
+	//offset+= 3;
+
+	printf("offset = %d\n", offset);
+
+	uint8_t* data = (uint8_t*)(mod_info->start + offset);
+
+	int index = 0;
+	for (int y = 0; y < height; y++)
+	{
+		for (int x = 0; x < width; x++)
+		{
+			uint8_t r = 0;
+			uint8_t g = 0;
+			uint8_t b = 0;
+
+			r = data[index];
+
+			index++;
+
+			g = data[index];
+
+			index++;
+
+			b = data[index];
+
+			index++;
+
+			putpixel(15 + x, (get_display_size().y-(height+15)) + y, create_24bit_color(r, g, b));
+		}
+	}
+	*/
 
 	//run_user_mode();
 
