@@ -13,8 +13,8 @@ int load_ramdisk(struct multiboot_header* mboot_header)
     {
     	mboot_mod_desc_t* mod_info = (mboot_mod_desc_t*)(mboot_header->mods_addr + (i*sizeof(mboot_mod_desc_t)));
       
-      printf("....module %d start : %d, '%s'\n", i, mod_info->start, mod_info->start);
-      printf("....module %d end : %d, '%s'\n", i, mod_info->end, mod_info->end);
+      printf("....module %d start : %d\n", i, mod_info->start);
+      printf("....module %d end : %d\n", i, mod_info->end);
       printf("....module %d string : %d, '%s'\n", i, mod_info->string, mod_info->string);
       printf("\n");
     }
