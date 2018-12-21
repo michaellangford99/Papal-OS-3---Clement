@@ -169,6 +169,9 @@ int memory_init(struct multiboot_header* mboot_header)
 
 uint32_t* kmalloc(uint32_t length)
 {
+  if (length <= HEAP_CHUNK_DATA_SIZE)
+    return heap_alloc(length);
+
   uint32_t mem_blocks = (length / MEM_MNGR_SLOT_SIZE);  //number of blocks needed to grant requested memory
   if (length % MEM_MNGR_SLOT_SIZE != 0)            // if it isn't a multiple of 4K, add a block to the amount of needed blocks
     mem_blocks += 1;
@@ -192,7 +195,7 @@ uint32_t* kmalloc(uint32_t length)
     {
       //printf("found free block corresponding to address %d\n", i * 4096);
       //if we find a free block, keep going until we find the proper number...
-      for (uint32_t j = 0; j < mem_blocks; j++)
+      for (uint32_t j = 0; (j < mem_blocks) && ((i+j) < MEM_MNGR_SIZE_OF_MEMORY_BITMAP); j++)
       {
 
         if (test_block(i + j) != MEM_MNGR_FREE_SLOT)

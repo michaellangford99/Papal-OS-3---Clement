@@ -206,7 +206,6 @@ void set_page_table_present(uint32_t virt_address, uint8_t present) {
   if (pd[pdindex].page_dir_entry_bits.present != PDE_PTE_PRESENT)
     return;
 
-  //mask out the user/supervisor mode bit and combine with privilege_level
   pd[pdindex].page_dir_entry_bits.present = present;
 }
 void set_page_present(uint32_t virt_address, uint8_t present) {
@@ -225,7 +224,6 @@ void set_page_present(uint32_t virt_address, uint8_t present) {
   if (pt[ptindex].page_table_entry_bits.present != PDE_PTE_PRESENT)
     return;
 
-  //mask out the user/supervisor mode bit and combine with privilege_level
   pt[ptindex].page_table_entry_bits.present = present;
 }
 void unmap_page(uint32_t virt_address) {

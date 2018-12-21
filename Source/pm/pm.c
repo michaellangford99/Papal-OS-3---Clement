@@ -80,7 +80,7 @@ int pm_new_thread(uint32_t* entry_point, uint32_t stack_size, uint32_t privelege
   int index = list_add_node(threads, 0);
   node_t* new_thread_node = list_access_node(threads, index);
 
-  new_thread_node->data = (uint32_t*)kmalloc(sizeof(thread_t));    //pointer to thread descriptor struct
+  new_thread_node->data = (uint32_t*)kmalloc((stack_size < 4096) ? 4096 : stack_size);    //pointer to thread descriptor struct
   thread_t* thread = (thread_t*)new_thread_node->data;
 
   thread_count++;
@@ -94,7 +94,7 @@ int pm_new_thread(uint32_t* entry_point, uint32_t stack_size, uint32_t privelege
   thread->thread_regs.esi = 0;
 
   //allocate stack
-  thread->thread_regs.ebp = (uint32_t)kmalloc(stack_size);
+  thread->thread_regs.ebp = (uint32_t)kmalloc(4096);
   thread->thread_regs.esp = thread->thread_regs.ebp + stack_size - PM_ESP_OFFSET;
   thread->thread_regs.useresp = thread->thread_regs.esp;
 
@@ -128,7 +128,7 @@ int pm_new_thread(uint32_t* entry_point, uint32_t stack_size, uint32_t privelege
     thread->thread_regs.ds = 0x00000023;
 
     //stack will be clobbered otherwise by attempting to switch to an esp already in use because of TSS stack switch
-    thread->int_stack_esp = kmalloc(1024);
+    thread->int_stack_esp = kmalloc(4096);
     
     set_memory_range_dpl(thread->thread_regs.ebp, stack_size, DPL_3);
   }
@@ -158,7 +158,9 @@ int pm_new_thread(uint32_t* entry_point, uint32_t stack_size, uint32_t privelege
   thread_esp[17] = thread->thread_regs.fs;
   thread_esp[18] = thread->thread_regs.gs;
   */
-  //*
+
+  printf("starting new proc: %d, with DPL %d\n", thread_count, privelege);
+  /*
   printf("dumping registers of new proc: %d\n", thread_count);
 
   printf("gs:          0x%x\n", thread->thread_regs.gs);
@@ -186,7 +188,7 @@ int pm_new_thread(uint32_t* entry_point, uint32_t stack_size, uint32_t privelege
   printf("cs:          0x%x\n", thread->thread_regs.cs);
   printf("eflags:      0x%x\n", thread->thread_regs.eflags);
   printf("ss:          0x%x\n", thread->thread_regs.ss);
-  //*/
+  */
   //unlock(&proc_table_lock);
 
   //_breakpoint();
