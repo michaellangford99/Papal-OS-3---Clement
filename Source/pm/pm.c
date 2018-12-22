@@ -80,7 +80,7 @@ int pm_new_thread(uint32_t* entry_point, uint32_t stack_size, uint32_t privelege
   int index = list_add_node(threads, 0);
   node_t* new_thread_node = list_access_node(threads, index);
 
-  new_thread_node->data = (uint32_t*)kmalloc((stack_size < 4096) ? 4096 : stack_size);    //pointer to thread descriptor struct
+  new_thread_node->data = (uint32_t*)kmalloc(sizeof(thread_t));    //pointer to thread descriptor struct
   thread_t* thread = (thread_t*)new_thread_node->data;
 
   thread_count++;
@@ -94,7 +94,7 @@ int pm_new_thread(uint32_t* entry_point, uint32_t stack_size, uint32_t privelege
   thread->thread_regs.esi = 0;
 
   //allocate stack
-  thread->thread_regs.ebp = (uint32_t)kmalloc(4096);
+  thread->thread_regs.ebp = (uint32_t)kmalloc((stack_size < 4096) ? 4096 : stack_size);
   thread->thread_regs.esp = thread->thread_regs.ebp + stack_size - PM_ESP_OFFSET;
   thread->thread_regs.useresp = thread->thread_regs.esp;
 
