@@ -37,7 +37,6 @@ user_mode_function:
 
 global user_mode_function2
 user_mode_function2:
-  push 0xdeadbeef
+  mov eax, esp
   int 0x80
-  pop eax
   jmp user_mode_function2

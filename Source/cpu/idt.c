@@ -188,7 +188,7 @@ void isr_init()
 	idt_set_gate(31, (uint32_t)_isr31, isr_flags, isr_segment);
 	idt_set_gate(0x80, (uint32_t)_isr0x80, isr_flags, isr_segment);
 }
-uint32_t test;
+
 uint32_t isr_handler(struct x86_registers *regs)
 {
 	interrupt_block();
@@ -224,7 +224,6 @@ uint32_t isr_handler(struct x86_registers *regs)
 		graphics_update_fb();
 		while(true)
 		{
-			test++;
 			graphics_update_fb();
 		}
 	}
@@ -236,8 +235,18 @@ uint32_t isr_handler(struct x86_registers *regs)
 
 	proc_save(regs);
 
-	//printf("call recieved\n");
-	
+	/*
+	switch (regs->eax)
+	{
+		case 0:
+			//invalid
+			break;
+		case 1:
+			//exit
+			pm_kill_active_thread()
+			break;
+	}*/
+
 	/*printf("esp rcvd: 0x%x                      \n", (uint32_t)regs);
 	printf("gs        0x%x                      \n", regs->gs);
 	printf("fs        0x%x                      \n", regs->fs);
@@ -262,6 +271,9 @@ uint32_t isr_handler(struct x86_registers *regs)
 	printf("useresp   0x%x                      \n", regs->useresp);
 	printf("ss        0x%x                      \n", regs->ss);
 */
+
+	regs = proc_schedule(regs);
+
 	return (uint32_t)regs;
 }
 
