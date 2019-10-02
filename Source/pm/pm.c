@@ -127,11 +127,14 @@ int pm_new_thread(uint32_t* entry_point, uint32_t stack_size, uint32_t privelege
     thread->thread_regs.es = 0x00000023;
     thread->thread_regs.ds = 0x00000023;
 
+    //TODO this looks iffy
     //stack will be clobbered otherwise by attempting to switch to an esp already in use because of TSS stack switch
     thread->int_stack_esp = kmalloc(4096);
     
     set_memory_range_dpl(thread->thread_regs.ebp, stack_size, DPL_3);
   }
+
+  thread->privilege = privelege;
   thread->thread_regs.eflags = 0x202;//?fv2
 
   //now that struct has correct registers, these must be copied onto the new stack
@@ -197,6 +200,12 @@ int pm_new_thread(uint32_t* entry_point, uint32_t stack_size, uint32_t privelege
   return thread->thread_id;
 }
 
+uint32_t proc_get_privilege_active()
+{
+  thread_t* thread = (thread_t*)threads->data;
+  return thread->privilege;
+}
+
 void proc_save(struct x86_registers* proc_regs)
 {
 
@@ -232,6 +241,15 @@ void proc_save(struct x86_registers* proc_regs)
   {
     save_ring_0_esp((uint32_t)thread->int_stack_esp);
   }
+}
+
+/*
+Kills process at tip of of linked list (process most recently running)
+*/
+void proc_kill_active()
+{
+  printf("!!Killing active process id=%d", ((thread_t*)threads->data)->thread_id);
+  list_remove_node(&threads, 0);
 }
 
 struct x86_registers* proc_schedule(struct x86_registers* proc_regs)

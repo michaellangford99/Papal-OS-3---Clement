@@ -5,7 +5,7 @@
             "forcedInclude": [
                 "${localappdata}/Packages/CanonicalGroupLimited.UbuntuonWindows_79rhkp1fndgsc/LocalState/rootfs/usr/include/stdint.h"
             ],
-            "intelliSenseMode": "clang-x64",
+            "intelliSenseMode": "gcc-x64",
             "includePath": [
                 "${workspaceRoot}",
                 "${workspaceRoot}/sysroot/usr/include",

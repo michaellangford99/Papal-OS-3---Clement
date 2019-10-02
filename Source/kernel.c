@@ -59,9 +59,10 @@ void kernel_main(struct multiboot_header* mboot_header, uint32_t multiboot_magic
 	printf("proc:  0x%x\n", &proc_save);
 
 	set_memory_range_dpl((uint32_t)&user_mode_function2, 1024, DPL_3);
+	set_memory_range_dpl((uint32_t)&user_mode_function, 1024, DPL_3);
 
 	pm_new_thread((uint32_t*)&user_mode_function2, 1024, PM_PL3);
-	pm_new_thread((uint32_t*)&user_mode_function2, 1024, PM_PL3);
+	pm_new_thread((uint32_t*)&user_mode_function, 1024, PM_PL3);
 	pm_new_thread((uint32_t*)&user_mode_function2, 1024, PM_PL0);
 	pm_new_thread((uint32_t*)&user_mode_function2, 1024, PM_PL0);
 

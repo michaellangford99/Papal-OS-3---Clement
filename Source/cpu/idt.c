@@ -194,37 +194,49 @@ uint32_t isr_handler(struct x86_registers *regs)
 	interrupt_block();
 	if ((uint32_t)regs->int_no < 32)
 	{
-		printf("unhandled ");
-		printf(error_codes[(uint8_t)regs->int_no]);
-		printf(" (0x%x), with code 0x%x\nSystem execution halted indefinitely\n", regs->int_no, regs->err_code);
-
-		printf("esp rcvd: 0x%x                      \n", (uint32_t)regs);
-		printf("gs        0x%x                      \n", regs->gs);
-		printf("fs        0x%x                      \n", regs->fs);
-		printf("es        0x%x                      \n", regs->es);
-		printf("ds        0x%x                      \n", regs->ds);
-
-		printf("edi       0x%x                      \n", regs->edi);
-		printf("esi       0x%x                      \n", regs->esi);
-		printf("ebp       0x%x                      \n", regs->ebp);
-		printf("esp       0x%x                      \n", regs->esp);
-		printf("ebx       0x%x                      \n", regs->ebx);
-		printf("edx       0x%x                      \n", regs->edx);
-		printf("ecx       0x%x                      \n", regs->ecx);
-		printf("eax       0x%x                      \n", regs->eax);
-
-		printf("int_no    0x%x                      \n", regs->int_no);
-		printf("err_code  0x%x                      \n", regs->err_code);
-
-		printf("eip       0x%x                      \n", regs->eip);
-		printf("cs        0x%x                      \n", regs->cs);
-		printf("eflags    0x%x                      \n", regs->eflags);
-		printf("useresp   0x%x                      \n", regs->useresp);
-		printf("ss        0x%x                      \n", regs->ss);
-		graphics_update_fb();
-		while(true)
+		//if process is a user process, immediately kill it and queue up the next one
+		if (proc_get_privilege_active() == PM_PL3)
 		{
+			proc_kill_active();	
+
+			regs = proc_schedule(regs);
+
+			return (uint32_t)regs;		
+		}
+		else
+		{
+			printf("unhandled ");
+			printf(error_codes[(uint8_t)regs->int_no]);
+			printf(" (0x%x), with code 0x%x\nSystem execution halted indefinitely\n", regs->int_no, regs->err_code);
+
+			printf("esp rcvd: 0x%x                      \n", (uint32_t)regs);
+			printf("gs        0x%x                      \n", regs->gs);
+			printf("fs        0x%x                      \n", regs->fs);
+			printf("es        0x%x                      \n", regs->es);
+			printf("ds        0x%x                      \n", regs->ds);
+
+			printf("edi       0x%x                      \n", regs->edi);
+			printf("esi       0x%x                      \n", regs->esi);
+			printf("ebp       0x%x                      \n", regs->ebp);
+			printf("esp       0x%x                      \n", regs->esp);
+			printf("ebx       0x%x                      \n", regs->ebx);
+			printf("edx       0x%x                      \n", regs->edx);
+			printf("ecx       0x%x                      \n", regs->ecx);
+			printf("eax       0x%x                      \n", regs->eax);
+
+			printf("int_no    0x%x                      \n", regs->int_no);
+			printf("err_code  0x%x                      \n", regs->err_code);
+
+			printf("eip       0x%x                      \n", regs->eip);
+			printf("cs        0x%x                      \n", regs->cs);
+			printf("eflags    0x%x                      \n", regs->eflags);
+			printf("useresp   0x%x                      \n", regs->useresp);
+			printf("ss        0x%x                      \n", regs->ss);
 			graphics_update_fb();
+			while(true)
+			{
+				graphics_update_fb();
+			}
 		}
 	}
 
@@ -234,6 +246,15 @@ uint32_t isr_handler(struct x86_registers *regs)
 	//interrupt_block();
 
 	proc_save(regs);
+
+	if (regs->int_no == 0x80)
+	{
+		if (regs->eax == 0xdeadbeef)
+		{
+			printf(".");
+		}
+	}
+
 
 	/*
 	switch (regs->eax)

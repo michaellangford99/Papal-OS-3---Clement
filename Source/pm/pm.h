@@ -13,6 +13,7 @@ typedef struct {
     uint32_t thread_id;
     struct x86_registers thread_regs;
     uint32_t quantum;
+    uint32_t privilege;
     uint32_t* int_stack_esp
 } thread_t;
 
@@ -26,6 +27,8 @@ int pm_init();
 void save_ring_0_esp(uint32_t ring0_esp);
 void proc_save(struct x86_registers* proc_regs);
 int pm_new_thread(uint32_t* entry_point, uint32_t stack_size, uint32_t privelege);
+uint32_t proc_get_privilege_active();
+void proc_kill_active();
 struct x86_registers* proc_schedule(struct x86_registers* proc_regs);
 
 #endif

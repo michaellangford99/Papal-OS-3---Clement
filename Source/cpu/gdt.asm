@@ -33,10 +33,12 @@ setTSS:
 global user_mode_function
 user_mode_function:
 
+  int 0x00
+
   jmp user_mode_function
 
 global user_mode_function2
 user_mode_function2:
-  mov eax, esp
+  mov eax, 0xdeadbeef
   int 0x80
   jmp user_mode_function2

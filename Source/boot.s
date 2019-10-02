@@ -23,7 +23,7 @@
 .section .bootstrap_stack, "aw", @nobits
 .global stack_bottom
 stack_bottom:
-.skip 4096 # 32 KiB
+.skip 4096 # 4 KiB
 .global stack_top
 stack_top:
 

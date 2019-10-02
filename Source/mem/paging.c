@@ -10,7 +10,7 @@ extern void invalidate_page(uint32_t*);
 int init_paging() {
   printf("init_paging\n");
   //allocate 4KB for page directory
-
+  
   page_directory_entries = (page_directory_entry_t*)kmalloc(1024*4);
   page_tables = (page_table_t*)kmalloc(1024 * sizeof(page_table_t));
 
